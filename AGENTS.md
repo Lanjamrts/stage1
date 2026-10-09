@@ -1,7 +1,7 @@
 # AGENTS.md
 
 - Stack: React + Vite + Tailwind (client) · Node.js + Express + Mongoose (server) · MongoDB local mongodb://127.0.0.1:27017/sigbd.
-- Monorepo: /server et /client. Tout le texte utilisateur est en FRANÇAIS; code, commentaires, noms de fichiers en ANGLAIS
+- Monorepo: /backend et /frontend. Tout le texte utilisateur est en FRANÇAIS; code, commentaires, noms de fichiers en ANGLAIS
 - Cinq rôles: client (saisit), admin2 (valide/rejette/exporte, région), admin1 (utilisateurs/collecte/journal, central), developpeur (paramétrage/remarques/journal), consultant (lecture seule).
 - Machine à états: brouillon -> soumise (client), rejetee -> soumise (client), soumise -> validee|rejetee(admin2), validee -> exportee(admin2), exportee -> archivee( système). Tout autre => 409.
 - Permissions appliquées par le serveur sur chaque requête (rôle + périmètre): 403 mauvais rôle, 404 hors périmètre.

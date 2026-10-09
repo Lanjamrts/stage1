@@ -1,5 +1,5 @@
 // Sources de listes de référence utilisées par les champs select/multiselect
-// (miroir de server/src/services/moduleMeta.js — même structure que shared/rules)
+// (miroir de backend/src/services/moduleMeta.js — même structure que shared/rules)
 export function sourcesOf(fields) {
   const out = new Set();
   const walk = (list) => {

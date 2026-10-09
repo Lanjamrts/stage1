@@ -1,7 +1,7 @@
 // SIGBD — Règles de validation partagées navigateur / serveur.
 // MÊMES règles des deux côtés (SPEC §7). Le navigateur affiche les messages
 // instantanément, le serveur reste la vérité finale.
-// Fichier ESM sans dépendances, importé par /server (Node) et /client (Vite).
+// Fichier ESM sans dépendances, importé par /backend (Node) et /frontend (Vite).
 
 const REQUIRED = 'Ce champ est obligatoire.';
 

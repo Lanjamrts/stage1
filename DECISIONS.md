@@ -44,3 +44,4 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 - [P5] Mot de passe provisoire au format Xxx-Xxx-Xxx (majuscule+minuscule+chiffre par groupe), mustChangePassword=true, renvoyé une seule fois.
 - [P5] GET /audit : {id, date, action, userId, userLabel, object, ip}, 500 lignes les plus récentes ; filtre role résolu via les ObjectId + IM des utilisateurs du rôle (les échecs de connexion stockent l'IM).
 - [P5] Formulaisateur utilisateur : direction et service en saisie libre ; l'IM est immuable à l'édition.
+- [P5] Renommage des dossiers à la racine : /client → /frontend et /server → /backend (demande explicite) ; noms de package sigbd-frontend / sigbd-backend ; scripts npm inchangés (à lancer depuis chaque dossier). Les lignes historiques ci-dessus gardent l'ancien nom.

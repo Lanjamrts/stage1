@@ -8,12 +8,12 @@ Application web du Ministère de l'Économie et des Finances ( DGBF / SSEBF ). T
 - Backend: Node.js + Express ( REST API, JSON ).
 - Base de données: MongoDB locale à mongodb://127.0.0.1:27017/sigbd, accédée avec Mongoose.
 - Bibliothèques: bcrypt, jsonwebtoken, cookie-parser, helmet, express-rate-limit, express-mongo-sanitize, zod, exceljs, pdfkit, supertest + vitest ou jest.
-- Monorepo: /server et /client. Git dès le premier commit. Un README avec les instructions d'exécution.
+- Monorepo: /backend et /frontend. Git dès le premier commit. Un README avec les instructions d'exécution.
 
 ## RÉFÉRENCE VISUELLE
 - Les écrans exportés par le designer sont dans un zip: ~/sigbd/stitch_sigbd_design_system_guide.zip. Dézippé dans ./design (lecture seule). Chaque dossier contient code.html (Tailwind HTML) et screen.png. Lire design/syst_me_de_design_sigbd_dgbf/DESIGN.md pour les couleurs, polices et tokens.
 - Reproduire les mises en page, textes, couleurs et composants de ces écrans en React ( extraire les composants partagés: AppShell, Sidebar, TopBar, StatusBadge, RoleChip, DataTable, Modal, Drawer, Toast, FormField, RepeatableTable, Banner ).
-- L'emblème du Ministère est le PNG dans design/. Le copier vers client/public/emblem.png et l'utiliser de là ( jamais de hotlink externe).
+- L'emblème du Ministère est le PNG dans design/. Le copier vers frontend/public/emblem.png et l'utiliser de là ( jamais de hotlink externe).
 - QUAND UN ÉCRAN ENTRE EN CONFLIT AVEC CETTE SPÉCIFICATION, CETTE SPÉCIFICATION GAGNE. Défauts connus du zip à NE PAS copier:
  1. « Portail Client/Régional/Bénéficiaire/Déconcentré », « Exercice budgétaire… », « Ministère Éco & Fin », « Direction Générale » dans les sidebars: sidebar = emblème + « SIGBD » + menu du rôle + pied de page « DGBF · SSEBF » uniquement.
 
