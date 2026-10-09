@@ -16,6 +16,10 @@ import DonneesSaisies from './pages/admin2/DonneesSaisies.jsx';
 import RevueSaisie from './pages/admin2/RevueSaisie.jsx';
 import Consultation from './pages/admin2/Consultation.jsx';
 import RemarquesPage from './pages/RemarquesPage.jsx';
+import Admin1Dashboard from './pages/admin1/Admin1Dashboard.jsx';
+import Utilisateurs from './pages/admin1/Utilisateurs.jsx';
+import CollectePage from './pages/admin1/CollectePage.jsx';
+import AuditJournal from './pages/admin1/AuditJournal.jsx';
 import { ROUTE_ROLES } from './menus.js';
 
 // Page d'ébauche (remplacée phase par phase par les vraies pages)
@@ -35,9 +39,9 @@ const PROTECTED_ROUTES = [
   { path: '/donnees-saisies/:id', element: <RevueSaisie /> },
   { path: '/consultation', element: <Consultation /> },
   { path: '/remarques', element: <RemarquesPage /> },
-  { path: '/collecte', title: 'Collecte et téléchargement' },
-  { path: '/audit', title: "Journal d'audit" },
-  { path: '/utilisateurs', title: 'Utilisateurs' },
+  { path: '/collecte', element: <CollectePage /> },
+  { path: '/audit', element: <AuditJournal /> },
+  { path: '/utilisateurs', element: <Utilisateurs /> },
   { path: '/parametrage', title: 'Paramétrage' },
   { path: '/consultation-donnees', title: 'Consultation des données' },
 ];

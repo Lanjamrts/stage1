@@ -35,3 +35,12 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 - [P4] API remarques implémentée en entier dès la Phase 4 : POST + GET /mes (admin1/admin2) servent l'écran admin2 ; GET / et PATCH /:id/etat (developpeur) serviront la boîte de réception de la Phase 6.
 - [P4] Lignes d'audit ajoutées : download_excel, download_pdf, remarque_create, remarque_state_change.
 - [P4] La purge du seed inclut désormais la collection remarques (les utilisateurs sont recréés avec de nouveaux _id ; sinon les remarques deviennent orphelines).
+- [P5] Tableau de bord : périodes retenues = échéance atteinte ; seuls les modules « periodic » de même périodicité génèrent des emplacements attendus, pour les structures actives ayant une région (types sans structure — DRBF — ou structures sans région — SSEBF, DGBF, Cellule — non comptés).
+- [P5] « Soumise ou ultérieur » = statut différent de brouillon (rejetee incluse), comptée une fois = statut courant. Taux de rejet calculé sur toutes les saisies du périmètre (filtres module/période), pas seulement sur les emplacements attendus. « En retard » = emplacement attendu sans aucune saisie soumise ; une saisie soumise après l'échéance n'est pas comptée en retard (lecture simple de la SPEC).
+- [P5] Le consultant reçoit les mêmes calculs que admin1 sur GET /dashboard (lecture seule, aucun bouton).
+- [P5] GET /referentiels/structures?full=1 renvoie {id, label, type, region} : sert le tiroir Utilisateurs ET les cases régions/types de la page Collecte — pas de nouvel endpoint /regions.
+- [P5] Filtres /collecte : regions (noms) et types (codes) en valeurs séparées par des virgules, modules en ids séparés par des virgules. L'export accepte les mêmes filtres mais force toujours exportee+archivee (le paramètre statut est ignoré pour l'export).
+- [P5] Pas de réactivation d'utilisateur (absente de la SPEC) : seul « Désactiver » est proposé.
+- [P5] Mot de passe provisoire au format Xxx-Xxx-Xxx (majuscule+minuscule+chiffre par groupe), mustChangePassword=true, renvoyé une seule fois.
+- [P5] GET /audit : {id, date, action, userId, userLabel, object, ip}, 500 lignes les plus récentes ; filtre role résolu via les ObjectId + IM des utilisateurs du rôle (les échecs de connexion stockent l'IM).
+- [P5] Formulaisateur utilisateur : direction et service en saisie libre ; l'IM est immuable à l'édition.
