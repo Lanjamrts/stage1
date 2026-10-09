@@ -32,6 +32,7 @@ export const ROLE_MENUS = {
 export const ROUTE_ROLES = {
   '/': ['client', 'admin1', 'consultant'],
   '/mes-saisies': ['client'],
+  '/mes-saisies/:id': ['client'],
   '/donnees-saisies': ['admin2'],
   '/consultation': ['admin2'],
   '/remarques': ['admin1', 'admin2', 'developpeur'],

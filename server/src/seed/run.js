@@ -11,6 +11,10 @@ import UtilisateurModel from '../models/Utilisateur.js';
 import PeriodeModel from '../models/Periode.js';
 import ReferentielModel from '../models/Referentiel.js';
 import JournalAuditModel from '../models/JournalAudit.js';
+import ModuleModel from '../models/Module.js';
+import SaisieModel from '../models/Saisie.js';
+import { MODULES } from './modules.js';
+import { buildSaisies } from './saisies.js';
 
 dotenv.config();
 
@@ -70,6 +74,8 @@ async function seed() {
     PeriodeModel.deleteMany({}),
     ReferentielModel.deleteMany({}),
     JournalAuditModel.deleteMany({}),
+    ModuleModel.deleteMany({}),
+    SaisieModel.deleteMany({}),
   ]);
   console.log('Collections nettoyees');
 
@@ -125,10 +131,18 @@ async function seed() {
   console.log(`${referentiels.length} referentiels crees`);
 
   // 5. Periodes (3)
-  await PeriodeModel.insertMany(PERIODES);
+  const periodeDocs = await PeriodeModel.insertMany(PERIODES);
+  const periodeIdByLabel = {};
+  periodeDocs.forEach(p => { periodeIdByLabel[p.label] = p._id; });
   console.log(`${PERIODES.length} periodes creees`);
 
-  // 6. Utilisateurs (mot de passe commun "Test@2026", hash bcrypt)
+  // 6. Modules (gabarits, fields structurés)
+  const moduleDocs = await ModuleModel.insertMany(MODULES.map(m => ({ ...m, version: 1, active: true })));
+  const moduleIdByCode = {};
+  moduleDocs.forEach(m => { moduleIdByCode[m.code] = m._id; });
+  console.log(`${MODULES.length} modules cres`);
+
+  // 7. Utilisateurs (mot de passe commun "Test@2026", hash bcrypt)
   const passwordHash = await bcrypt.hash('Test@2026', 10);
   const utilisateurs = [
     { im: '104562', nom: 'Rakotoarivelo', prenom: 'Hery', direction: 'DRBF Analamanga', service: 'Service des rapports', role: 'client', structureId: structByCode['SRB-ANL'], status: 'actif', mustChangePassword: false },
@@ -142,10 +156,27 @@ async function seed() {
     { im: '125430', nom: 'Rakotonirina', prenom: 'Haja', direction: 'DRBF Analamanga', service: 'Service des rapports', role: 'client', structureId: structByCode['SRSP-ANL'], status: 'actif', mustChangePassword: true },
     { im: 'SYS-0000', nom: 'Systeme', prenom: 'SIGBD', direction: 'DGBF', service: 'Cellule Informatique', role: 'developpeur', structureId: structByCode['CELLULE_INFO'], status: 'actif', mustChangePassword: false },
   ];
-  await UtilisateurModel.insertMany(
+  const userDocs = await UtilisateurModel.insertMany(
     utilisateurs.map(u => ({ ...u, passwordHash, failedAttempts: 0, lockedUntil: null }))
   );
+  const userIdByIm = {};
+  const actorLabelByIm = {};
+  userDocs.forEach(u => {
+    userIdByIm[u.im] = u._id;
+    actorLabelByIm[u.im] = `${u.prenom} ${u.nom}`;
+  });
   console.log(`${utilisateurs.length} utilisateurs crees`);
+
+  // 8. Saisies de depart (divers statuts — SPEC §9)
+  const saisies = buildSaisies({
+    moduleIdByCode,
+    structureIdByCode: structByCode,
+    userIdByIm,
+    periodeIdByLabel,
+    actorLabelByIm,
+  });
+  await SaisieModel.insertMany(saisies);
+  console.log(`${saisies.length} saisies creees`);
 
   await mongoose.disconnect();
   console.log('Seed termine avec succes.');

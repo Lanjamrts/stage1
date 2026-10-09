@@ -10,6 +10,8 @@ import mongoose from 'mongoose';
 
 import authRoutes from './routes/auth.js';
 import moduleRoutes from './routes/modules.js';
+import referentielRoutes from './routes/referentiels.js';
+import periodeRoutes from './routes/periodes.js';
 import saisieRoutes from './routes/saisies.js';
 import collecteRoutes from './routes/collectes.js';
 import consultationRoutes from './routes/consultations.js';
@@ -50,6 +52,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api', requireAuth());
 
 app.use('/api/modules', moduleRoutes);
+app.use('/api/referentiels', referentielRoutes);
+app.use('/api/periodes', periodeRoutes);
 app.use('/api/saisies', saisieRoutes);
 app.use('/api/collecte', collecteRoutes);
 app.use('/api/consultation', consultationRoutes);

@@ -20,3 +20,12 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 - [P1] L'auteur « système » du seed est un utilisateur technique de rôle developpeur (im SYS-0000) créé en base.
 - [P1] L'environnement utilise ES modules ("type": "module") côté serveur; Vite côté client.
 - [P1] Le cookie de session sera httpOnly + sameSite=strict + secure selon NODE_ENV (décision Phase 2, consignée maintenant).
+- [P3] Le DSL de la SPEC (key:type!) est une notation d'écriture : en base, modules.fields est un JSON structuré {key,label,type,required,…) ; pas de parseur DSL.
+- [P3] Règles communes navigateur/serveur placées dans /shared/rules.mjs (ESM sans dépendances) ; Vite autorisé via server.fs.allow ['..'].
+- [P3] Messages français non fournis par la SPEC : maxLength « Ce champ ne doit pas dépasser N caractères. », entier/nombre, tableau « Ce tableau doit contenir au moins une ligne. », select « Cette valeur n'est pas autorisée. », afterField « La date doit être postérieure ou égale à {libellé}. », transition « Cette transition n'est pas autorisée. », édition « Cette saisie ne peut plus être modifiée. ».
+- [P3] GET /api/periodes ajouté (indispensable au choix de période de la modale « Nouvelle saisie » ; la SPEC ne listait pas d'endpoint périodes).
+- [P3] GET /api/referentiels/structures sert les libellés des structures actives (source du multiselect « structures » du CRGP).
+- [P3] Période courante d'un module = période de sa périodicité dont start <= aujourd'hui la plus récente (Octobre 2026 / T3 2026 avec les données du seed).
+- [P3] 4 compteurs du tableau de bord client : Total saisies, Brouillons, Soumises, Rejetées.
+- [P3] Les routes de transition admin2 (valider/rejeter/exporter) sont implémentées côté API dès la Phase 3 (droits et machine à états vérifiables) ; l'UI arrive en Phase 4.
+- [P3] admin1 voit les métadonnées de toutes les saisies mais values=null hors exportee/archivee (appliqué dès la Phase 3 dans la lecture API).

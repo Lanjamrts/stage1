@@ -17,9 +17,11 @@ const saisieSchema = new mongoose.Schema(
     values: { type: mongoose.Schema.Types.Mixed, default: {} }, // JSON de la saisie
     validations: [
       {
-        decision: { type: String, enum: ['validee', 'rejetee'] },
-        motif: { type: String }, // seulement rejetee, requis 1-500
+        // Une entrée par transition : soumise, validee, rejetee, exportee (SPEC §2)
+        decision: { type: String, enum: ['soumise', 'validee', 'rejetee', 'exportee'], required: true },
+        motif: { type: String }, // requis 1-500 seulement pour rejetee
         actorId: { type: mongoose.Schema.Types.ObjectId, ref: 'Utilisateur' },
+        actorLabel: { type: String },
         date: { type: Date, default: Date.now },
       },
     ],
@@ -33,10 +35,9 @@ const saisieSchema = new mongoose.Schema(
 );
 
 // Index unique pour les modules périodiques :
-// Une saisie unique par (structureId, moduleId, periodeId)
-// MAIS les modules d'événements (type événement) n'ont pas de période ; ils n'ont pas d'index
-// Pour simplifier, nous allons ajouter un index unique conditionnel plus tard via le seed ou la base de données.
-// Pour le moment, nous ajoutons un index simple.
+// Une saisie unique par (structureId, moduleId, periodeId).
+// Les modules d'événements n'ont pas de periodeId : ils ne sont pas concernés
+// (partialFilterExpression ne s'applique qu'aux documents qui ont un periodeId).
 saisieSchema.index({ structureId: 1, moduleId: 1, periodeId: 1 }, { unique: true, partialFilterExpression: { periodeId: { $exists: true } } });
 
 export default mongoose.model('Saisie', saisieSchema);

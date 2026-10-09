@@ -9,6 +9,9 @@ import ChangePasswordPage from './components/Auth/ChangePasswordPage.jsx';
 import AppShell from './components/Layout/AppShell.jsx';
 import AccessDenied from './pages/AccessDenied.jsx';
 import SessionExpired from './pages/SessionExpired.jsx';
+import HomePage from './pages/HomePage.jsx';
+import MesSaisies from './pages/client/MesSaisies.jsx';
+import SaisieDetail from './pages/client/SaisieDetail.jsx';
 import { ROUTE_ROLES } from './menus.js';
 
 // Page d'ébauche (remplacée phase par phase par les vraies pages)
@@ -21,8 +24,9 @@ const PlaceholderPage = ({ title }) => (
 
 // Routes protégées par rôle, rendues dans l'AppShell
 const PROTECTED_ROUTES = [
-  { path: '/', title: 'Tableau de bord' },
-  { path: '/mes-saisies', title: 'Mes saisies' },
+  { path: '/', element: <HomePage /> },
+  { path: '/mes-saisies', element: <MesSaisies /> },
+  { path: '/mes-saisies/:id', element: <SaisieDetail /> },
   { path: '/donnees-saisies', title: 'Données saisies' },
   { path: '/consultation', title: 'Consultation et téléchargement' },
   { path: '/remarques', title: 'Remarques' },
@@ -61,7 +65,7 @@ export default function App() {
               element={
                 <RoleGuard roles={ROUTE_ROLES[r.path]}>
                   <AppShell>
-                    <PlaceholderPage title={r.title} />
+                    {r.element || <PlaceholderPage title={r.title} />}
                   </AppShell>
                 </RoleGuard>
               }
