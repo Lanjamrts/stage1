@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { api, formatDateTime } from '../../api.js';
+import { api, formatDateTime, formatTime } from '../../api.js';
 import StatusBadge from '../../components/Common/StatusBadge.jsx';
 
 const STATUS_OPTIONS = [
@@ -22,6 +22,7 @@ export default function MesSaisies() {
   const [periodes, setPeriodes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [syncAt, setSyncAt] = useState(null);
 
   const statut = searchParams.get('statut') || '';
   const moduleId = searchParams.get('module') || '';
@@ -46,6 +47,7 @@ export default function MesSaisies() {
         if (!cancelled) {
           setSaisies(data);
           setError(null);
+          setSyncAt(new Date());
         }
       })
       .catch((err) => {
@@ -83,6 +85,21 @@ export default function MesSaisies() {
   const filterSelect =
     'h-[40px] px-3 rounded-lg border border-[#D6DCE5] bg-white text-sm min-w-[180px]';
 
+  // État « aucun résultat » (zip d3) : récapitulatif des filtres appliqués.
+  const appliedChips = [];
+  if (moduleId) {
+    const m = modules.find((x) => x.id === moduleId);
+    appliedChips.push({ key: 'module', label: `Module : ${m ? m.label : moduleId}` });
+  }
+  if (periodeId) {
+    const p = periodes.find((x) => x.id === periodeId);
+    appliedChips.push({ key: 'periode', label: `Période : ${p ? p.label : periodeId}` });
+  }
+  if (statut) {
+    const opt = STATUS_OPTIONS.find(([v]) => v === statut);
+    appliedChips.push({ key: 'statut', label: `Statut : ${opt ? opt[1] : statut}` });
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
@@ -95,8 +112,9 @@ export default function MesSaisies() {
             Retrouvez toutes vos saisies et leur état d'avancement.
           </p>
         </div>
-        <span className="inline-flex items-center rounded-full bg-[#EBF3FC] border border-[#B8D2EF] px-3 py-1 text-[13px] font-semibold text-[#1F5FA8]">
-          {saisies.length} saisie{saisies.length > 1 ? 's' : ''} enregistrée{saisies.length > 1 ? 's' : ''}
+        <span className="text-sm text-[#5B6778]">
+          <span aria-hidden>🕘</span> Dernière synchronisation :{' '}
+          {syncAt ? `Aujourd'hui à ${formatTime(syncAt)}` : '—'}
         </span>
       </div>
 
@@ -150,6 +168,27 @@ export default function MesSaisies() {
         )}
       </div>
 
+      {/* Filtres appliqués + compteur (zip d3) */}
+      {hasFilters && (
+        <div className="flex flex-wrap items-center gap-2 text-sm">
+          <span className="text-[#5B6778] font-medium">Filtres appliqués :</span>
+          {appliedChips.map((c) => (
+            <button
+              key={c.key}
+              onClick={() => setParam(c.key, '')}
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#D6DCE5] bg-[#F5F7FA] px-3 py-1 text-[13px] text-[#1A2433] hover:bg-[#E3E8EF]"
+              title="Retirer ce filtre"
+            >
+              {c.label} <span aria-hidden>×</span>
+            </button>
+          ))}
+          <span className="text-[#5B6778] ml-1">
+            {saisies.length} enregistrement{saisies.length > 1 ? 's' : ''} trouvé
+            {saisies.length > 1 ? 's' : ''}
+          </span>
+        </div>
+      )}
+
       {error && (
         <div className="rounded-lg border border-[#F6C7C3] bg-[#FEF3F2] px-4 py-3 text-sm text-[#B42318]">
           {error}
@@ -187,12 +226,20 @@ export default function MesSaisies() {
                         <p className="text-[#8A94A6] text-sm mt-1">
                           Modifiez ou réinitialisez les filtres pour afficher vos saisies.
                         </p>
-                        <button
-                          onClick={() => setSearchParams({})}
-                          className="mt-4 h-[40px] px-5 rounded-lg border border-[#E3E8EF] text-sm font-semibold hover:bg-[#F5F7FA]"
-                        >
-                          Réinitialiser les filtres
-                        </button>
+                        <div className="mt-4 flex flex-wrap justify-center gap-3">
+                          <button
+                            onClick={() => setSearchParams({})}
+                            className="h-[40px] px-5 rounded-lg border border-[#E3E8EF] text-sm font-semibold hover:bg-[#F5F7FA]"
+                          >
+                            Réinitialiser les filtres
+                          </button>
+                          <button
+                            onClick={() => navigate('/')}
+                            className="h-[40px] px-5 rounded-lg bg-[#1F5FA8] hover:bg-[#174C87] text-white text-sm font-semibold"
+                          >
+                            Créer une nouvelle saisie
+                          </button>
+                        </div>
                       </>
                     ) : (
                       <>
@@ -200,7 +247,8 @@ export default function MesSaisies() {
                           Vous n'avez encore aucune saisie
                         </p>
                         <p className="text-[#8A94A6] text-sm mt-1">
-                          Vos saisies apparaîtront ici dès que vous aurez commencé un module.
+                          Vos saisies apparaîtront ici dès que vous aurez commencé un module
+                          budgétaire ou complété un bordereau régional.
                         </p>
                         <button
                           onClick={() => navigate('/')}
@@ -208,6 +256,11 @@ export default function MesSaisies() {
                         >
                           Aller au tableau de bord
                         </button>
+                        <p className="text-[13px] text-[#8A94A6] mt-5">
+                          <span className="font-semibold text-[#5B6778]">Aide à la complétion</span>{' '}
+                          — Besoin d'accompagnement pour démarrer une saisie de dotation ?
+                          Contactez le délégué régional DGBF.
+                        </p>
                       </>
                     )}
                   </td>

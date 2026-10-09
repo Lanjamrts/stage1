@@ -26,14 +26,6 @@ import Parametrage from './pages/dev/Parametrage.jsx';
 import GabaritEditeur from './pages/dev/GabaritEditeur.jsx';
 import { ROUTE_ROLES } from './menus.js';
 
-// Page d'ébauche (remplacée phase par phase par les vraies pages)
-const PlaceholderPage = ({ title }) => (
-  <div className="bg-white rounded-xl border border-[#E3E8EF] p-6 shadow-sm">
-    <h1 className="text-[20px] font-semibold text-[#0B2A4A]">{title}</h1>
-    <p className="text-[#5B6778] mt-2">Contenu de cette page (à implémenter)</p>
-  </div>
-);
-
 // Routes protégées par rôle, rendues dans l'AppShell
 const PROTECTED_ROUTES = [
   { path: '/', element: <HomePage /> },
@@ -80,7 +72,7 @@ export default function App() {
               element={
                 <RoleGuard roles={ROUTE_ROLES[r.path]}>
                   <AppShell>
-                    {r.element || <PlaceholderPage title={r.title} />}
+                    {r.element}
                   </AppShell>
                 </RoleGuard>
               }

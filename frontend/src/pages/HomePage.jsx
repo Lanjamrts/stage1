@@ -16,15 +16,11 @@ export default function HomePage() {
       .catch(() => setRole(null));
   }, []);
 
+  // '/' est réservé (ROUTE_ROLES) à client, admin1 et consultant ; les autres
+  // rôles atterrissent sur leur page (SPEC §4) et ne passent jamais ici.
   if (role === 'client') return <ClientDashboard />;
   if (role === 'admin1') return <Admin1Dashboard />;
   if (role === 'consultant') return <Admin1Dashboard readOnly />;
   if (role === null) return <div className="text-[#5B6778]">Chargement...</div>;
-
-  return (
-    <div className="bg-white rounded-xl border border-[#E3E8EF] p-6 shadow-sm">
-      <h1 className="text-[20px] font-semibold text-[#0B2A4A]">Tableau de bord</h1>
-      <p className="text-[#5B6778] mt-2">Contenu de cette page (à implémenter)</p>
-    </div>
-  );
+  return null;
 }
