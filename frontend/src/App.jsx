@@ -20,6 +20,10 @@ import Admin1Dashboard from './pages/admin1/Admin1Dashboard.jsx';
 import Utilisateurs from './pages/admin1/Utilisateurs.jsx';
 import CollectePage from './pages/admin1/CollectePage.jsx';
 import AuditJournal from './pages/admin1/AuditJournal.jsx';
+import ConsultationDonnees from './pages/consultant/ConsultationDonnees.jsx';
+import ConsultationRapport from './pages/consultant/ConsultationRapport.jsx';
+import Parametrage from './pages/dev/Parametrage.jsx';
+import GabaritEditeur from './pages/dev/GabaritEditeur.jsx';
 import { ROUTE_ROLES } from './menus.js';
 
 // Page d'ébauche (remplacée phase par phase par les vraies pages)
@@ -42,8 +46,10 @@ const PROTECTED_ROUTES = [
   { path: '/collecte', element: <CollectePage /> },
   { path: '/audit', element: <AuditJournal /> },
   { path: '/utilisateurs', element: <Utilisateurs /> },
-  { path: '/parametrage', title: 'Paramétrage' },
-  { path: '/consultation-donnees', title: 'Consultation des données' },
+  { path: '/parametrage', element: <Parametrage /> },
+  { path: '/parametrage/:id', element: <GabaritEditeur /> },
+  { path: '/consultation-donnees', element: <ConsultationDonnees /> },
+  { path: '/consultation-donnees/:id', element: <ConsultationRapport /> },
 ];
 
 export default function App() {

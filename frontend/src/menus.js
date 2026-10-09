@@ -41,7 +41,9 @@ export const ROUTE_ROLES = {
   '/audit': ['admin1', 'developpeur'],
   '/utilisateurs': ['admin1'],
   '/parametrage': ['developpeur'],
+  '/parametrage/:id': ['developpeur'],
   '/consultation-donnees': ['consultant'],
+  '/consultation-donnees/:id': ['consultant'],
 };
 
 // Libellés d'affichage des rôles (chip dans la TopBar)

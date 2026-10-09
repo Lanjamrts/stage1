@@ -6,7 +6,7 @@ import Admin1Dashboard from './admin1/Admin1Dashboard.jsx';
 // Page d'accueil « / » : le contenu dépend du rôle.
 // - client : tableau de bord client (Phase 3)
 // - admin1 : tableau de bord admin1 (Phase 5)
-// - consultant : tableau de bord consultant (Phase 6)
+// - consultant : tableau de bord en lecture seule (Phase 6)
 export default function HomePage() {
   const [role, setRole] = useState(null);
 
@@ -18,6 +18,7 @@ export default function HomePage() {
 
   if (role === 'client') return <ClientDashboard />;
   if (role === 'admin1') return <Admin1Dashboard />;
+  if (role === 'consultant') return <Admin1Dashboard readOnly />;
   if (role === null) return <div className="text-[#5B6778]">Chargement...</div>;
 
   return (

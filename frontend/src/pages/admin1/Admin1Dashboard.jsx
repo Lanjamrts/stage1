@@ -3,7 +3,8 @@ import { api } from '../../api.js';
 
 // Tableau de bord Admin 1 (SPEC §4) : taux par région, retards,
 // taux de rejet, structures en retard. Aucun bouton d'action.
-export default function Admin1Dashboard() {
+// En mode lecture seule (consultant, SPEC §4) : pilule « Lecture seule ».
+export default function Admin1Dashboard({ readOnly = false }) {
   const [data, setData] = useState(null);
   const [modules, setModules] = useState([]);
   const [periodes, setPeriodes] = useState([]);
@@ -60,7 +61,14 @@ export default function Admin1Dashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-[24px] font-semibold text-[#0B2A4A]">Tableau de bord</h1>
+        <h1 className="text-[24px] font-semibold text-[#0B2A4A] flex items-center gap-3">
+          Tableau de bord
+          {readOnly && (
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full border border-[#D7C4F0] bg-[#F3ECFB] text-xs font-semibold text-[#6B3FA0]">
+              Lecture seule
+            </span>
+          )}
+        </h1>
         <p className="text-sm text-[#5B6778] mt-1">
           Taux de soumission, retards et taux de rejet par région.
         </p>

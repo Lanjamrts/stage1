@@ -19,6 +19,7 @@ import dashboardRoutes from './routes/dashboards.js';
 import userRoutes from './routes/users.js';
 import remarqueRoutes from './routes/remarques.js';
 import auditRoutes from './routes/audits.js';
+import configRoutes from './routes/config.js';
 import { requireAuth } from './middleware/auth.js';
 
 dotenv.config();
@@ -61,6 +62,7 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/remarques', remarqueRoutes);
 app.use('/api/audit', auditRoutes);
+app.use('/api/config/modules', configRoutes);
 
 // Middleware pour les routes non trouvées
 app.use((req, res) => {

@@ -45,3 +45,10 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 - [P5] GET /audit : {id, date, action, userId, userLabel, object, ip}, 500 lignes les plus récentes ; filtre role résolu via les ObjectId + IM des utilisateurs du rôle (les échecs de connexion stockent l'IM).
 - [P5] Formulaisateur utilisateur : direction et service en saisie libre ; l'IM est immuable à l'édition.
 - [P5] Renommage des dossiers à la racine : /client → /frontend et /server → /backend (demande explicite) ; noms de package sigbd-frontend / sigbd-backend ; scripts npm inchangés (à lancer depuis chaque dossier). Les lignes historiques ci-dessus gardent l'ancien nom.
+- [P6] Tableau de bord consultant = la page admin1 réutilisée avec pilule « Lecture seule » (GET /dashboard accepte déjà admin1 + consultant) ; pas de page dupliquée.
+- [P6] La table « Consultation des données » (consultant) n'a ni bouton ni action : le clic sur une ligne est une navigation vers la page rapport (SPEC §4). Le rapport réutilise GET /saisies/:id et /:id/historique (le serveur renvoie déjà 404 hors exportee/archivee au consultant).
+- [P6] GET /consultation : toutes régions, statuts exportee + archivee, filtres module/période ; moduleId ou periodeId malformé → 400 « Filtre invalide. ».
+- [P6] Éditeur de gabarit : le serveur valide la structure des champs (types connus, clé /^[a-z][a-z0-9_]*$/i, tableau ≥ 1 sous-champ, ≥ 1 champ) avec messages FR ; la détection de clés dupliquées n'est faite que côté client (pas imposée par la SPEC — choix le plus simple).
+- [P6] Activation/désactivation d'un gabarit via PATCH /config/modules/:id/active, sans ligne d'audit (liste fermée des actions auditées en SPEC §8 : « publication de gabarit » = POST/PUT).
+- [P6] Listes de référence en écriture : seulement Directions, Services, Grades, EPN, STD (POST|PUT|PATCH) ; Régions, Structures et Périodes en lecture seule (SPEC §8 n'en prévoit pas l'écriture — en ajouter serait une fonctionnalité de plus).
+- [P6] Aperçu de l'éditeur = DynamicForm désactivé, valeurs vides, options résolues via /referentiels/:source ; champs auto éditables (total/region/structure/author, clés de somme pour total).

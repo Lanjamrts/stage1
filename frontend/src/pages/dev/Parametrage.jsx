@@ -1,0 +1,339 @@
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { api } from '../../api.js';
+import { useToast } from '../../components/Common/Toast/Toast.jsx';
+
+const PERIODICITY_LABELS = { monthly: 'Mensuelle', quarterly: 'Trimestrielle' };
+const KIND_LABELS = { periodic: 'Périodique', event: 'Événement' };
+
+// Listes de référence affichées (SPEC §4) : Régions, Structures, Directions,
+// Services, Grades, Périodes, EPN, STD. Seules Directions/Services/Grades/EPN/STD
+// sont modifiables (POST|PUT|PATCH /referentiels — Régions, Structures et
+// Périodes n'ont pas d'API d'écriture).
+const REF_LISTS = [
+  { key: 'regions', label: 'Régions', editable: false },
+  { key: 'structures', label: 'Structures', editable: false, full: true },
+  { key: 'directions', label: 'Directions', editable: true },
+  { key: 'services', label: 'Services', editable: true },
+  { key: 'grades', label: 'Grades', editable: true },
+  { key: 'periodes', label: 'Périodes', editable: false },
+  { key: 'epn', label: 'EPN', editable: true },
+  { key: 'std', label: 'STD', editable: true },
+];
+
+const inputCls =
+  'w-full h-[36px] px-3 rounded-lg border border-[#D6DCE5] bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#1F5FA8]/30';
+
+// Une carte de liste de référence : valeurs + (si modifiable) ajout et rename.
+function ReferenceCard({ list, onChanged }) {
+  const { addToast } = useToast();
+  const [values, setValues] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [newValue, setNewValue] = useState('');
+  const [editing, setEditing] = useState(null); // {index, value}
+  const [busy, setBusy] = useState(false);
+
+  const load = async () => {
+    try {
+      if (list.key === 'periodes') {
+        const p = await api('/periodes');
+        setValues(p.map((x) => x.label));
+      } else if (list.full) {
+        const d = await api(`/referentiels/${list.key}?full=1`);
+        setValues((d.items || []).map((i) => i.label));
+      } else {
+        const d = await api(`/referentiels/${list.key}`);
+        setValues(d.values || []);
+      }
+    } catch {
+      setValues([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [list.key]);
+
+  const add = async () => {
+    const v = newValue.trim();
+    if (!v) return;
+    setBusy(true);
+    try {
+      await api(`/referentiels/${list.key}`, { method: 'POST', body: { value: v } });
+      addToast(`« ${v} » ajouté(e).`, 'success');
+      setNewValue('');
+      await load();
+      onChanged();
+    } catch (err) {
+      addToast(err.message, 'error');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const rename = async () => {
+    const v = (editing.value || '').trim();
+    if (!v) return;
+    setBusy(true);
+    try {
+      await api(`/referentiels/${list.key}`, {
+        method: 'PUT',
+        body: { value: values[editing.index], newValue: v },
+      });
+      addToast('Valeur renommée.', 'success');
+      setEditing(null);
+      await load();
+      onChanged();
+    } catch (err) {
+      addToast(err.message, 'error');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="bg-white rounded-xl border border-[#E3E8EF] shadow-sm p-5">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-[15px] font-semibold text-[#0B2A4A]">{list.label}</h3>
+        <span className="text-xs text-[#5B6778]">{values.length} valeur{values.length > 1 ? 's' : ''}</span>
+      </div>
+
+      {loading && <p className="text-sm text-[#5B6778]">Chargement...</p>}
+
+      {!loading && values.length === 0 && (
+        <p className="text-sm text-[#5B6778] mb-3">Liste vide.</p>
+      )}
+
+      <ul className="space-y-1.5 max-h-[220px] overflow-y-auto mb-3">
+        {!loading &&
+          values.map((v, i) => (
+            <li key={`${v}-${i}`} className="flex items-center justify-between gap-2 text-sm">
+              {editing && editing.index === i ? (
+                <div className="flex items-center gap-2 flex-1">
+                  <input
+                    type="text"
+                    className={inputCls}
+                    value={editing.value}
+                    onChange={(e) => setEditing({ index: i, value: e.target.value })}
+                  />
+                  <button
+                    onClick={rename}
+                    disabled={busy}
+                    className="h-[30px] px-3 rounded-lg bg-[#1F5FA8] text-white text-xs font-semibold disabled:opacity-60"
+                  >
+                    OK
+                  </button>
+                  <button
+                    onClick={() => setEditing(null)}
+                    className="h-[30px] px-3 rounded-lg border border-[#E3E8EF] text-xs font-medium"
+                  >
+                    Annuler
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <span className="text-[#1A2433] truncate">{v}</span>
+                  {list.editable && (
+                    <button
+                      onClick={() => setEditing({ index: i, value: v })}
+                      className="text-xs font-semibold text-[#1F5FA8] hover:underline shrink-0"
+                    >
+                      Renommer
+                    </button>
+                  )}
+                </>
+              )}
+            </li>
+          ))}
+      </ul>
+
+      {list.editable && (
+        <div className="flex items-center gap-2 pt-3 border-t border-[#E3E8EF]">
+          <input
+            type="text"
+            className={inputCls}
+            placeholder="Nouvelle valeur"
+            value={newValue}
+            maxLength={200}
+            onChange={(e) => setNewValue(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') add();
+            }}
+          />
+          <button
+            onClick={add}
+            disabled={busy || !newValue.trim()}
+            className="h-[36px] px-4 rounded-lg bg-[#1F5FA8] hover:bg-[#174C87] text-white text-sm font-semibold disabled:opacity-60 shrink-0"
+          >
+            Ajouter
+          </button>
+        </div>
+      )}
+      {!list.editable && (
+        <p className="text-xs text-[#5B6778] pt-3 border-t border-[#E3E8EF]">
+          Liste en lecture seule.
+        </p>
+      )}
+    </div>
+  );
+}
+
+// « Paramétrage » (SPEC §4, developpeur) : liste des gabarits + éditeur,
+// et listes de référence. Aucun accès aux rapports ni aux utilisateurs.
+export default function Parametrage() {
+  const navigate = useNavigate();
+  const { addToast } = useToast();
+  const [tab, setTab] = useState('gabarits');
+  const [modules, setModules] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const data = await api('/modules');
+      setModules(data);
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  const toggleActive = async (m) => {
+    try {
+      await api(`/config/modules/${m.id}/active`, {
+        method: 'PATCH',
+        body: { active: !m.active },
+      });
+      addToast(
+        m.active ? `Gabarit ${m.code} désactivé.` : `Gabarit ${m.code} activé.`,
+        'success'
+      );
+      await load();
+    } catch (err) {
+      addToast(err.message, 'error');
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-[24px] font-semibold text-[#0B2A4A]">Paramétrage</h1>
+        <p className="text-sm text-[#5B6778] mt-1">
+          Gabarits de saisie (versions) et listes de référence.
+        </p>
+      </div>
+
+      {/* Onglets */}
+      <div className="flex flex-wrap gap-2 border-b border-[#E3E8EF]">
+        {[
+          { key: 'gabarits', label: 'Gabarits' },
+          { key: 'listes', label: 'Listes de référence' },
+        ].map((t) => (
+          <button
+            key={t.key}
+            onClick={() => setTab(t.key)}
+            className={`px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px ${
+              tab === t.key
+                ? 'border-[#1F5FA8] text-[#1F5FA8]'
+                : 'border-transparent text-[#5B6778] hover:text-[#0B2A4A]'
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {error && (
+        <div className="rounded-lg border border-[#F6C7C3] bg-[#FEF3F2] px-4 py-3 text-sm text-[#B42318]">
+          {error}
+        </div>
+      )}
+
+      {tab === 'gabarits' && (
+        <div className="bg-white rounded-xl border border-[#E3E8EF] shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-[#F5F7FA] text-left">
+                  <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Code</th>
+                  <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Libellé</th>
+                  <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Périodicité</th>
+                  <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Type</th>
+                  <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Version</th>
+                  <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Statut</th>
+                  <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading && (
+                  <tr>
+                    <td colSpan={7} className="px-5 py-8 text-center text-[#5B6778]">
+                      Chargement...
+                    </td>
+                  </tr>
+                )}
+                {!loading &&
+                  modules.map((m) => (
+                    <tr key={m.id} className="border-t border-[#E3E8EF]">
+                      <td className="px-5 py-3 font-semibold text-[#0B2A4A]">{m.code}</td>
+                      <td className="px-5 py-3 text-[#1A2433]">{m.label}</td>
+                      <td className="px-5 py-3 text-[#5B6778]">
+                        {PERIODICITY_LABELS[m.periodicity] || m.periodicity}
+                      </td>
+                      <td className="px-5 py-3 text-[#5B6778]">{KIND_LABELS[m.kind] || m.kind}</td>
+                      <td className="px-5 py-3 text-[#1A2433]">v{m.version}</td>
+                      <td className="px-5 py-3">
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full border text-xs font-semibold ${
+                            m.active
+                              ? 'bg-[#EBF7EE] border-[#B7E3C8] text-[#1E7B4F]'
+                              : 'bg-[#F5F7FA] border-[#E3E8EF] text-[#5B6778]'
+                          }`}
+                        >
+                          {m.active ? 'Actif' : 'Inactif'}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3">
+                        <div className="flex flex-wrap gap-2">
+                          <button
+                            onClick={() => navigate(`/parametrage/${m.id}`)}
+                            className="h-[30px] px-3 rounded-lg border border-[#D6DCE5] text-xs font-semibold text-[#1F5FA8] hover:bg-[#EBF3FC]"
+                          >
+                            Éditer
+                          </button>
+                          <button
+                            onClick={() => toggleActive(m)}
+                            className="h-[30px] px-3 rounded-lg border border-[#D6DCE5] text-xs font-semibold text-[#0B2A4A] hover:bg-[#F5F7FA]"
+                          >
+                            {m.active ? 'Désactiver' : 'Activer'}
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {tab === 'listes' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          {REF_LISTS.map((list) => (
+            <ReferenceCard key={list.key} list={list} onChanged={() => {}} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
