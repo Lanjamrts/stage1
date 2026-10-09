@@ -12,6 +12,10 @@ import SessionExpired from './pages/SessionExpired.jsx';
 import HomePage from './pages/HomePage.jsx';
 import MesSaisies from './pages/client/MesSaisies.jsx';
 import SaisieDetail from './pages/client/SaisieDetail.jsx';
+import DonneesSaisies from './pages/admin2/DonneesSaisies.jsx';
+import RevueSaisie from './pages/admin2/RevueSaisie.jsx';
+import Consultation from './pages/admin2/Consultation.jsx';
+import RemarquesPage from './pages/RemarquesPage.jsx';
 import { ROUTE_ROLES } from './menus.js';
 
 // Page d'ébauche (remplacée phase par phase par les vraies pages)
@@ -27,9 +31,10 @@ const PROTECTED_ROUTES = [
   { path: '/', element: <HomePage /> },
   { path: '/mes-saisies', element: <MesSaisies /> },
   { path: '/mes-saisies/:id', element: <SaisieDetail /> },
-  { path: '/donnees-saisies', title: 'Données saisies' },
-  { path: '/consultation', title: 'Consultation et téléchargement' },
-  { path: '/remarques', title: 'Remarques' },
+  { path: '/donnees-saisies', element: <DonneesSaisies /> },
+  { path: '/donnees-saisies/:id', element: <RevueSaisie /> },
+  { path: '/consultation', element: <Consultation /> },
+  { path: '/remarques', element: <RemarquesPage /> },
   { path: '/collecte', title: 'Collecte et téléchargement' },
   { path: '/audit', title: "Journal d'audit" },
   { path: '/utilisateurs', title: 'Utilisateurs' },

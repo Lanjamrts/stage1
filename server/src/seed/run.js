@@ -13,6 +13,7 @@ import ReferentielModel from '../models/Referentiel.js';
 import JournalAuditModel from '../models/JournalAudit.js';
 import ModuleModel from '../models/Module.js';
 import SaisieModel from '../models/Saisie.js';
+import RemarqueModel from '../models/Remarque.js';
 import { MODULES } from './modules.js';
 import { buildSaisies } from './saisies.js';
 
@@ -76,6 +77,7 @@ async function seed() {
     JournalAuditModel.deleteMany({}),
     ModuleModel.deleteMany({}),
     SaisieModel.deleteMany({}),
+    RemarqueModel.deleteMany({}),
   ]);
   console.log('Collections nettoyees');
 

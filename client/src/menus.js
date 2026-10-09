@@ -34,6 +34,7 @@ export const ROUTE_ROLES = {
   '/mes-saisies': ['client'],
   '/mes-saisies/:id': ['client'],
   '/donnees-saisies': ['admin2'],
+  '/donnees-saisies/:id': ['admin2'],
   '/consultation': ['admin2'],
   '/remarques': ['admin1', 'admin2', 'developpeur'],
   '/collecte': ['admin1'],

@@ -29,3 +29,9 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 - [P3] 4 compteurs du tableau de bord client : Total saisies, Brouillons, Soumises, Rejetées.
 - [P3] Les routes de transition admin2 (valider/rejeter/exporter) sont implémentées côté API dès la Phase 3 (droits et machine à états vérifiables) ; l'UI arrive en Phase 4.
 - [P3] admin1 voit les métadonnées de toutes les saisies mais values=null hors exportee/archivee (appliqué dès la Phase 3 dans la lecture API).
+- [P4] GET /collecte renvoie un tableau JSON simple (cohérent avec /saisies), pas {items, total}.
+- [P4] Export Excel = 2 feuilles (métadonnées + valeurs aplaties avec libellés français) ; PDF = une fiche par saisie. Seules les lignes exportee/archivee sont exportées (SPEC §8).
+- [P4] Filtres de « Consultation et téléchargement » (admin2) : module, période, statut. Le périmètre régional est forcé côté serveur ; pas de filtre structure (aucun endpoint de structures par région).
+- [P4] API remarques implémentée en entier dès la Phase 4 : POST + GET /mes (admin1/admin2) servent l'écran admin2 ; GET / et PATCH /:id/etat (developpeur) serviront la boîte de réception de la Phase 6.
+- [P4] Lignes d'audit ajoutées : download_excel, download_pdf, remarque_create, remarque_state_change.
+- [P4] La purge du seed inclut désormais la collection remarques (les utilisateurs sont recréés avec de nouveaux _id ; sinon les remarques deviennent orphelines).
