@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+
+<html lang="fr"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"on-primary-fixed-variant":"#004787","primary-fixed":"#d5e3ff","on-tertiary-container":"#93ecb6","on-tertiary-fixed":"#002111","inverse-primary":"#a7c8ff","surface-container":"#e5eeff","on-tertiary":"#ffffff","background":"#f8f9ff","surface-variant":"#d7e3f7","secondary-container":"#bbd6ff","surface-container-low":"#eff4ff","error-container":"#ffdad6","on-tertiary-fixed-variant":"#005231","inverse-on-surface":"#eaf1ff","surface-tint":"#1f5fa8","secondary-fixed-dim":"#aec8f0","secondary":"#466083","outline-variant":"#c2c6d3","tertiary":"#005231","primary":"#004788","on-secondary":"#ffffff","outline":"#727782","surface":"#f8f9ff","surface-container-lowest":"#ffffff","secondary-fixed":"#d3e4ff","on-secondary-fixed-variant":"#2d486a","on-background":"#101c2b","on-error-container":"#93000a","surface-container-high":"#dde9fd","tertiary-fixed-dim":"#81d8a4","surface-bright":"#f8f9ff","inverse-surface":"#253140","on-surface-variant":"#424751","on-error":"#ffffff","primary-fixed-dim":"#a7c8ff","on-primary-container":"#c5daff","error":"#ba1a1a","surface-dim":"#cfdbef","primary-container":"#1f5fa8","surface-container-highest":"#d7e3f7","tertiary-fixed":"#9df5bf","on-primary-fixed":"#001c3b","on-surface":"#101c2b","tertiary-container":"#036d42","on-primary":"#ffffff","on-secondary-fixed":"#001c38","on-secondary-container":"#435d80"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"space-xl":"2rem","gutter-desktop":"1.5rem","space-md":"1rem","space-sm":"0.5rem","margin":"1rem","space-lg":"1.5rem","gutter":"1rem","space-xs":"0.25rem","margin-desktop":"2rem"},"fontFamily":{"headline-xl-mobile":["Inter"],"label-md":["Inter"],"headline-lg":["Inter"],"headline-xl":["Inter"],"metric-num":["Inter"],"headline-sm":["Inter"],"label-sm":["Inter"],"label-lg":["Inter"],"headline-md":["Inter"],"body-md":["Inter"],"body-lg":["Inter"],"body-sm":["Inter"]},"fontSize":{"headline-xl-mobile":["24px",{"lineHeight":"32px","letterSpacing":"-0.01em","fontWeight":"700"}],"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0.02em","fontWeight":"600"}],"headline-lg":["24px",{"lineHeight":"32px","letterSpacing":"-0.01em","fontWeight":"600"}],"headline-xl":["32px",{"lineHeight":"40px","letterSpacing":"-0.02em","fontWeight":"700"}],"metric-num":["22px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"600"}],"headline-sm":["16px",{"lineHeight":"24px","fontWeight":"600"}],"label-sm":["11px",{"lineHeight":"14px","letterSpacing":"0.03em","fontWeight":"500"}],"label-lg":["14px",{"lineHeight":"20px","fontWeight":"600"}],"headline-md":["20px",{"lineHeight":"28px","fontWeight":"600"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}],"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"body-sm":["13px",{"lineHeight":"18px","fontWeight":"400"}]}}}}</script></head><body class="bg-background font-body-md text-on-surface min-h-screen"><div class="fixed top-0 left-0 w-full h-1 z-50 flex pointer-events-none"><div class="w-1/2 h-full bg-[#B42318]"></div><div class="w-1/2 h-full bg-[#1E7B4F]"></div></div><aside class="fixed left-0 top-1 bottom-0 w-60 bg-[#0B2A4A] z-40 flex flex-col justify-between select-none shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="flex flex-col"><div class="h-16 px-space-md flex items-center gap-space-sm"><img alt="MEF Emblem" class="h-10 w-10 object-contain rounded-full" src="https://lh3.googleusercontent.com/aida/AEtjO1UOEFzzVWKsKd7D4_tckAmMcRr0d-XGnSpF987DdvxBkNEkYqzOAZkzEnTS_NJ44TY1EjwWdLuVWrr4XjhrK6ySfV31SlW7iRceuUgaAPFsUIe3xvu1P2dq2-KLkfrKjF-ENp96Ef_o6OCngIKSG2LG03JxgDdyQN3J7LHSnUkC1SKua8SLLlcscD7C-r9mJsLUzsgV4GsPnHI5PshDYwwZf2Af_VNq-UuTUnzS3gSLhPz0g6htv1orMA"/><span class="font-headline-sm text-headline-sm text-on-primary tracking-wide">SIGBD</span></div><nav class="px-space-sm pt-space-md flex flex-col gap-space-xs" data-active-classes="bg-primary-container text-on-primary font-label-lg text-label-lg rounded-lg"><a aria-current="page" class="flex items-center gap-space-sm px-space-md py-space-sm transition-colors bg-primary-container text-on-primary font-label-lg text-label-lg rounded-lg" data-path="tableau-de-bord" href="#"><span class="material-symbols-outlined text-[20px]">dashboard</span><span class="font-label-lg text-label-lg">Tableau de bord</span></a><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg text-on-primary-container hover:bg-white/10 hover:text-on-primary transition-colors" data-path="mes-saisies" href="#"><span class="material-symbols-outlined text-[20px]">edit_note</span><span class="font-label-lg text-label-lg">Mes saisies</span></a></nav></div><div class="p-space-md"><div class="font-label-sm text-label-sm text-white/60 tracking-wider uppercase text-center">DGBF · SSEBF</div></div></aside><div class="pl-60 min-h-screen flex flex-col"><header class="fixed top-1 left-60 right-0 h-16 bg-surface-container-lowest z-30 shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="w-full h-full px-gutter-desktop flex items-center justify-between"><div class="flex items-center gap-space-xs text-on-surface-variant font-body-sm text-body-sm"><span class="font-label-md text-label-md text-on-surface">SIGBD</span><span class="material-symbols-outlined text-[16px]">chevron_right</span><span class="font-body-sm text-body-sm text-on-surface-variant">Portail Client</span></div><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-sm"><span class="font-label-lg text-label-lg text-on-surface">Hery Rakotoarivelo</span><span class="inline-flex items-center px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm">Client</span></div><span class="text-outline-variant">|</span><span class="font-body-sm text-body-sm text-on-surface-variant">SRB – Analamanga</span><span class="text-outline-variant">|</span><a class="flex items-center gap-space-xs text-on-surface-variant hover:text-error transition-colors font-label-lg text-label-lg" data-path="connexion" href="#"><span class="material-symbols-outlined text-[18px]">logout</span><span>Se déconnecter</span></a><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1UOEFzzVWKsKd7D4_tckAmMcRr0d-XGnSpF987DdvxBkNEkYqzOAZkzEnTS_NJ44TY1EjwWdLuVWrr4XjhrK6ySfV31SlW7iRceuUgaAPFsUIe3xvu1P2dq2-KLkfrKjF-ENp96Ef_o6OCngIKSG2LG03JxgDdyQN3J7LHSnUkC1SKua8SLLlcscD7C-r9mJsLUzsgV4GsPnHI5PshDYwwZf2Af_VNq-UuTUnzS3gSLhPz0g6htv1orMA"/></div></div></header><main class="w-full pt-16 flex-1 bg-[#F5F7FA]"><div class="flex flex-col w-full pb-28">
+<!-- Fil d'Ariane contextuel supplémentaire synchronisé -->
+<div class="w-full bg-surface-container-lowest shadow-[0_1px_3px_rgba(0,0,0,0.03)] px-gutter-desktop py-space-sm mb-space-md">
+<div class="max-w-[880px] mx-auto flex items-center gap-space-xs text-on-surface-variant font-body-sm text-body-sm">
+<a class="hover:text-primary transition-colors flex items-center gap-1" href="#">
+<span class="material-symbols-outlined text-[16px]">home</span>
+<span>Tableau de bord</span>
+</a>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="hover:text-primary transition-colors cursor-pointer">Compte rendu CRGP</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="font-label-md text-label-md text-on-surface">Réunion du 02/10/2026</span>
+</div>
+</div>
+<!-- Contenu Principal Centré (880px) -->
+<div class="w-full max-w-[880px] mx-auto px-space-md flex flex-col gap-space-lg">
+<!-- HEADER DE PAGE -->
+<div class="flex items-start justify-between bg-surface-container-lowest p-space-lg rounded-xl shadow-sm">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-space-xs">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-tertiary font-label-sm text-label-sm bg-tertiary-fixed/30">
+            DGBF · SSEBF
+          </span>
+<span class="text-outline-variant font-label-sm text-label-sm">|</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant tracking-wider uppercase">Exercice 2026</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-[#0B2A4A] tracking-tight mt-1">
+          Compte rendu CRGP
+        </h1>
+<p class="font-body-md text-body-md text-[#5B6778]">
+          Réunion du 02/10/2026 · SRB – Analamanga
+        </p>
+</div>
+<div class="flex flex-col items-end gap-1.5 pt-1">
+<span class="inline-flex items-center px-3 py-1 rounded-full bg-[#F1F4F9] text-[#475467] font-label-md text-label-md">
+<span class="w-2 h-2 rounded-full bg-[#98A2B3] mr-2"></span>
+          Brouillon
+        </span>
+<div class="flex items-center gap-1 font-body-sm text-body-sm text-[#1E7B4F]">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+<span>Brouillon enregistré à 14:25</span>
+</div>
+</div>
+</div>
+<!-- FORMULAIRE COMPTE RENDU -->
+<form class="flex flex-col gap-space-lg" id="crgpForm" onsubmit="event.preventDefault();">
+<!-- SECTION 1: INFORMATIONS GÉNÉRALES -->
+<section class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center gap-space-sm pb-space-xs">
+<div class="w-7 h-7 rounded-full bg-[#1F5FA8] text-on-primary font-label-lg text-label-lg flex items-center justify-center shrink-0">
+            1
+          </div>
+<h2 class="font-headline-sm text-headline-sm text-[#1A2433]">
+            Informations générales
+          </h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-md pt-space-xs">
+<!-- Région -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-[#1A2433] flex items-center justify-between">
+<span>Région</span>
+<span class="text-[11px] font-label-sm text-[#5B6778] uppercase">Automatique</span>
+</label>
+<div class="h-11 px-3.5 rounded-lg bg-[#F8F9FA] text-[#1A2433] font-body-md text-body-md flex items-center select-none shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
+              Analamanga
+            </div>
+</div>
+<!-- Date de réunion -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-[#1A2433]" for="meetingDate">
+              Date de la réunion <span class="text-error">*</span>
+</label>
+<div class="relative">
+<input class="w-full h-11 pl-3.5 pr-10 rounded-lg bg-surface-container-lowest text-[#1A2433] font-body-md text-body-md shadow-sm focus:outline-none focus:shadow-[0_0_0_3px_rgba(31,95,168,0.25)] transition-all" id="meetingDate" name="meetingDate" required="" type="text" value="02/10/2026"/>
+<span class="material-symbols-outlined absolute right-3 top-3 text-[20px] text-[#5B6778] pointer-events-none">
+                calendar_today
+              </span>
+</div>
+</div>
+<!-- Lieu -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-[#1A2433]" for="meetingLocation">
+              Lieu <span class="text-error">*</span>
+</label>
+<input class="w-full h-11 px-3.5 rounded-lg bg-surface-container-lowest text-[#1A2433] font-body-md text-body-md shadow-sm focus:outline-none focus:shadow-[0_0_0_3px_rgba(31,95,168,0.25)] transition-all" id="meetingLocation" name="meetingLocation" required="" type="text" value="Salle de réunion de la DRBF Analamanga"/>
+</div>
+<!-- Thème -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-[#1A2433]" for="meetingTheme">
+              Thème <span class="text-error">*</span>
+</label>
+<input class="w-full h-11 px-3.5 rounded-lg bg-surface-container-lowest text-[#1A2433] font-body-md text-body-md shadow-sm focus:outline-none focus:shadow-[0_0_0_3px_rgba(31,95,168,0.25)] transition-all" id="meetingTheme" name="meetingTheme" required="" type="text" value="Suivi de l'exécution budgétaire du troisième trimestre"/>
+</div>
+</div>
+</section>
+<!-- SECTION 2: PARTICIPANTS -->
+<section class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center gap-space-sm pb-space-xs">
+<div class="w-7 h-7 rounded-full bg-[#1F5FA8] text-on-primary font-label-lg text-label-lg flex items-center justify-center shrink-0">
+            2
+          </div>
+<h2 class="font-headline-sm text-headline-sm text-[#1A2433]">
+            Participants
+          </h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-space-md pt-space-xs">
+<!-- Nombre de participants -->
+<div class="md:col-span-1 flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-[#1A2433]" for="participantCount">
+              Nombre <span class="text-error">*</span>
+</label>
+<input class="w-full h-11 px-3.5 rounded-lg bg-surface-container-lowest text-[#1A2433] font-body-md text-body-md shadow-sm focus:outline-none focus:shadow-[0_0_0_3px_rgba(31,95,168,0.25)] transition-all" id="participantCount" min="1" name="participantCount" required="" type="number" value="14"/>
+</div>
+<!-- Structures représentées -->
+<div class="md:col-span-3 flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-[#1A2433]">
+              Structures représentées <span class="text-error">*</span>
+</label>
+<div class="min-h-11 p-1.5 rounded-lg bg-surface-container-lowest shadow-sm flex flex-wrap items-center gap-1.5" id="structuresContainer">
+<span class="structure-chip inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#F1F4F9] text-[#1A2433] font-label-md text-label-md">
+                SRB – Analamanga
+                <button class="text-[#5B6778] hover:text-[#B42318] flex items-center justify-center transition-colors" onclick="this.closest('.structure-chip').remove()" type="button">
+<span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+</span>
+<span class="structure-chip inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#F1F4F9] text-[#1A2433] font-label-md text-label-md">
+                SRSP – Analamanga
+                <button class="text-[#5B6778] hover:text-[#B42318] flex items-center justify-center transition-colors" onclick="this.closest('.structure-chip').remove()" type="button">
+<span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+</span>
+<span class="structure-chip inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#F1F4F9] text-[#1A2433] font-label-md text-label-md">
+                CIRBF – Analamanga
+                <button class="text-[#5B6778] hover:text-[#B42318] flex items-center justify-center transition-colors" onclick="this.closest('.structure-chip').remove()" type="button">
+<span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+</span>
+<span class="structure-chip inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#F1F4F9] text-[#1A2433] font-label-md text-label-md">
+                SRPE – Analamanga
+                <button class="text-[#5B6778] hover:text-[#B42318] flex items-center justify-center transition-colors" onclick="this.closest('.structure-chip').remove()" type="button">
+<span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+</span>
+<button class="text-primary hover:text-on-primary-fixed-variant text-label-sm font-label-sm px-2 py-1 flex items-center gap-0.5 rounded hover:bg-surface-container transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">add</span>
+                Ajouter
+              </button>
+</div>
+<p class="font-label-sm text-label-sm text-[#5B6778]">
+              Sélectionnez toutes les structures présentes.
+            </p>
+</div>
+</div>
+</section>
+<!-- SECTION 3: POINTS ABORDÉS, DÉCISIONS ET RECOMMANDATIONS -->
+<section class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col gap-space-lg">
+<div class="flex items-center gap-space-sm pb-space-xs">
+<div class="w-7 h-7 rounded-full bg-[#1F5FA8] text-on-primary font-label-lg text-label-lg flex items-center justify-center shrink-0">
+            3
+          </div>
+<h2 class="font-headline-sm text-headline-sm text-[#1A2433]">
+            Points abordés, décisions et recommandations
+          </h2>
+</div>
+<!-- Points abordés -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-[#1A2433]" for="pointsAbordes">
+            Points abordés <span class="text-error">*</span>
+</label>
+<div class="relative">
+<textarea class="w-full p-3.5 pb-7 rounded-lg bg-surface-container-lowest text-[#1A2433] font-body-md text-body-md shadow-sm focus:outline-none focus:shadow-[0_0_0_3px_rgba(31,95,168,0.25)] transition-all resize-y" id="pointsAbordes" maxlength="2000" oninput="updateCharCount(this, 'pointsCount')" required="" rows="4">Point sur le taux d'engagement des crédits. Difficultés de transmission des pièces par les communes. Calendrier des missions de contrôle.</textarea>
+<div class="absolute bottom-2 right-3 font-label-sm text-label-sm text-[#5B6778] pointer-events-none" id="pointsCount">
+              205 / 2000
+            </div>
+</div>
+</div>
+<!-- Décisions -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-[#1A2433]" for="decisions">
+            Décisions <span class="text-error">*</span>
+</label>
+<div class="relative">
+<textarea class="w-full p-3.5 pb-7 rounded-lg bg-surface-container-lowest text-[#1A2433] font-body-md text-body-md shadow-sm focus:outline-none focus:shadow-[0_0_0_3px_rgba(31,95,168,0.25)] transition-all resize-y" id="decisions" maxlength="2000" oninput="updateCharCount(this, 'decisionsCount')" required="" rows="3">Les missions de contrôle seront programmées avant la fin octobre. Les pièces manquantes seront relancées par courrier.</textarea>
+<div class="absolute bottom-2 right-3 font-label-sm text-label-sm text-[#5B6778] pointer-events-none" id="decisionsCount">
+              112 / 2000
+            </div>
+</div>
+</div>
+<!-- Recommandations -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-[#1A2433] flex items-center gap-2" for="recommandations">
+<span>Recommandations</span>
+<span class="font-label-sm text-label-sm text-[#5B6778] bg-[#F1F4F9] px-2 py-0.5 rounded">Facultatif</span>
+</label>
+<div class="relative">
+<textarea class="w-full p-3.5 pb-7 rounded-lg bg-surface-container-lowest text-[#1A2433] font-body-md text-body-md shadow-sm focus:outline-none focus:shadow-[0_0_0_3px_rgba(31,95,168,0.25)] transition-all resize-y" id="recommandations" maxlength="2000" oninput="updateCharCount(this, 'recomCount')" rows="3">Renforcer le suivi des communes en retard de transmission.</textarea>
+<div class="absolute bottom-2 right-3 font-label-sm text-label-sm text-[#5B6778] pointer-events-none" id="recomCount">
+              78 / 2000
+            </div>
+</div>
+</div>
+</section>
+<!-- SECTION 4: ACTIONS À MENER -->
+<section class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col gap-space-md">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-space-sm">
+<div class="w-7 h-7 rounded-full bg-[#1F5FA8] text-on-primary font-label-lg text-label-lg flex items-center justify-center shrink-0">
+              4
+            </div>
+<h2 class="font-headline-sm text-headline-sm text-[#1A2433]">
+              Actions à mener
+            </h2>
+</div>
+<p class="font-body-sm text-body-sm text-[#5B6778] pl-9">
+            Indiquez au moins une action.
+          </p>
+</div>
+<!-- Tableau d'actions -->
+<div class="overflow-x-auto rounded-lg shadow-sm">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-[#0B2A4A] text-on-primary font-label-sm text-label-sm uppercase tracking-wider">
+<th class="py-3 px-4 w-1/2">Action</th>
+<th class="py-3 px-4 w-1/4">Responsable</th>
+<th class="py-3 px-4 w-[140px]">Échéance</th>
+<th class="py-3 px-3 w-[48px] text-center"></th>
+</tr>
+</thead>
+<tbody class="font-body-sm text-body-sm text-[#1A2433]" id="actionsTableBody">
+<tr class="bg-surface-container-lowest hover:bg-surface-container-low transition-colors">
+<td class="py-2.5 px-3">
+<input class="w-full h-10 px-3 bg-surface-container-lowest rounded shadow-sm text-body-sm focus:outline-none focus:shadow-[0_0_0_2px_rgba(31,95,168,0.3)]" type="text" value="Programmer les missions de contrôle dans les communes"/>
+</td>
+<td class="py-2.5 px-3">
+<input class="w-full h-10 px-3 bg-surface-container-lowest rounded shadow-sm text-body-sm focus:outline-none focus:shadow-[0_0_0_2px_rgba(31,95,168,0.3)]" type="text" value="Chef du bureau du budget"/>
+</td>
+<td class="py-2.5 px-3">
+<div class="relative">
+<input class="w-full h-10 pl-2.5 pr-8 bg-surface-container-lowest rounded shadow-sm text-body-sm focus:outline-none focus:shadow-[0_0_0_2px_rgba(31,95,168,0.3)]" type="text" value="20/10/2026"/>
+<span class="material-symbols-outlined absolute right-2 top-2.5 text-[18px] text-[#5B6778] pointer-events-none">calendar_today</span>
+</div>
+</td>
+<td class="py-2.5 px-2 text-center">
+<button class="w-9 h-9 rounded flex items-center justify-center text-[#5B6778] hover:text-[#B42318] hover:bg-surface-container transition-colors" onclick="this.closest('tr').remove()" title="Supprimer la ligne" type="button">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</td>
+</tr>
+<tr class="bg-surface-container-lowest hover:bg-surface-container-low transition-colors">
+<td class="py-2.5 px-3">
+<input class="w-full h-10 px-3 bg-surface-container-lowest rounded shadow-sm text-body-sm focus:outline-none focus:shadow-[0_0_0_2px_rgba(31,95,168,0.3)]" type="text" value="Relancer les communes pour la transmission des pièces"/>
+</td>
+<td class="py-2.5 px-3">
+<input class="w-full h-10 px-3 bg-surface-container-lowest rounded shadow-sm text-body-sm focus:outline-none focus:shadow-[0_0_0_2px_rgba(31,95,168,0.3)]" type="text" value="Secrétariat du SRB"/>
+</td>
+<td class="py-2.5 px-3">
+<div class="relative">
+<input class="w-full h-10 pl-2.5 pr-8 bg-surface-container-lowest rounded shadow-sm text-body-sm focus:outline-none focus:shadow-[0_0_0_2px_rgba(31,95,168,0.3)]" type="text" value="12/10/2026"/>
+<span class="material-symbols-outlined absolute right-2 top-2.5 text-[18px] text-[#5B6778] pointer-events-none">calendar_today</span>
+</div>
+</td>
+<td class="py-2.5 px-2 text-center">
+<button class="w-9 h-9 rounded flex items-center justify-center text-[#5B6778] hover:text-[#B42318] hover:bg-surface-container transition-colors" onclick="this.closest('tr').remove()" title="Supprimer la ligne" type="button">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</td>
+</tr>
+<tr class="bg-surface-container-lowest hover:bg-surface-container-low transition-colors">
+<td class="py-2.5 px-3">
+<input class="w-full h-10 px-3 bg-surface-container-lowest rounded shadow-sm text-body-sm focus:outline-none focus:shadow-[0_0_0_2px_rgba(31,95,168,0.3)]" type="text" value="Préparer le point d'étape pour la prochaine réunion"/>
+</td>
+<td class="py-2.5 px-3">
+<input class="w-full h-10 px-3 bg-surface-container-lowest rounded shadow-sm text-body-sm focus:outline-none focus:shadow-[0_0_0_2px_rgba(31,95,168,0.3)]" type="text" value="Hery Rakotoarivelo"/>
+</td>
+<td class="py-2.5 px-3">
+<div class="relative">
+<input class="w-full h-10 pl-2.5 pr-8 bg-surface-container-lowest rounded shadow-sm text-body-sm focus:outline-none focus:shadow-[0_0_0_2px_rgba(31,95,168,0.3)]" type="text" value="30/10/2026"/>
+<span class="material-symbols-outlined absolute right-2 top-2.5 text-[18px] text-[#5B6778] pointer-events-none">calendar_today</span>
+</div>
+</td>
+<td class="py-2.5 px-2 text-center">
+<button class="w-9 h-9 rounded flex items-center justify-center text-[#5B6778] hover:text-[#B42318] hover:bg-surface-container transition-colors" onclick="this.closest('tr').remove()" title="Supprimer la ligne" type="button">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div>
+<button class="h-11 px-4 rounded-lg bg-surface-container-lowest text-[#1A2433] hover:bg-[#F5F7FA] font-label-lg text-label-lg shadow-sm flex items-center gap-2 transition-colors" id="btnAddAction" onclick="addNewActionRow()" type="button">
+<span class="material-symbols-outlined text-[20px] text-primary">add</span>
+<span>Ajouter une ligne</span>
+</button>
+</div>
+</section>
+<!-- SECTION 5: PROCHAINE RÉUNION -->
+<section class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center gap-space-sm pb-space-xs">
+<div class="w-7 h-7 rounded-full bg-[#1F5FA8] text-on-primary font-label-lg text-label-lg flex items-center justify-center shrink-0">
+            5
+          </div>
+<div class="flex items-center gap-2">
+<h2 class="font-headline-sm text-headline-sm text-[#1A2433]">
+              Prochaine réunion
+            </h2>
+<span class="font-label-sm text-label-sm text-[#5B6778] bg-[#F1F4F9] px-2 py-0.5 rounded">Facultatif</span>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-md pt-space-xs">
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-[#1A2433]" for="nextMeetingDate">
+              Date de la prochaine réunion
+            </label>
+<div class="relative">
+<input class="w-full h-11 pl-3.5 pr-10 rounded-lg bg-surface-container-lowest text-[#1A2433] font-body-md text-body-md shadow-sm focus:outline-none focus:shadow-[0_0_0_3px_rgba(31,95,168,0.25)] transition-all" id="nextMeetingDate" name="nextMeetingDate" type="text" value="30/10/2026"/>
+<span class="material-symbols-outlined absolute right-3 top-3 text-[20px] text-[#5B6778] pointer-events-none">
+                calendar_today
+              </span>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 6: PIÈCES JUSTIFICATIVES -->
+<section class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center gap-space-sm pb-space-xs">
+<div class="w-7 h-7 rounded-full bg-[#1F5FA8] text-on-primary font-label-lg text-label-lg flex items-center justify-center shrink-0">
+            6
+          </div>
+<div class="flex items-center gap-2">
+<h2 class="font-headline-sm text-headline-sm text-[#1A2433]">
+              Pièces justificatives
+            </h2>
+<span class="font-label-sm text-label-sm text-[#5B6778] bg-[#F1F4F9] px-2 py-0.5 rounded">Facultatif</span>
+</div>
+</div>
+<!-- Upload Zone -->
+<div class="w-full rounded-lg bg-surface-container-low p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-surface-container transition-colors group">
+<div class="w-12 h-12 rounded-full bg-surface-container-lowest flex items-center justify-center mb-3 shadow-sm group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[26px] text-[#5B6778]">
+              cloud_upload
+            </span>
+</div>
+<p class="font-label-lg text-label-lg text-[#1F5FA8] group-hover:underline mb-1">
+            Glissez un fichier ici ou cliquez pour le choisir
+          </p>
+<p class="font-label-sm text-label-sm text-[#5B6778]">
+            Formats acceptés : PDF, image. Taille maximale : 5 Mo.
+          </p>
+<input accept=".pdf,image/*" class="hidden" type="file"/>
+</div>
+</section>
+</form>
+</div>
+<!-- BARRE D'ACTION INFÉRIEURE FIXE (STICKY FOOTER) -->
+<footer class="fixed bottom-0 left-60 right-0 h-[68px] bg-surface-container-lowest z-30 shadow-[0_-4px_12px_rgba(11,42,74,0.05)] flex items-center justify-between px-8">
+<div>
+<button class="h-11 px-4 rounded-lg font-label-lg text-label-lg text-[#5B6778] hover:text-[#1A2433] hover:bg-[#F5F7FA] transition-colors flex items-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-[18px]">arrow_back</span>
+<span>Annuler</span>
+</button>
+</div>
+<div class="flex items-center gap-3">
+<button class="h-11 px-4 rounded-lg bg-surface-container-lowest text-[#1A2433] hover:bg-[#F5F7FA] font-label-lg text-label-lg shadow-sm flex items-center gap-2 transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px] text-[#5B6778]">save</span>
+<span>Enregistrer en brouillon</span>
+</button>
+<button class="h-11 px-5 rounded-lg bg-[#1F5FA8] hover:bg-[#174C87] text-on-primary font-label-lg text-label-lg shadow-sm flex items-center gap-2 transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">send</span>
+<span>Soumettre</span>
+</button>
+</div>
+</footer>
+</div>
+<script>
+  function updateCharCount(textarea, counterId) {
+    const counter = document.getElementById(counterId);
+    if (counter) {
+      counter.textContent = `${textarea.value.length} / ${textarea.maxLength}`;
+    }
+  }
+
+  function addNewActionRow() {
+    const tbody = document.getElementById('actionsTableBody');
+    if (!tbody) return;
+
+    const row = document.createElement('tr');
+    row.className = 'bg-surface-container-lowest hover:bg-surface-container-low transition-colors';
+    row.innerHTML = `
+      <td class="py-2.5 px-3">
+        <input type="text" placeholder="Description de l'action" class="w-full h-10 px-3 bg-surface-container-lowest rounded shadow-sm text-body-sm focus:outline-none focus:shadow-[0_0_0_2px_rgba(31,95,168,0.3)]">
+      </td>
+      <td class="py-2.5 px-3">
+        <input type="text" placeholder="Entité ou nom" class="w-full h-10 px-3 bg-surface-container-lowest rounded shadow-sm text-body-sm focus:outline-none focus:shadow-[0_0_0_2px_rgba(31,95,168,0.3)]">
+      </td>
+      <td class="py-2.5 px-3">
+        <div class="relative">
+          <input type="text" placeholder="JJ/MM/AAAA" class="w-full h-10 pl-2.5 pr-8 bg-surface-container-lowest rounded shadow-sm text-body-sm focus:outline-none focus:shadow-[0_0_0_2px_rgba(31,95,168,0.3)]">
+          <span class="material-symbols-outlined absolute right-2 top-2.5 text-[18px] text-[#5B6778] pointer-events-none">calendar_today</span>
+        </div>
+      </td>
+      <td class="py-2.5 px-2 text-center">
+        <button type="button" onclick="this.closest('tr').remove()" class="w-9 h-9 rounded flex items-center justify-center text-[#5B6778] hover:text-[#B42318] hover:bg-surface-container transition-colors" title="Supprimer la ligne">
+          <span class="material-symbols-outlined text-[20px]">delete</span>
+        </button>
+      </td>
+    `;
+    tbody.appendChild(row);
+  }
+</script></main></div></body></html>

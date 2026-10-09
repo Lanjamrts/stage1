@@ -1,0 +1,495 @@
+<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><meta content="web_dashboard" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "on-secondary": "#ffffff",
+          "on-primary": "#ffffff",
+          "tertiary-container": "#036d42",
+          "on-secondary-fixed": "#001c38",
+          "primary-container": "#1f5fa8",
+          "on-primary-fixed-variant": "#004787",
+          "on-background": "#101c2b",
+          "error": "#ba1a1a",
+          "surface-variant": "#d7e3f7",
+          "primary": "#004788",
+          "surface-container-high": "#dde9fd",
+          "on-error-container": "#93000a",
+          "surface-dim": "#cfdbef",
+          "on-tertiary": "#ffffff",
+          "surface-tint": "#1f5fa8",
+          "on-error": "#ffffff",
+          "outline": "#727782",
+          "secondary-container": "#bbd6ff",
+          "on-surface": "#101c2b",
+          "secondary-fixed": "#d3e4ff",
+          "on-tertiary-fixed": "#002111",
+          "primary-fixed": "#d5e3ff",
+          "on-surface-variant": "#424751",
+          "inverse-surface": "#253140",
+          "surface-container-highest": "#d7e3f7",
+          "surface-container-low": "#eff4ff",
+          "outline-variant": "#c2c6d3",
+          "inverse-on-surface": "#eaf1ff",
+          "tertiary-fixed": "#9df5bf",
+          "error-container": "#ffdad6",
+          "secondary-fixed-dim": "#aec8f0",
+          "on-secondary-fixed-variant": "#2d486a",
+          "secondary": "#466083",
+          "on-primary-container": "#c5daff",
+          "surface-bright": "#f8f9ff",
+          "tertiary-fixed-dim": "#81d8a4",
+          "surface": "#f8f9ff",
+          "inverse-primary": "#a7c8ff",
+          "on-primary-fixed": "#001c3b",
+          "tertiary": "#005231",
+          "primary-fixed-dim": "#a7c8ff",
+          "on-tertiary-container": "#93ecb6",
+          "surface-container-lowest": "#ffffff",
+          "surface-container": "#e5eeff",
+          "on-secondary-container": "#435d80",
+          "on-tertiary-fixed-variant": "#005231",
+          "background": "#f8f9ff"
+        },
+        "borderRadius": {
+          "DEFAULT": "0.25rem",
+          "lg": "0.5rem",
+          "xl": "0.75rem",
+          "full": "9999px"
+        },
+        "spacing": {
+          "space-sm": "0.5rem",
+          "space-md": "1rem",
+          "margin-desktop": "2rem",
+          "space-xs": "0.25rem",
+          "gutter-desktop": "1.5rem",
+          "space-xl": "2rem",
+          "space-lg": "1.5rem",
+          "margin": "1rem",
+          "gutter": "1rem"
+        },
+        "fontFamily": {
+          "headline-md": [
+            "Inter"
+          ],
+          "metric-num": [
+            "Inter"
+          ],
+          "label-sm": [
+            "Inter"
+          ],
+          "label-md": [
+            "Inter"
+          ],
+          "label-lg": [
+            "Inter"
+          ],
+          "headline-sm": [
+            "Inter"
+          ],
+          "headline-xl": [
+            "Inter"
+          ],
+          "body-lg": [
+            "Inter"
+          ],
+          "body-md": [
+            "Inter"
+          ],
+          "headline-xl-mobile": [
+            "Inter"
+          ],
+          "headline-lg": [
+            "Inter"
+          ],
+          "body-sm": [
+            "Inter"
+          ]
+        },
+        "fontSize": {
+          "headline-md": [
+            "20px",
+            {
+              "lineHeight": "28px",
+              "fontWeight": "600"
+            }
+          ],
+          "metric-num": [
+            "22px",
+            {
+              "lineHeight": "28px",
+              "letterSpacing": "-0.01em",
+              "fontWeight": "600"
+            }
+          ],
+          "label-sm": [
+            "11px",
+            {
+              "lineHeight": "14px",
+              "letterSpacing": "0.03em",
+              "fontWeight": "500"
+            }
+          ],
+          "label-md": [
+            "12px",
+            {
+              "lineHeight": "16px",
+              "letterSpacing": "0.02em",
+              "fontWeight": "600"
+            }
+          ],
+          "label-lg": [
+            "14px",
+            {
+              "lineHeight": "20px",
+              "fontWeight": "600"
+            }
+          ],
+          "headline-sm": [
+            "16px",
+            {
+              "lineHeight": "24px",
+              "fontWeight": "600"
+            }
+          ],
+          "headline-xl": [
+            "32px",
+            {
+              "lineHeight": "40px",
+              "letterSpacing": "-0.02em",
+              "fontWeight": "700"
+            }
+          ],
+          "body-lg": [
+            "16px",
+            {
+              "lineHeight": "24px",
+              "fontWeight": "400"
+            }
+          ],
+          "body-md": [
+            "14px",
+            {
+              "lineHeight": "20px",
+              "fontWeight": "400"
+            }
+          ],
+          "headline-xl-mobile": [
+            "24px",
+            {
+              "lineHeight": "32px",
+              "letterSpacing": "-0.01em",
+              "fontWeight": "700"
+            }
+          ],
+          "headline-lg": [
+            "24px",
+            {
+              "lineHeight": "32px",
+              "letterSpacing": "-0.01em",
+              "fontWeight": "600"
+            }
+          ],
+          "body-sm": [
+            "13px",
+            {
+              "lineHeight": "18px",
+              "fontWeight": "400"
+            }
+          ]
+        }
+      },
+    },
+  }</script></head><body class="bg-[#F5F7FA] font-body-md text-on-surface antialiased"><div class="fixed top-0 left-0 w-full h-1 flex z-50"><div class="w-1/2 h-full bg-[#B42318]"></div><div class="w-1/2 h-full bg-[#1E7B4F]"></div></div><aside class="fixed left-0 top-1 bottom-0 w-60 bg-[#0B2A4A] flex flex-col justify-between z-40 text-on-primary"><div class="flex flex-col"><div class="h-16 px-space-md border-b border-white/10 flex items-center gap-space-sm"><img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPhOKagOPdhGQkzQ2VgbkOYlEQUxg9vIXN_DKtKu_uxjkcsIDEQ_ABdrPxCfaIXZJ3byRpfQqCRPiC35_AcsChvNrI7nLR4pqsWIuI6USTKw8Dl-ZD6qxC71Kamu8sxPsW4ioLBTgn65Et-5jHnPX-WqMDOYNXLkZ50ESwfbU7xZPw7xMVzmYPXqEo1u5d-lgiAPQVaFv-KyZcnG7lacHRUPQ755gy6zMG_D87kYdBvHE3wTlEDGA" alt="Ministère de l'Économie et des Finances" style="height: 40px; width: auto; object-fit: contain;"><div class="flex flex-col"><span class="font-headline-sm text-white tracking-wider leading-none">SIGBD</span></div></div><nav class="flex flex-col gap-1 p-space-sm mt-space-sm" data-active-classes="bg-white/10 text-white font-label-lg font-semibold rounded-lg shadow-sm"><a class="flex items-center gap-3 px-space-md py-2.5 rounded-lg text-white/70 hover:bg-white/5 hover:text-white transition-all text-body-md font-body-md" data-path="tableau-de-bord" href="#"><span class="material-symbols-outlined text-[20px]">dashboard</span><span class="">Tableau de bord</span></a><a class="flex items-center gap-3 px-space-md py-2.5 rounded-lg text-white/70 hover:bg-white/5 hover:text-white transition-all text-body-md font-body-md" data-path="mes-saisies" href="#"><span class="material-symbols-outlined text-[20px]">edit_note</span><span class="">Mes saisies</span></a></nav></div><div class="p-space-md border-t border-white/10 flex flex-col gap-1"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-[#1E7B4F]"></span><span class="text-[11px] font-semibold text-white/90 leading-tight uppercase tracking-wider">DGBF · SSEBF</span></div></div></aside><div class="pl-60"><header class="fixed top-1 left-60 right-0 h-16 bg-surface-container-lowest border-b border-[#E3E8EF] z-30 flex items-center justify-between px-margin-desktop"><div class="flex items-center gap-2 text-body-sm font-body-sm text-on-surface-variant"><span class="material-symbols-outlined text-[18px] text-outline">home</span><span class="text-outline-variant">/</span><span class="text-on-surface font-semibold">SIGBD</span><span class="text-outline-variant">/</span><span class="text-primary font-medium">Portail Régional</span></div><div class="flex items-center gap-space-lg"><div class="flex items-center gap-space-md pl-space-md border-l border-[#E3E8EF]"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div><div class="flex flex-col text-left"><div class="flex items-center gap-2"><span class="font-label-lg text-label-lg text-on-surface">Hery Rakotoarivelo</span><span class="bg-tertiary-fixed text-on-tertiary-fixed border border-tertiary/20 font-label-sm text-label-sm px-2 py-0.5 rounded leading-none">Client</span></div><span class="text-body-sm font-body-sm text-on-surface-variant">SRB – Analamanga</span></div></div><a class="flex items-center gap-1.5 px-3 py-1.5 text-body-sm font-body-sm text-error hover:bg-error-container hover:text-on-error-container rounded-lg transition-colors border border-transparent hover:border-error/20" data-path="login" href="#"><span class="material-symbols-outlined text-[18px]">logout</span><span class="">Se déconnecter</span></a></div></header><main class="w-full pt-16 bg-[#F5F7FA] min-h-screen px-margin-desktop py-space-xl"><div class="flex flex-col w-full">
+<div class="w-full max-w-[880px] mx-auto flex flex-col gap-6 pb-28">
+<!-- 1. ALERT BANNER: Offline State -->
+<div class="w-full bg-[#FFF4E0] border-l-4 border-[#B7791F] rounded-lg p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm transition-all duration-300" id="offline-banner">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#B7791F] text-[20px] shrink-0 animate-pulse">wifi_off</span>
+<p class="font-body-md text-body-md text-[#1A2433] leading-snug">
+<span class="font-semibold text-[#B7791F]">Connexion interrompue.</span> Vos dernières modifications ne sont pas encore enregistrées. Ne fermez pas cette page.
+        </p>
+</div>
+<button class="shrink-0 h-9 px-4 bg-surface-container-lowest border border-[#B7791F] rounded-lg text-[#B7791F] font-label-md text-body-sm font-semibold hover:bg-[#FFF4E0] active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer shadow-sm" id="retry-btn" type="button">
+<span class="material-symbols-outlined text-[16px]">sync</span>
+<span class="">Réessayer maintenant</span>
+</button>
+</div>
+<!-- 2. PAGE HEADER -->
+<div class="w-full flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1 pb-2 border-b border-[#E3E8EF]">
+<div class="flex flex-col gap-1">
+<h1 class="font-headline-xl text-headline-xl text-[#0B2A4A] tracking-tight">Rapport d'activités</h1>
+<p class="font-body-md text-body-md text-[#5B6778]">Septembre 2026 · SRB – Analamanga</p>
+</div>
+<div class="flex flex-col sm:items-end gap-1.5 shrink-0">
+<span class="inline-flex items-center px-2.5 py-1 rounded bg-[#F1F4F9] text-[#5B6778] font-label-sm text-label-sm uppercase tracking-wider font-semibold border border-[#E3E8EF]">
+          Brouillon
+        </span>
+<div class="flex items-center gap-1.5 text-[#B7791F] font-body-sm text-body-sm font-medium">
+<span class="material-symbols-outlined text-[16px] text-[#B7791F]">warning</span>
+<span class="">Dernier enregistrement à 10:42</span>
+</div>
+</div>
+</div>
+<!-- 3. FORM SECTIONS -->
+<form class="flex flex-col gap-6" onsubmit="event.preventDefault()">
+<!-- SECTION 1: Informations Générales -->
+<section class="bg-surface-container-lowest border border-[#E3E8EF] rounded-xl p-6 shadow-sm flex flex-col gap-5">
+<div class="flex items-center gap-3">
+<div class="w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center font-label-md text-label-md shrink-0">
+            1
+          </div>
+<h2 class="font-headline-md text-headline-md text-[#0B2A4A]">Informations générales</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface-variant">Région</label>
+<input class="h-11 px-3.5 bg-surface-container-low border border-[#E3E8EF] rounded-lg text-on-surface-variant font-body-md text-body-md cursor-not-allowed select-none focus:outline-none" readonly="" type="text" value="Analamanga">
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface-variant">Structure</label>
+<input class="h-11 px-3.5 bg-surface-container-low border border-[#E3E8EF] rounded-lg text-on-surface-variant font-body-md text-body-md cursor-not-allowed select-none focus:outline-none" readonly="" type="text" value="SRB – Analamanga">
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface-variant">Rédacteur</label>
+<input class="h-11 px-3.5 bg-surface-container-low border border-[#E3E8EF] rounded-lg text-on-surface-variant font-body-md text-body-md cursor-not-allowed select-none focus:outline-none" readonly="" type="text" value="Hery Rakotoarivelo">
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface">Période <span class="text-error">*</span></label>
+<div class="relative">
+<select class="w-full h-11 px-3.5 pr-10 bg-surface-container-lowest border border-[#E3E8EF] rounded-lg text-on-surface font-body-md text-body-md focus:border-primary focus:outline-none transition-colors cursor-pointer appearance-none">
+<option selected="" value="2026-09">Septembre 2026</option>
+<option value="2026-08">Août 2026</option>
+<option value="2026-07">Juillet 2026</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-outline text-[20px]">expand_more</span>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 2: Activités Réalisées -->
+<section class="bg-surface-container-lowest border border-[#E3E8EF] rounded-xl p-6 shadow-sm flex flex-col gap-4">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-3">
+<div class="w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center font-label-md text-label-md shrink-0">
+              2
+            </div>
+<h2 class="font-headline-md text-headline-md text-[#0B2A4A]">Activités réalisées <span class="text-error">*</span></h2>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant ml-10">Ajoutez au moins une activité.</p>
+</div>
+<div class="overflow-x-auto rounded-lg border border-[#E3E8EF]">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low h-10 border-b border-[#E3E8EF]">
+<th class="px-4 text-left font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Libellé de l'activité</th>
+<th class="px-4 w-36 text-left font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Date</th>
+<th class="px-4 w-36 text-left font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Statut</th>
+<th class="px-3 w-12 text-center font-label-md text-label-md text-on-surface-variant"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-[#E3E8EF] text-body-md font-body-md">
+<tr class="h-12 hover:bg-surface-container-lowest/50 transition-colors">
+<td class="px-4 text-on-surface">Mission de contrôle des engagements dans les communes</td>
+<td class="px-4 text-on-surface font-metric-num text-body-sm">03/09/2026</td>
+<td class="px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[12px] font-semibold bg-[#E8F5E9] text-[#1E7B4F] border border-[#1E7B4F]/20">
+<span class="w-1.5 h-1.5 rounded-full bg-[#1E7B4F]"></span>Réalisée
+                  </span>
+</td>
+<td class="px-3 text-center">
+<button aria-label="Supprimer la ligne" class="text-outline hover:text-error transition-colors p-1 rounded hover:bg-error-container" type="button">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</td>
+</tr>
+<tr class="h-12 bg-surface-container-low/30 hover:bg-surface-container-lowest/50 transition-colors">
+<td class="px-4 text-on-surface">Formation des agents sur la nouvelle nomenclature budgétaire</td>
+<td class="px-4 text-on-surface font-metric-num text-body-sm">12/09/2026</td>
+<td class="px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[12px] font-semibold bg-[#E8F5E9] text-[#1E7B4F] border border-[#1E7B4F]/20">
+<span class="w-1.5 h-1.5 rounded-full bg-[#1E7B4F]"></span>Réalisée
+                  </span>
+</td>
+<td class="px-3 text-center">
+<button aria-label="Supprimer la ligne" class="text-outline hover:text-error transition-colors p-1 rounded hover:bg-error-container" type="button">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</td>
+</tr>
+<tr class="h-12 hover:bg-surface-container-lowest/50 transition-colors">
+<td class="px-4 text-on-surface">Appui aux EPN pour l'élaboration des comptes administratifs</td>
+<td class="px-4 text-on-surface font-metric-num text-body-sm">24/09/2026</td>
+<td class="px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[12px] font-semibold bg-[#FEF3C7] text-[#B7791F] border border-[#B7791F]/20">
+<span class="w-1.5 h-1.5 rounded-full bg-[#B7791F]"></span>En cours
+                  </span>
+</td>
+<td class="px-3 text-center">
+<button aria-label="Supprimer la ligne" class="text-outline hover:text-error transition-colors p-1 rounded hover:bg-error-container" type="button">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="flex justify-start">
+<button class="h-10 px-4 bg-surface-container-lowest border border-[#CCD4E0] rounded-lg text-on-surface font-label-md text-label-md hover:bg-surface-container-low transition-colors flex items-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-[18px] text-primary">add</span>
+<span class="">Ajouter une ligne</span>
+</button>
+</div>
+</section>
+<!-- SECTION 3: Indicateurs de performance -->
+<section class="bg-surface-container-lowest border border-[#E3E8EF] rounded-xl p-6 shadow-sm flex flex-col gap-4">
+<div class="flex items-center gap-3">
+<div class="w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center font-label-md text-label-md shrink-0">
+            3
+          </div>
+<div class="flex items-center gap-2">
+<h2 class="font-headline-md text-headline-md text-[#0B2A4A]">Indicateurs de performance</h2>
+<span class="text-body-sm font-body-sm text-outline-variant font-normal">(Facultatif)</span>
+</div>
+</div>
+<div class="overflow-x-auto rounded-lg border border-[#E3E8EF]">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low h-10 border-b border-[#E3E8EF]">
+<th class="px-4 text-left font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Indicateur</th>
+<th class="px-4 w-40 text-right font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Valeur atteinte</th>
+<th class="px-3 w-12 text-center"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-[#E3E8EF] text-body-md font-body-md">
+<tr class="h-12 hover:bg-surface-container-lowest/50 transition-colors">
+<td class="px-4 text-on-surface">Nombre de missions de contrôle réalisées</td>
+<td class="px-4 text-right font-metric-num text-body-md font-semibold text-on-surface">4</td>
+<td class="px-3 text-center">
+<button aria-label="Supprimer l'indicateur" class="text-outline hover:text-error transition-colors p-1 rounded hover:bg-error-container" type="button">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</td>
+</tr>
+<tr class="h-12 bg-surface-container-low/30 hover:bg-surface-container-lowest/50 transition-colors">
+<td class="px-4 text-on-surface">Dossiers traités dans les délais (%)</td>
+<td class="px-4 text-right font-metric-num text-body-md font-semibold text-on-surface">92 %</td>
+<td class="px-3 text-center">
+<button aria-label="Supprimer l'indicateur" class="text-outline hover:text-error transition-colors p-1 rounded hover:bg-error-container" type="button">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="flex justify-start">
+<button class="h-10 px-4 bg-surface-container-lowest border border-[#CCD4E0] rounded-lg text-on-surface font-label-md text-label-md hover:bg-surface-container-low transition-colors flex items-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-[18px] text-primary">add</span>
+<span class="">Ajouter une ligne</span>
+</button>
+</div>
+</section>
+<!-- SECTION 4: Difficultés rencontrées et solutions -->
+<section class="bg-surface-container-lowest border border-[#E3E8EF] rounded-xl p-6 shadow-sm flex flex-col gap-4">
+<div class="flex items-center gap-3">
+<div class="w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center font-label-md text-label-md shrink-0">
+            4
+          </div>
+<div class="flex items-center gap-2">
+<h2 class="font-headline-md text-headline-md text-[#0B2A4A]">Difficultés rencontrées et solutions</h2>
+<span class="text-body-sm font-body-sm text-outline-variant font-normal">(Facultatif)</span>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<textarea class="w-full p-3.5 bg-surface-container-lowest border border-[#E3E8EF] rounded-lg text-on-surface font-body-md text-body-md focus:border-primary focus:outline-none transition-colors resize-y leading-relaxed" placeholder="Décrivez les contraintes techniques, humaines ou logistiques et les mesures palliatives..." rows="3">Retards de transmission des pièces par certaines communes. Relances effectuées par téléphone et courrier.</textarea>
+<div class="flex justify-end">
+<span class="text-body-sm font-body-sm text-outline">118 / 2000</span>
+</div>
+</div>
+</section>
+<!-- SECTION 5: Perspectives et besoins -->
+<section class="bg-surface-container-lowest border border-[#E3E8EF] rounded-xl p-6 shadow-sm flex flex-col gap-4">
+<div class="flex items-center gap-3">
+<div class="w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center font-label-md text-label-md shrink-0">
+            5
+          </div>
+<div class="flex items-center gap-2">
+<h2 class="font-headline-md text-headline-md text-[#0B2A4A]">Perspectives et besoins</h2>
+<span class="text-body-sm font-body-sm text-outline-variant font-normal">(Facultatif)</span>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<textarea class="w-full p-3.5 bg-surface-container-lowest border border-[#E3E8EF] rounded-lg text-on-surface font-body-md text-body-md focus:border-primary focus:outline-none transition-colors resize-y leading-relaxed" placeholder="Plan prévisionnel pour le mois à venir, appuis logistiques requis..." rows="3">Poursuivre les missions d'appui en octobre. Besoin d'un véhicule supplémentaire pour les déplacements.</textarea>
+<div class="flex justify-end">
+<span class="text-body-sm font-body-sm text-outline">112 / 2000</span>
+</div>
+</div>
+</section>
+<!-- SECTION 6: Pièces justificatives -->
+<section class="bg-surface-container-lowest border border-[#E3E8EF] rounded-xl p-6 shadow-sm flex flex-col gap-4">
+<div class="flex items-center gap-3">
+<div class="w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center font-label-md text-label-md shrink-0">
+            6
+          </div>
+<div class="flex items-center gap-2">
+<h2 class="font-headline-md text-headline-md text-[#0B2A4A]">Pièces justificatives</h2>
+<span class="text-body-sm font-body-sm text-outline-variant font-normal">(Facultatif)</span>
+</div>
+</div>
+<div class="w-full border-2 border-dashed border-[#CCD4E0] hover:border-primary rounded-xl p-8 flex flex-col items-center justify-center gap-2 bg-surface hover:bg-surface-container-low transition-colors cursor-pointer group">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-primary group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[24px]">cloud_upload</span>
+</div>
+<p class="font-headline-sm text-headline-sm text-on-surface text-center">
+            Glissez un fichier ici ou <span class="text-primary underline">cliquez pour le choisir</span>
+</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant text-center">
+            Formats acceptés : PDF, image. Taille maximale : 5 Mo
+          </p>
+</div>
+</section>
+</form>
+</div>
+<!-- 4. STICKY ACTION BAR AT BOTTOM -->
+<div class="fixed bottom-0 left-60 right-0 h-[72px] bg-surface-container-lowest border-t border-[#E3E8EF] z-20 flex items-center shadow-md px-margin-desktop">
+<div class="w-full max-w-[880px] mx-auto flex items-center justify-between">
+<div>
+<button class="h-11 px-4 text-[#8A94A6] font-label-lg text-label-lg opacity-50 cursor-not-allowed select-none transition-none" disabled="" type="button">
+          Annuler
+        </button>
+</div>
+<div class="flex items-center gap-3">
+<button class="h-11 px-4 bg-surface-container-lowest border border-[#E3E8EF] rounded-lg text-[#8A94A6] font-label-lg text-label-lg opacity-50 cursor-not-allowed select-none shadow-none" disabled="" type="button">
+          Enregistrer en brouillon
+        </button>
+<button class="h-11 px-6 bg-[#D1D5DB] rounded-lg text-white font-label-lg text-label-lg opacity-60 cursor-not-allowed select-none shadow-none" disabled="" type="button">
+          Soumettre
+        </button>
+</div>
+</div>
+</div>
+</div>
+<script>
+  (function() {
+    const retryBtn = document.getElementById('retry-btn');
+    if (retryBtn) {
+      retryBtn.addEventListener('click', function() {
+        const icon = retryBtn.querySelector('.material-symbols-outlined');
+        if (icon) {
+          icon.classList.add('animate-spin');
+        }
+        retryBtn.disabled = true;
+        setTimeout(function() {
+          if (icon) {
+            icon.classList.remove('animate-spin');
+          }
+          retryBtn.disabled = false;
+        }, 1500);
+      });
+    }
+  })();
+</script></main></div>
+
+</body></html>

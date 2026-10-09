@@ -1,0 +1,338 @@
+<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><meta content="web_dashboard" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "on-secondary": "#ffffff",
+          "on-primary": "#ffffff",
+          "tertiary-container": "#036d42",
+          "on-secondary-fixed": "#001c38",
+          "primary-container": "#1f5fa8",
+          "on-primary-fixed-variant": "#004787",
+          "on-background": "#101c2b",
+          "error": "#ba1a1a",
+          "surface-variant": "#d7e3f7",
+          "primary": "#004788",
+          "surface-container-high": "#dde9fd",
+          "on-error-container": "#93000a",
+          "surface-dim": "#cfdbef",
+          "on-tertiary": "#ffffff",
+          "surface-tint": "#1f5fa8",
+          "on-error": "#ffffff",
+          "outline": "#727782",
+          "secondary-container": "#bbd6ff",
+          "on-surface": "#101c2b",
+          "secondary-fixed": "#d3e4ff",
+          "on-tertiary-fixed": "#002111",
+          "primary-fixed": "#d5e3ff",
+          "on-surface-variant": "#424751",
+          "inverse-surface": "#253140",
+          "surface-container-highest": "#d7e3f7",
+          "surface-container-low": "#eff4ff",
+          "outline-variant": "#c2c6d3",
+          "inverse-on-surface": "#eaf1ff",
+          "tertiary-fixed": "#9df5bf",
+          "error-container": "#ffdad6",
+          "secondary-fixed-dim": "#aec8f0",
+          "on-secondary-fixed-variant": "#2d486a",
+          "secondary": "#466083",
+          "on-primary-container": "#c5daff",
+          "surface-bright": "#f8f9ff",
+          "tertiary-fixed-dim": "#81d8a4",
+          "surface": "#f8f9ff",
+          "inverse-primary": "#a7c8ff",
+          "on-primary-fixed": "#001c3b",
+          "tertiary": "#005231",
+          "primary-fixed-dim": "#a7c8ff",
+          "on-tertiary-container": "#93ecb6",
+          "surface-container-lowest": "#ffffff",
+          "surface-container": "#e5eeff",
+          "on-secondary-container": "#435d80",
+          "on-tertiary-fixed-variant": "#005231",
+          "background": "#f8f9ff"
+        },
+        "borderRadius": {
+          "DEFAULT": "0.25rem",
+          "lg": "0.5rem",
+          "xl": "0.75rem",
+          "full": "9999px"
+        },
+        "spacing": {
+          "space-sm": "0.5rem",
+          "space-md": "1rem",
+          "margin-desktop": "2rem",
+          "space-xs": "0.25rem",
+          "gutter-desktop": "1.5rem",
+          "space-xl": "2rem",
+          "space-lg": "1.5rem",
+          "margin": "1rem",
+          "gutter": "1rem"
+        },
+        "fontFamily": {
+          "headline-md": [
+            "Inter"
+          ],
+          "metric-num": [
+            "Inter"
+          ],
+          "label-sm": [
+            "Inter"
+          ],
+          "label-md": [
+            "Inter"
+          ],
+          "label-lg": [
+            "Inter"
+          ],
+          "headline-sm": [
+            "Inter"
+          ],
+          "headline-xl": [
+            "Inter"
+          ],
+          "body-lg": [
+            "Inter"
+          ],
+          "body-md": [
+            "Inter"
+          ],
+          "headline-xl-mobile": [
+            "Inter"
+          ],
+          "headline-lg": [
+            "Inter"
+          ],
+          "body-sm": [
+            "Inter"
+          ]
+        },
+        "fontSize": {
+          "headline-md": [
+            "20px",
+            {
+              "lineHeight": "28px",
+              "fontWeight": "600"
+            }
+          ],
+          "metric-num": [
+            "22px",
+            {
+              "lineHeight": "28px",
+              "letterSpacing": "-0.01em",
+              "fontWeight": "600"
+            }
+          ],
+          "label-sm": [
+            "11px",
+            {
+              "lineHeight": "14px",
+              "letterSpacing": "0.03em",
+              "fontWeight": "500"
+            }
+          ],
+          "label-md": [
+            "12px",
+            {
+              "lineHeight": "16px",
+              "letterSpacing": "0.02em",
+              "fontWeight": "600"
+            }
+          ],
+          "label-lg": [
+            "14px",
+            {
+              "lineHeight": "20px",
+              "fontWeight": "600"
+            }
+          ],
+          "headline-sm": [
+            "16px",
+            {
+              "lineHeight": "24px",
+              "fontWeight": "600"
+            }
+          ],
+          "headline-xl": [
+            "32px",
+            {
+              "lineHeight": "40px",
+              "letterSpacing": "-0.02em",
+              "fontWeight": "700"
+            }
+          ],
+          "body-lg": [
+            "16px",
+            {
+              "lineHeight": "24px",
+              "fontWeight": "400"
+            }
+          ],
+          "body-md": [
+            "14px",
+            {
+              "lineHeight": "20px",
+              "fontWeight": "400"
+            }
+          ],
+          "headline-xl-mobile": [
+            "24px",
+            {
+              "lineHeight": "32px",
+              "letterSpacing": "-0.01em",
+              "fontWeight": "700"
+            }
+          ],
+          "headline-lg": [
+            "24px",
+            {
+              "lineHeight": "32px",
+              "letterSpacing": "-0.01em",
+              "fontWeight": "600"
+            }
+          ],
+          "body-sm": [
+            "13px",
+            {
+              "lineHeight": "18px",
+              "fontWeight": "400"
+            }
+          ]
+        }
+      },
+    },
+  }</script></head><body class="bg-[#F5F7FA] font-body-md text-on-surface antialiased"><div class="fixed top-0 left-0 w-full h-1 flex z-50"><div class="w-1/2 h-full bg-[#B42318]"></div><div class="w-1/2 h-full bg-[#1E7B4F]"></div></div><aside class="fixed left-0 top-1 bottom-0 w-60 bg-[#0B2A4A] flex flex-col justify-between z-40 text-on-primary"><div class="flex flex-col"><div class="h-16 px-space-md border-b border-white/10 flex items-center gap-space-sm"><img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDog3OSCfJr2GIaHEoS6piyGC_JU3w_2Or7Sxt3XcLGnJEHVUUinMs6k8sGKLr-ORPOBOe6_bV3m8aR8HqqwsQ6aUmsShX8D2NJ7YvOac0J2l15LtLuFvUF-PZVwitARsifh5fhvHqU7ONaHeZHQjxmxI0A04gZQxCU2Lk_36yk2t03dKgQ8dpEBWh6o6aGok5dftLKkoJDklotq_5Pd3JXYH5x4bIuVUHuidjfvkHyx6DNsV4zjEE" alt="Ministère de l'Économie et des Finances" style="height: 40px; width: auto; object-fit: contain;"><span class="font-headline-sm text-white tracking-wider leading-none">SIGBD</span></div><nav class="flex flex-col gap-1 p-space-sm mt-space-sm" data-active-classes="bg-white/10 text-white font-label-lg font-semibold rounded-lg shadow-sm"><a class="flex items-center gap-3 px-space-md py-2.5 rounded-lg text-white/70 hover:bg-white/5 hover:text-white transition-all text-body-md font-body-md" data-path="tableau-de-bord" href="#"><span class="material-symbols-outlined text-[20px]">dashboard</span><span class="">Tableau de bord</span></a><a aria-current="page" class="flex items-center gap-3 px-space-md py-2.5 rounded-lg bg-white/10 text-white font-label-lg font-semibold shadow-sm transition-all" data-path="mes-saisies" href="#"><span class="material-symbols-outlined text-[20px]">edit_note</span><span class="">Mes saisies</span></a></nav></div><div class="p-space-md border-t border-white/10 flex flex-col gap-1"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-[#1E7B4F]"></span><span class="text-[11px] font-semibold text-white/90 leading-tight uppercase tracking-wider">DGBF · SSEBF</span></div></div></aside><div class="pl-60"><header class="fixed top-1 left-60 right-0 h-16 bg-surface-container-lowest border-b border-[#E3E8EF] z-30 flex items-center justify-between px-margin-desktop"><div class="flex items-center gap-2 text-body-sm font-body-sm text-on-surface-variant">
+          <span class="material-symbols-outlined text-[18px] text-outline">home</span>
+          <span class="text-outline-variant">/</span>
+          <span class="text-on-surface font-semibold">SIGBD</span>
+          <span class="text-outline-variant">/</span>
+          <span class="text-primary font-medium">Mes saisies</span>
+        </div><div class="flex items-center gap-space-lg"><div class="flex items-center gap-space-md pl-space-md border-l border-[#E3E8EF]"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div><div class="flex flex-col text-left"><div class="flex items-center gap-2"><span class="font-label-lg text-label-lg text-on-surface">Hery Rakotoarivelo</span><span class="bg-tertiary-fixed text-on-tertiary-fixed border border-tertiary/20 font-label-sm text-label-sm px-2 py-0.5 rounded leading-none">Client</span></div><span class="text-body-sm font-body-sm text-on-surface-variant">SRB – Analamanga</span></div></div><a class="flex items-center gap-1.5 px-3 py-1.5 text-body-sm font-body-sm text-error hover:bg-error-container hover:text-on-error-container rounded-lg transition-colors border border-transparent hover:border-error/20" data-path="login" href="#"><span class="material-symbols-outlined text-[18px]">logout</span><span class="">Se déconnecter</span></a></div></header><main class="w-full pt-16 bg-[#F5F7FA] min-h-screen px-margin-desktop py-space-xl"><div class="flex flex-col w-full">
+<script>
+    (() => {
+      const navLinks = document.querySelectorAll('aside nav a');
+      navLinks.forEach((link) => {
+        const path = link.getAttribute('data-path');
+        if (path === 'mes-saisies') {
+          link.className = 'flex items-center gap-3 px-space-md py-2.5 rounded-lg bg-white/10 text-white font-label-lg font-semibold shadow-sm transition-all';
+        } else {
+          link.className = 'flex items-center gap-3 px-space-md py-2.5 rounded-lg text-white/70 hover:bg-white/5 hover:text-white transition-all text-body-md font-body-md';
+        }
+      });
+      const breadcrumb = document.querySelector('header div.flex.items-center.gap-2');
+      if (breadcrumb) {
+        breadcrumb.innerHTML = `
+          <span class="material-symbols-outlined text-[18px] text-outline">home</span>
+          <span class="text-outline-variant">/</span>
+          <span class="text-on-surface font-semibold">SIGBD</span>
+          <span class="text-outline-variant">/</span>
+          <span class="text-primary font-medium">Mes saisies</span>
+        `;
+      }
+    })();
+  </script>
+<div class="flex flex-col gap-6 max-w-7xl mx-auto w-full">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-label-sm font-semibold tracking-wide uppercase bg-surface-container-high text-primary">
+            Exercice Budgétaire 2026
+          </span>
+<span class="text-outline-variant text-body-sm">•</span>
+<span class="text-body-sm font-body-sm text-secondary">Direction Régionale</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Mes saisies</h1>
+<p class="font-body-md text-body-md text-secondary">
+          Retrouvez toutes vos saisies et leur état d'avancement.
+        </p>
+</div>
+<div class="flex items-center gap-3 self-start md:self-auto">
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container-low shadow-sm">
+<span class="material-symbols-outlined text-outline text-[18px]">history</span>
+<span class="font-body-sm text-body-sm text-secondary">Dernière synchronisation : <strong class="font-medium text-on-surface">Aujourd'hui à 08:30</strong></span>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm">
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-3 flex-1">
+<div class="relative">
+<label class="block font-label-sm text-label-sm text-outline mb-1.5 uppercase tracking-wider font-semibold">
+              Module
+            </label>
+<div class="h-11 w-full bg-surface-container-low rounded-lg px-3.5 flex items-center justify-between text-outline cursor-not-allowed opacity-60 select-none">
+<div class="flex items-center gap-2.5 truncate">
+<span class="material-symbols-outlined text-[18px] text-outline">view_module</span>
+<span class="font-body-md text-body-md text-outline">Tous les modules</span>
+</div>
+<span class="material-symbols-outlined text-[18px] text-outline">expand_more</span>
+</div>
+</div>
+<div class="relative">
+<label class="block font-label-sm text-label-sm text-outline mb-1.5 uppercase tracking-wider font-semibold">
+              Période
+            </label>
+<div class="h-11 w-full bg-surface-container-low rounded-lg px-3.5 flex items-center justify-between text-outline cursor-not-allowed opacity-60 select-none">
+<div class="flex items-center gap-2.5 truncate">
+<span class="material-symbols-outlined text-[18px] text-outline">calendar_today</span>
+<span class="font-body-md text-body-md text-outline">Toutes les périodes</span>
+</div>
+<span class="material-symbols-outlined text-[18px] text-outline">expand_more</span>
+</div>
+</div>
+<div class="relative">
+<label class="block font-label-sm text-label-sm text-outline mb-1.5 uppercase tracking-wider font-semibold">
+              Statut du dossier
+            </label>
+<div class="h-11 w-full bg-surface-container-low rounded-lg px-3.5 flex items-center justify-between text-outline cursor-not-allowed opacity-60 select-none">
+<div class="flex items-center gap-2.5 truncate">
+<span class="material-symbols-outlined text-[18px] text-outline">hourglass_empty</span>
+<span class="font-body-md text-body-md text-outline">Tous les statuts</span>
+</div>
+<span class="material-symbols-outlined text-[18px] text-outline">expand_more</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2 lg:self-end pt-1 lg:pt-0">
+<button class="h-11 px-4 rounded-lg bg-surface-container-low text-outline font-label-lg text-label-lg flex items-center gap-2 cursor-not-allowed opacity-60 select-none" disabled="" type="button">
+<span class="material-symbols-outlined text-[18px]">tune</span>
+<span class="">Réinitialiser</span>
+</button>
+</div>
+</div>
+</div>
+<div class="w-full flex justify-center mt-2">
+<div class="bg-surface-container-lowest rounded-xl p-16 w-full max-w-[880px] shadow-sm flex flex-col items-center text-center relative overflow-hidden">
+<div class="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-surface-container-high/40 blur-3xl pointer-events-none"></div>
+<div class="absolute -bottom-24 -left-24 w-72 h-72 rounded-full bg-surface-container-high/40 blur-3xl pointer-events-none"></div>
+<div class="relative flex items-center justify-center mb-6">
+<div class="w-20 h-20 rounded-full bg-surface-container-low flex items-center justify-center shadow-inner">
+<span class="material-symbols-outlined text-outline text-[40px] leading-none">folder_open</span>
+</div>
+<div class="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-surface-container-high flex items-center justify-center text-primary shadow-sm">
+<span class="material-symbols-outlined text-[16px]">info</span>
+</div>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface mb-2 font-semibold">
+          Vous n'avez encore aucune saisie
+        </h2>
+<p class="font-body-md text-body-md text-secondary max-w-md mx-auto mb-8">
+          Vos saisies apparaîtront ici dès que vous aurez commencé un module budgétaire ou complété un bordereau régional.
+        </p>
+<a class="inline-flex items-center justify-center h-11 px-6 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg transition-colors gap-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20" data-path="tableau-de-bord" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+<span class="">Aller au tableau de bord</span>
+</a>
+<div class="mt-12 pt-8 w-full max-w-lg flex flex-col items-center gap-3">
+<div class="h-0.5 w-16 bg-surface-container-high rounded-full"></div>
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Aide à la complétion</span>
+<p class="font-body-sm text-body-sm text-secondary">
+            Besoin d'accompagnement pour démarrer une saisie de dotation ? Consultez le guide utilisateur ou contactez le délégué régional DGBF.
+          </p>
+</div>
+</div>
+</div>
+</div>
+</div></main></div>
+
+</body></html>

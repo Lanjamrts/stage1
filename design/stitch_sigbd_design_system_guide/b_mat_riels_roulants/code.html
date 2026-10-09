@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+
+<html lang="fr"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"error-container":"#ffdad6","background":"#f8f9ff","on-surface":"#101c2b","surface-variant":"#d7e3f7","tertiary-fixed":"#9df5bf","surface-tint":"#1f5fa8","on-tertiary-fixed":"#002111","secondary-fixed":"#d3e4ff","on-tertiary-container":"#93ecb6","surface-dim":"#cfdbef","on-background":"#101c2b","surface-container-highest":"#d7e3f7","inverse-on-surface":"#eaf1ff","on-primary-fixed-variant":"#004787","on-surface-variant":"#424751","on-primary":"#ffffff","tertiary-fixed-dim":"#81d8a4","tertiary":"#005231","tertiary-container":"#036d42","on-secondary":"#ffffff","on-tertiary":"#ffffff","surface-container-high":"#dde9fd","on-primary-fixed":"#001c3b","primary":"#004788","primary-fixed-dim":"#a7c8ff","secondary-fixed-dim":"#aec8f0","on-secondary-fixed-variant":"#2d486a","inverse-surface":"#253140","inverse-primary":"#a7c8ff","outline-variant":"#c2c6d3","on-error":"#ffffff","outline":"#727782","on-tertiary-fixed-variant":"#005231","surface-container-low":"#eff4ff","surface-container-lowest":"#ffffff","primary-container":"#1f5fa8","surface-container":"#e5eeff","on-secondary-container":"#435d80","secondary-container":"#bbd6ff","on-secondary-fixed":"#001c38","primary-fixed":"#d5e3ff","on-error-container":"#93000a","surface-bright":"#f8f9ff","on-primary-container":"#c5daff","surface":"#f8f9ff","error":"#ba1a1a","secondary":"#466083"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"space-lg":"1.5rem","gutter-desktop":"1.5rem","gutter":"1rem","space-xs":"0.25rem","space-sm":"0.5rem","margin-desktop":"2rem","margin":"1rem","space-md":"1rem","space-xl":"2rem"},"fontFamily":{"body-md":["Inter"],"body-sm":["Inter"],"body-lg":["Inter"],"label-lg":["Inter"],"headline-lg":["Inter"],"label-md":["Inter"],"label-sm":["Inter"],"metric-num":["Inter"],"headline-xl":["Inter"],"headline-sm":["Inter"],"headline-md":["Inter"],"headline-xl-mobile":["Inter"]},"fontSize":{"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}],"body-sm":["13px",{"lineHeight":"18px","fontWeight":"400"}],"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"label-lg":["14px",{"lineHeight":"20px","fontWeight":"600"}],"headline-lg":["24px",{"lineHeight":"32px","letterSpacing":"-0.01em","fontWeight":"600"}],"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0.02em","fontWeight":"600"}],"label-sm":["11px",{"lineHeight":"14px","letterSpacing":"0.03em","fontWeight":"500"}],"metric-num":["22px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"600"}],"headline-xl":["32px",{"lineHeight":"40px","letterSpacing":"-0.02em","fontWeight":"700"}],"headline-sm":["16px",{"lineHeight":"24px","fontWeight":"600"}],"headline-md":["20px",{"lineHeight":"28px","fontWeight":"600"}],"headline-xl-mobile":["24px",{"lineHeight":"32px","letterSpacing":"-0.01em","fontWeight":"700"}]}}}}</script></head><body class="bg-background font-body-md text-on-surface antialiased min-h-screen"><div class="fixed top-0 left-0 right-0 h-1 z-[60] flex"><div class="w-1/2 h-full bg-[#B42318]"></div><div class="w-1/2 h-full bg-[#1E7B4F]"></div></div><aside class="fixed left-0 top-1 h-[calc(100vh-4px)] w-[240px] bg-[#0B2A4A] z-50 flex flex-col justify-between select-none"><div class="flex flex-col"><div class="h-16 px-space-md flex items-center gap-space-sm border-b border-[#133E6E]/40"><img alt="MEF Emblem" class="h-10 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UOEFzzVWKsKd7D4_tckAmMcRr0d-XGnSpF987DdvxBkNEkYqzOAZkzEnTS_NJ44TY1EjwWdLuVWrr4XjhrK6ySfV31SlW7iRceuUgaAPFsUIe3xvu1P2dq2-KLkfrKjF-ENp96Ef_o6OCngIKSG2LG03JxgDdyQN3J7LHSnUkC1SKua8SLLlcscD7C-r9mJsLUzsgV4GsPnHI5PshDYwwZf2Af_VNq-UuTUnzS3gSLhPz0g6htv1orMA"/><span class="font-headline-md text-headline-md font-bold tracking-tight text-white">SIGBD</span></div><nav class="px-space-sm pt-space-md flex flex-col gap-1" data-active-classes="bg-primary-container text-white font-label-lg text-label-lg rounded-lg"><a aria-current="page" class="flex items-center gap-space-sm px-space-md py-2.5 transition-colors bg-primary-container text-white font-label-lg text-label-lg rounded-lg" data-path="tableau-de-bord" href="#"><span class="material-symbols-outlined text-[20px]">dashboard</span><span>Tableau de bord</span></a><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-colors font-label-lg text-label-lg" data-path="mes-saisies" href="#"><span class="material-symbols-outlined text-[20px]">edit_note</span><span>Mes saisies</span></a></nav></div><div class="p-space-md border-t border-[#133E6E]/40"><p class="font-label-sm text-label-sm tracking-wider text-white/60 uppercase font-medium">DGBF · SSEBF</p></div></aside><div class="pl-[240px]"><header class="fixed top-1 left-[240px] right-0 h-16 bg-surface-container-lowest z-40 border-b border-outline-variant/30 flex items-center justify-between px-margin-desktop"><div class="flex items-center gap-space-xs font-body-sm text-body-sm text-on-surface-variant"><span class="hover:text-on-surface transition-colors cursor-pointer">SIGBD</span><span class="material-symbols-outlined text-[16px] text-outline">chevron_right</span><span class="text-on-surface font-label-sm text-label-sm font-semibold">Portail</span></div><div class="flex items-center gap-space-lg"><div class="flex items-center gap-space-sm"><div class="flex flex-col text-right"><span class="font-label-md text-label-md text-on-surface font-semibold">Hery Rakotoarivelo</span><span class="font-body-sm text-body-sm text-on-surface-variant">SRB – Analamanga</span></div><span class="inline-flex items-center px-2 py-0.5 rounded bg-surface-container text-primary font-label-sm text-label-sm font-medium">Client</span><img alt="Profile" class="w-8 h-8 rounded-full object-cover border border-outline-variant/40 ml-1" src="https://lh3.googleusercontent.com/aida/AEtjO1UOEFzzVWKsKd7D4_tckAmMcRr0d-XGnSpF987DdvxBkNEkYqzOAZkzEnTS_NJ44TY1EjwWdLuVWrr4XjhrK6ySfV31SlW7iRceuUgaAPFsUIe3xvu1P2dq2-KLkfrKjF-ENp96Ef_o6OCngIKSG2LG03JxgDdyQN3J7LHSnUkC1SKua8SLLlcscD7C-r9mJsLUzsgV4GsPnHI5PshDYwwZf2Af_VNq-UuTUnzS3gSLhPz0g6htv1orMA"/></div><div class="h-6 w-px bg-outline-variant/40"></div><a class="inline-flex items-center gap-1.5 font-label-md text-label-md text-error hover:text-on-error-container transition-colors" data-path="connexion" href="#"><span class="material-symbols-outlined text-[18px]">logout</span><span>Se déconnecter</span></a></div></header><main class="relative pt-16 bg-background min-h-screen px-margin-desktop py-space-xl"><div class="flex flex-col w-full">
+<div class="w-full max-w-[1120px] mx-auto pb-24">
+<!-- Breadcrumb -->
+<nav aria-label="Fil d'Ariane" class="flex items-center gap-space-xs font-body-sm text-body-sm text-on-surface-variant mb-space-md">
+<a class="hover:text-primary transition-colors" href="#">Tableau de bord</a>
+<span class="material-symbols-outlined text-[16px] text-outline">chevron_right</span>
+<span class="hover:text-primary transition-colors">Recensement matériels roulants</span>
+<span class="material-symbols-outlined text-[16px] text-outline">chevron_right</span>
+<span class="text-on-surface font-label-sm text-label-sm font-semibold">T3 2026</span>
+</nav>
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-md mb-space-xl bg-surface-container-lowest p-space-lg rounded-xl shadow-sm">
+<div class="flex flex-col gap-0.5">
+<h1 class="text-[28px] leading-[36px] font-semibold tracking-tight text-[#0B2A4A]">Recensement matériels roulants</h1>
+<p class="font-body-md text-body-md text-[#5B6778]">T3 2026 · SRB – Analamanga</p>
+</div>
+<div class="flex flex-col items-start md:items-end gap-1.5 self-start md:self-auto">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-surface-container text-[#5B6778] font-medium">Brouillon</span>
+<div class="inline-flex items-center gap-1 font-body-sm text-[13px] text-[#1E7B4F]">
+<span class="material-symbols-outlined text-[16px] text-[#1E7B4F]">check_circle</span>
+<span>Brouillon enregistré à 09:35</span>
+</div>
+</div>
+</div>
+<!-- Forms Container -->
+<div class="flex flex-col gap-space-xl">
+<!-- Section 1: Informations générales -->
+<section class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col gap-space-lg">
+<div class="flex items-center gap-space-sm pb-space-sm">
+<div class="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center font-label-md text-label-md font-semibold">
+            1
+          </div>
+<h2 class="text-[20px] leading-[28px] font-semibold text-[#0B2A4A]">1. Informations générales</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-lg">
+<!-- Structure Field (Read-only) -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-[#1A2433] font-medium" for="field-structure">Structure</label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3.5 text-[18px] text-[#5B6778] select-none pointer-events-none">lock</span>
+<input class="w-full h-11 pl-10 pr-3.5 rounded-lg bg-[#F8F9FA] text-[#1A2433] font-body-md text-body-md cursor-not-allowed select-none focus:outline-none" id="field-structure" readonly="" type="text" value="SRB – Analamanga"/>
+</div>
+</div>
+<!-- Période Field -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-[#1A2433] font-medium" for="field-periode">
+              Période <span class="text-error font-bold">*</span>
+</label>
+<div class="relative flex items-center">
+<select class="w-full h-11 px-3.5 rounded-lg bg-surface-container-lowest text-[#1A2433] font-body-md text-body-md appearance-none focus:outline-none focus:bg-surface-container-low transition-colors cursor-pointer" id="field-periode">
+<option selected="" value="T3 2026">T3 2026</option>
+<option value="T2 2026">T2 2026</option>
+<option value="T1 2026">T1 2026</option>
+<option value="T4 2025">T4 2025</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 text-[20px] text-[#5B6778] pointer-events-none select-none">arrow_drop_down</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: Véhicules -->
+<section class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col gap-space-lg">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-space-sm">
+<div class="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center font-label-md text-label-md font-semibold">
+              2
+            </div>
+<h2 class="text-[20px] leading-[28px] font-semibold text-[#0B2A4A]">
+              2. Véhicules <span class="text-error font-bold">*</span>
+</h2>
+</div>
+<p class="font-body-sm text-[13px] text-[#5B6778] pl-9">Une ligne par véhicule. L'immatriculation doit être unique.</p>
+</div>
+<!-- Table Container -->
+<div class="overflow-x-auto rounded-lg bg-surface-container-lowest">
+<table class="w-full text-left border-collapse min-w-[960px]" id="vehicles-table">
+<thead>
+<tr class="bg-[#0B2A4A] text-on-primary font-label-sm text-label-sm uppercase tracking-wider h-10 select-none">
+<th class="px-3 font-semibold whitespace-nowrap" scope="col">Type de véhicule <span class="text-error-container">*</span></th>
+<th class="px-3 font-semibold whitespace-nowrap" scope="col">Marque <span class="text-error-container">*</span></th>
+<th class="px-3 font-semibold whitespace-nowrap" scope="col">Modèle <span class="text-error-container">*</span></th>
+<th class="px-3 font-semibold whitespace-nowrap" scope="col">Immatriculation <span class="text-error-container">*</span></th>
+<th class="px-3 font-semibold whitespace-nowrap" scope="col">Année circ. <span class="text-error-container">*</span></th>
+<th class="px-3 font-semibold whitespace-nowrap" scope="col">État <span class="text-error-container">*</span></th>
+<th class="px-3 font-semibold whitespace-nowrap" scope="col">Service d'affectation</th>
+<th class="px-3 font-semibold whitespace-nowrap" scope="col">Agent d'affectation</th>
+<th class="px-2 text-center w-12 font-semibold" scope="col">Actions</th>
+</tr>
+</thead>
+<tbody id="vehicle-rows-body">
+<!-- Row 1 -->
+<tr class="h-11 bg-surface-container-lowest hover:bg-surface-container-low transition-colors" data-row-id="1">
+<td class="px-3 py-1.5">
+<div class="relative">
+<select class="w-full h-8 px-2 rounded bg-surface-container-low text-[#1A2433] font-body-sm text-body-sm appearance-none focus:outline-none">
+<option selected="" value="Voiture">Voiture</option>
+<option value="Camionnette">Camionnette</option>
+<option value="Moto">Moto</option>
+<option value="Autre">Autre</option>
+</select>
+<span class="material-symbols-outlined absolute right-1 top-1.5 text-[16px] text-outline pointer-events-none">arrow_drop_down</span>
+</div>
+</td>
+<td class="px-3 py-1.5">
+<input class="w-full h-8 px-2 rounded bg-surface-container-low text-[#1A2433] font-body-sm text-body-sm focus:outline-none" type="text" value="Toyota"/>
+</td>
+<td class="px-3 py-1.5">
+<input class="w-full h-8 px-2 rounded bg-surface-container-low text-[#1A2433] font-body-sm text-body-sm focus:outline-none" type="text" value="Hilux"/>
+</td>
+<td class="px-3 py-1.5">
+<input class="w-full h-8 px-2 rounded bg-surface-container-low text-[#1A2433] font-body-sm text-body-sm uppercase font-semibold focus:outline-none" type="text" value="4521 TBA"/>
+</td>
+<td class="px-3 py-1.5">
+<input class="w-20 h-8 px-2 rounded bg-surface-container-low text-[#1A2433] font-body-sm text-body-sm focus:outline-none" placeholder="AAAA" type="number" value="2017"/>
+</td>
+<td class="px-3 py-1.5">
+<div class="relative">
+<select class="w-full h-8 px-2 rounded bg-surface-container-low font-body-sm text-body-sm font-medium text-[#1E7B4F] appearance-none focus:outline-none">
+<option class="text-[#1E7B4F] font-medium" selected="" value="Bon">Bon</option>
+<option class="text-[#B7791F] font-medium" value="Moyen">Moyen</option>
+<option class="text-[#B42318] font-medium" value="Hors service">Hors service</option>
+</select>
+<span class="material-symbols-outlined absolute right-1 top-1.5 text-[16px] text-outline pointer-events-none">arrow_drop_down</span>
+</div>
+</td>
+<td class="px-3 py-1.5">
+<input class="w-full h-8 px-2 rounded bg-surface-container-low text-[#1A2433] font-body-sm text-body-sm focus:outline-none" type="text" value="Direction"/>
+</td>
+<td class="px-3 py-1.5">
+<input class="w-full h-8 px-2 rounded bg-surface-container-low text-[#1A2433] font-body-sm text-body-sm focus:outline-none" placeholder="—" type="text" value=""/>
+</td>
+<td class="px-2 py-1.5 text-center">
+<button aria-label="Supprimer la ligne" class="w-8 h-8 rounded inline-flex items-center justify-center text-error hover:bg-error-container hover:text-on-error-container transition-colors" onclick="deleteRow(this)" type="button">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="h-11 bg-surface-container-low/40 hover:bg-surface-container-low transition-colors" data-row-id="2">
+<td class="px-3 py-1.5">
+<div class="relative">
+<select class="w-full h-8 px-2 rounded bg-surface-container-low text-[#1A2433] font-body-sm text-body-sm appearance-none focus:outline-none">
+<option value="Voiture">Voiture</option>
+<option value="Camionnette">Camionnette</option>
+<option selected="" value="Moto">Moto</option>
+<option value="Autre">Autre</option>
+</select>
+<span class="material-symbols-outlined absolute right-1 top-1.5 text-[16px] text-outline pointer-events-none">arrow_drop_down</span>
+</div>
+</td>
+<td class="px-3 py-1.5">
+<input class="w-full h-8 px-2 rounded bg-surface-container-low text-[#1A2433] font-body-sm text-body-sm focus:outline-none" type="text" value="Yamaha"/>
+</td>
+<td class="px-3 py-1.5">
+<input class="w-full h-8 px-2 rounded bg-surface-container-low text-[#1A2433] font-body-sm text-body-sm focus:outline-none" type="text" value="YBR 125"/>
+</td>
+<td class="px-3 py-1.5">
+<input class="w-full h-8 px-2 rounded bg-surface-container-low text-[#1A2433] font-body-sm text-body-sm uppercase font-semibold focus:outline-none" type="text" value="7783 TAB"/>
+</td>
+<td class="px-3 py-1.5">
+<input class="w-20 h-8 px-2 rounded bg-surface-container-low text-[#1A2433] font-body-sm text-body-sm focus:outline-none" placeholder="AAAA" type="number" value="2019"/>
+</td>
+<td class="px-3 py-1.5">
+<div class="relative">
+<select class="w-full h-8 px-2 rounded bg-surface-container-low font-body-sm text-body-sm font-medium text-[#B7791F] appearance-none focus:outline-none">
+<option class="text-[#1E7B4F] font-medium" value="Bon">Bon</option>
+<option class="text-[#B7791F] font-medium" selected="" value="Moyen">Moyen</option>
+<option class="text-[#B42318] font-medium" value="Hors service">Hors service</option>
+</select>
+<span class="material-symbols-outlined absolute right-1 top-1.5 text-[16px] text-outline pointer-events-none">arrow_drop_down</span>
+</div>
+</td>
+<td class="px-3 py-1.5">
+<input class="w-full h-8 px-2 rounded bg-surface-container-low text-[#1A2433] font-body-sm text-body-sm focus:outline-none" type="text" value="Bureau du budget"/>
+</td>
+<td class="px-3 py-1.5">
+<input class="w-full h-8 px-2 rounded bg-surface-container-low text-[#1A2433] font-body-sm text-body-sm focus:outline-none" type="text" value="R. Andriamanana"/>
+</td>
+<td class="px-2 py-1.5 text-center">
+<button aria-label="Supprimer la ligne" class="w-8 h-8 rounded inline-flex items-center justify-center text-error hover:bg-error-container hover:text-on-error-container transition-colors" onclick="deleteRow(this)" type="button">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="h-11 bg-surface-container-lowest hover:bg-surface-container-low transition-colors" data-row-id="3">
+<td class="px-3 py-1.5">
+<div class="relative">
+<select class="w-full h-8 px-2 rounded bg-surface-container-low text-[#1A2433] font-body-sm text-body-sm appearance-none focus:outline-none">
+<option value="Voiture">Voiture</option>
+<option selected="" value="Camionnette">Camionnette</option>
+<option value="Moto">Moto</option>
+<option value="Autre">Autre</option>
+</select>
+<span class="material-symbols-outlined absolute right-1 top-1.5 text-[16px] text-outline pointer-events-none">arrow_drop_down</span>
+</div>
+</td>
+<td class="px-3 py-1.5">
+<input class="w-full h-8 px-2 rounded bg-surface-container-low text-[#1A2433] font-body-sm text-body-sm focus:outline-none" type="text" value="Nissan"/>
+</td>
+<td class="px-3 py-1.5">
+<input class="w-full h-8 px-2 rounded bg-surface-container-low text-[#1A2433] font-body-sm text-body-sm focus:outline-none" type="text" value="Navara"/>
+</td>
+<td class="px-3 py-1.5">
+<input class="w-full h-8 px-2 rounded bg-surface-container-low text-[#1A2433] font-body-sm text-body-sm uppercase font-semibold focus:outline-none" type="text" value="3310 TBC"/>
+</td>
+<td class="px-3 py-1.5">
+<input class="w-20 h-8 px-2 rounded bg-surface-container-low text-[#1A2433] font-body-sm text-body-sm focus:outline-none" placeholder="AAAA" type="number" value="2012"/>
+</td>
+<td class="px-3 py-1.5">
+<div class="relative">
+<select class="w-full h-8 px-2 rounded bg-surface-container-low font-body-sm text-body-sm font-medium text-[#B42318] appearance-none focus:outline-none">
+<option class="text-[#1E7B4F] font-medium" value="Bon">Bon</option>
+<option class="text-[#B7791F] font-medium" value="Moyen">Moyen</option>
+<option class="text-[#B42318] font-medium" selected="" value="Hors service">Hors service</option>
+</select>
+<span class="material-symbols-outlined absolute right-1 top-1.5 text-[16px] text-outline pointer-events-none">arrow_drop_down</span>
+</div>
+</td>
+<td class="px-3 py-1.5">
+<input class="w-full h-8 px-2 rounded bg-surface-container-low text-[#1A2433] font-body-sm text-body-sm focus:outline-none" type="text" value="Parc automobile"/>
+</td>
+<td class="px-3 py-1.5">
+<input class="w-full h-8 px-2 rounded bg-surface-container-low text-[#1A2433] font-body-sm text-body-sm focus:outline-none" placeholder="—" type="text" value=""/>
+</td>
+<td class="px-2 py-1.5 text-center">
+<button aria-label="Supprimer la ligne" class="w-8 h-8 rounded inline-flex items-center justify-center text-error hover:bg-error-container hover:text-on-error-container transition-colors" onclick="deleteRow(this)" type="button">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Section Footer (Add Button + Count) -->
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-space-md pt-space-xs">
+<button class="h-11 px-space-md rounded-lg bg-surface-container-lowest text-[#0B2A4A] font-label-lg text-label-lg shadow-sm hover:bg-surface-container-low active:bg-surface-container transition-colors inline-flex items-center gap-2 select-none" onclick="addVehicleRow()" type="button">
+<span class="material-symbols-outlined text-[20px] text-primary">add</span>
+<span>Ajouter un véhicule</span>
+</button>
+<div class="font-body-md text-[14px] text-[#5B6778] self-end sm:self-auto" id="vehicle-count-display">
+            Nombre de véhicules : 3
+          </div>
+</div>
+</section>
+</div>
+</div>
+<!-- Sticky Bottom Action Bar -->
+<aside class="fixed bottom-0 left-[240px] right-0 bg-surface-container-lowest z-40 py-4 px-8 shadow-xl flex items-center justify-between">
+<div class="w-full max-w-[1120px] mx-auto flex items-center justify-between">
+<button class="h-11 px-4 text-[#5B6778] hover:text-on-surface font-label-lg text-label-lg transition-colors select-none" type="button">
+        Annuler
+      </button>
+<div class="flex items-center gap-space-md">
+<button class="h-11 px-space-md rounded-lg bg-surface-container-lowest text-[#1A2433] hover:bg-surface-container-low active:bg-surface-container font-label-lg text-label-lg shadow-sm transition-colors select-none" type="button">
+          Enregistrer en brouillon
+        </button>
+<button class="h-11 px-space-lg rounded-lg bg-[#1F5FA8] hover:bg-[#174C87] active:bg-[#133E6E] text-white font-label-lg text-label-lg shadow-sm transition-colors select-none" type="button">
+          Soumettre
+        </button>
+</div>
+</div>
+</aside>
+</div>
+<script>
+  function updateVehicleCount() {
+    const rowCount = document.querySelectorAll('#vehicle-rows-body tr').length;
+    const countDisplay = document.getElementById('vehicle-count-display');
+    if (countDisplay) {
+      countDisplay.textContent = 'Nombre de véhicules : ' + rowCount;
+    }
+  }
+
+  function deleteRow(buttonElement) {
+    const row = buttonElement.closest('tr');
+    if (row) {
+      row.remove();
+      updateVehicleCount();
+    }
+  }
+
+  function addVehicleRow() {
+    const tbody = document.getElementById('vehicle-rows-body');
+    const newRowId = Date.now();
+    const tr = document.createElement('tr');
+    tr.className = 'h-11 bg-surface-container-lowest hover:bg-surface-container-low transition-colors';
+    tr.setAttribute('data-row-id', newRowId);
+
+    tr.innerHTML = `
+      <td class="px-3 py-1.5">
+        <div class="relative">
+          <select class="w-full h-8 px-2 rounded bg-surface-container-low text-[#1A2433] font-body-sm text-body-sm appearance-none focus:outline-none">
+            <option value="Voiture" selected>Voiture</option>
+            <option value="Camionnette">Camionnette</option>
+            <option value="Moto">Moto</option>
+            <option value="Autre">Autre</option>
+          </select>
+          <span class="material-symbols-outlined absolute right-1 top-1.5 text-[16px] text-outline pointer-events-none">arrow_drop_down</span>
+        </div>
+      </td>
+      <td class="px-3 py-1.5">
+        <input type="text" placeholder="Ex: Peugeot" class="w-full h-8 px-2 rounded bg-surface-container-low text-[#1A2433] font-body-sm text-body-sm focus:outline-none">
+      </td>
+      <td class="px-3 py-1.5">
+        <input type="text" placeholder="Ex: 308" class="w-full h-8 px-2 rounded bg-surface-container-low text-[#1A2433] font-body-sm text-body-sm focus:outline-none">
+      </td>
+      <td class="px-3 py-1.5">
+        <input type="text" placeholder="Ex: 0000 TAB" class="w-full h-8 px-2 rounded bg-surface-container-low text-[#1A2433] font-body-sm text-body-sm uppercase font-semibold focus:outline-none">
+      </td>
+      <td class="px-3 py-1.5">
+        <input type="number" placeholder="AAAA" class="w-20 h-8 px-2 rounded bg-surface-container-low text-[#1A2433] font-body-sm text-body-sm focus:outline-none">
+      </td>
+      <td class="px-3 py-1.5">
+        <div class="relative">
+          <select onchange="handleStateColor(this)" class="w-full h-8 px-2 rounded bg-surface-container-low font-body-sm text-body-sm font-medium text-[#1E7B4F] appearance-none focus:outline-none">
+            <option value="Bon" selected class="text-[#1E7B4F] font-medium">Bon</option>
+            <option value="Moyen" class="text-[#B7791F] font-medium">Moyen</option>
+            <option value="Hors service" class="text-[#B42318] font-medium">Hors service</option>
+          </select>
+          <span class="material-symbols-outlined absolute right-1 top-1.5 text-[16px] text-outline pointer-events-none">arrow_drop_down</span>
+        </div>
+      </td>
+      <td class="px-3 py-1.5">
+        <input type="text" placeholder="Service" class="w-full h-8 px-2 rounded bg-surface-container-low text-[#1A2433] font-body-sm text-body-sm focus:outline-none">
+      </td>
+      <td class="px-3 py-1.5">
+        <input type="text" placeholder="—" class="w-full h-8 px-2 rounded bg-surface-container-low text-[#1A2433] font-body-sm text-body-sm focus:outline-none">
+      </td>
+      <td class="px-2 py-1.5 text-center">
+        <button type="button" onclick="deleteRow(this)" aria-label="Supprimer la ligne" class="w-8 h-8 rounded inline-flex items-center justify-center text-error hover:bg-error-container hover:text-on-error-container transition-colors">
+          <span class="material-symbols-outlined text-[18px]">delete</span>
+        </button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+    updateVehicleCount();
+  }
+
+  function handleStateColor(selectElement) {
+    selectElement.classList.remove('text-[#1E7B4F]', 'text-[#B7791F]', 'text-[#B42318]');
+    if (selectElement.value === 'Bon') {
+      selectElement.classList.add('text-[#1E7B4F]');
+    } else if (selectElement.value === 'Moyen') {
+      selectElement.classList.add('text-[#B7791F]');
+    } else if (selectElement.value === 'Hors service') {
+      selectElement.classList.add('text-[#B42318]');
+    }
+  }
+</script></main></div></body></html>

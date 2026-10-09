@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+
+<html lang="fr"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={"darkMode":"class","theme":{"extend":{"colors":{"on-tertiary-fixed":"#002111","tertiary-fixed-dim":"#81d8a4","surface-container-high":"#dde9fd","background":"#f8f9ff","on-tertiary-container":"#93ecb6","surface-container":"#e5eeff","tertiary-container":"#036d42","surface-dim":"#cfdbef","tertiary":"#005231","on-secondary-fixed-variant":"#2d486a","surface-tint":"#1f5fa8","error":"#ba1a1a","inverse-on-surface":"#eaf1ff","outline":"#727782","on-secondary-fixed":"#001c38","on-surface":"#101c2b","primary-container":"#1f5fa8","surface-bright":"#f8f9ff","surface-variant":"#d7e3f7","primary-fixed":"#d5e3ff","secondary-fixed":"#d3e4ff","secondary":"#466083","on-secondary-container":"#435d80","primary":"#004788","on-tertiary":"#ffffff","on-error-container":"#93000a","on-background":"#101c2b","on-tertiary-fixed-variant":"#005231","tertiary-fixed":"#9df5bf","on-primary-container":"#c5daff","inverse-primary":"#a7c8ff","error-container":"#ffdad6","on-error":"#ffffff","secondary-fixed-dim":"#aec8f0","primary-fixed-dim":"#a7c8ff","surface-container-highest":"#d7e3f7","surface":"#f8f9ff","surface-container-low":"#eff4ff","inverse-surface":"#253140","on-secondary":"#ffffff","surface-container-lowest":"#ffffff","outline-variant":"#c2c6d3","on-primary":"#ffffff","on-primary-fixed-variant":"#004787","secondary-container":"#bbd6ff","on-surface-variant":"#424751","on-primary-fixed":"#001c3b"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"gutter":"1rem","space-lg":"1.5rem","space-md":"1rem","space-xs":"0.25rem","margin":"1rem","space-xl":"2rem","gutter-desktop":"1.5rem","space-sm":"0.5rem","margin-desktop":"2rem"},"fontFamily":{"body-sm":["Inter"],"headline-lg":["Inter"],"label-md":["Inter"],"headline-md":["Inter"],"metric-num":["Inter"],"headline-xl-mobile":["Inter"],"label-sm":["Inter"],"headline-sm":["Inter"],"body-lg":["Inter"],"body-md":["Inter"],"headline-xl":["Inter"],"label-lg":["Inter"]},"fontSize":{"body-sm":["13px",{"lineHeight":"18px","fontWeight":"400"}],"headline-lg":["24px",{"lineHeight":"32px","letterSpacing":"-0.01em","fontWeight":"600"}],"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0.02em","fontWeight":"600"}],"headline-md":["20px",{"lineHeight":"28px","fontWeight":"600"}],"metric-num":["22px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"600"}],"headline-xl-mobile":["24px",{"lineHeight":"32px","letterSpacing":"-0.01em","fontWeight":"700"}],"label-sm":["11px",{"lineHeight":"14px","letterSpacing":"0.03em","fontWeight":"500"}],"headline-sm":["16px",{"lineHeight":"24px","fontWeight":"600"}],"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}],"headline-xl":["32px",{"lineHeight":"40px","letterSpacing":"-0.02em","fontWeight":"700"}],"label-lg":["14px",{"lineHeight":"20px","fontWeight":"600"}]}}}};</script></head><body class="bg-background font-body-md text-on-surface antialiased min-h-screen"><div class="fixed top-0 left-0 w-full h-1 z-50 flex pointer-events-none"><div class="w-1/2 h-full bg-[#B42318]"></div><div class="w-1/2 h-full bg-[#1E7B4F]"></div></div><aside class="fixed left-0 top-1 h-[calc(100vh-4px)] w-[240px] bg-[#0B2A4A] z-40 flex flex-col justify-between select-none"><div class="flex flex-col"><div class="h-16 px-space-md flex items-center gap-3 border-b border-white/10"><img alt="Sceau Officiel" class="h-10 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UOEFzzVWKsKd7D4_tckAmMcRr0d-XGnSpF987DdvxBkNEkYqzOAZkzEnTS_NJ44TY1EjwWdLuVWrr4XjhrK6ySfV31SlW7iRceuUgaAPFsUIe3xvu1P2dq2-KLkfrKjF-ENp96Ef_o6OCngIKSG2LG03JxgDdyQN3J7LHSnUkC1SKua8SLLlcscD7C-r9mJsLUzsgV4GsPnHI5PshDYwwZf2Af_VNq-UuTUnzS3gSLhPz0g6htv1orMA"/><span class="text-white font-headline-md text-[18px] font-semibold tracking-wide">SIGBD</span></div><nav class="flex flex-col gap-1 p-space-sm mt-space-sm" data-active-classes="bg-primary-container text-white font-label-lg"><a class="flex items-center gap-3 px-space-md py-2.5 rounded-lg text-white/80 hover:bg-white/10 hover:text-white transition-colors text-label-lg font-label-lg" data-path="tableau-de-bord" href="#"><span class="material-symbols-outlined text-[20px]">dashboard</span><span>Tableau de bord</span></a><a aria-current="page" class="flex items-center gap-3 px-space-md py-2.5 rounded-lg transition-colors bg-primary-container text-white font-label-lg" data-path="mes-saisies" href="#"><span class="material-symbols-outlined text-[20px]">inventory_2</span><span>Mes saisies</span></a></nav></div><div class="p-space-md border-t border-white/10 text-center"><div class="font-label-sm text-label-sm text-white/60 tracking-wider uppercase">DGBF · SSEBF</div></div></aside><div class="pl-[240px]"><header class="fixed top-1 left-[240px] right-0 h-16 bg-surface-container-lowest border-b border-[#E3E8EF] z-30 flex items-center justify-between px-gutter-desktop shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="flex items-center gap-2 text-on-surface-variant font-label-sm text-label-sm"><span class="material-symbols-outlined text-[18px]">home</span><span>/</span><span class="hover:text-on-surface cursor-pointer">SIGBD</span><span>/</span><span class="text-on-surface font-semibold">Portail Recensement</span></div><div class="flex items-center gap-space-lg"><div class="flex items-center gap-3"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1UOEFzzVWKsKd7D4_tckAmMcRr0d-XGnSpF987DdvxBkNEkYqzOAZkzEnTS_NJ44TY1EjwWdLuVWrr4XjhrK6ySfV31SlW7iRceuUgaAPFsUIe3xvu1P2dq2-KLkfrKjF-ENp96Ef_o6OCngIKSG2LG03JxgDdyQN3J7LHSnUkC1SKua8SLLlcscD7C-r9mJsLUzsgV4GsPnHI5PshDYwwZf2Af_VNq-UuTUnzS3gSLhPz0g6htv1orMA"/><div class="flex flex-col"><span class="font-label-lg text-label-lg text-on-surface">Hery Rakotoarivelo</span><span class="font-label-sm text-label-sm text-on-surface-variant">SRB – Analamanga</span></div><span class="inline-flex items-center px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-[#E6F4EC] text-[#1E7B4F] border border-[#1E7B4F]/20">Client</span></div><div class="h-6 w-px bg-[#E3E8EF]"></div><button class="flex items-center gap-1.5 text-on-surface-variant hover:text-error transition-colors font-label-md text-label-md" type="button"><span class="material-symbols-outlined text-[20px]">logout</span><span>Se déconnecter</span></button></div></header><main class="relative pt-16 min-h-screen bg-background w-full px-gutter-desktop py-space-lg"><div class="flex flex-col w-full">
+<script>
+    (function syncShellNav() {
+      const asideNav = document.querySelector('aside nav');
+      if (asideNav) {
+        const links = asideNav.querySelectorAll('a');
+        links.forEach(link => {
+          const path = link.getAttribute('data-path');
+          if (path === 'mes-saisies') {
+            link.classList.remove('hover:bg-white/10', 'text-white/80');
+            link.classList.add('bg-primary-container', 'text-white', 'font-label-lg');
+          } else {
+            link.classList.remove('bg-primary-container', 'text-white');
+            link.classList.add('text-white/80');
+          }
+        });
+      }
+      const breadcrumb = document.querySelector('header div.font-label-sm');
+      if (breadcrumb) {
+        breadcrumb.innerHTML = `
+          <span class="material-symbols-outlined text-[18px]">home</span>
+          <span>/</span>
+          <a href="#" class="hover:text-on-surface transition-colors cursor-pointer">Mes saisies</a>
+          <span>/</span>
+          <span class="hover:text-on-surface transition-colors cursor-pointer">Rapport d'activit&eacute;s</span>
+          <span>/</span>
+          <span class="text-on-surface font-semibold">Ao&ucirc;t 2026</span>
+        `;
+      }
+    })();
+  </script>
+<div class="w-full max-w-[1120px] mx-auto flex flex-col gap-6 pb-12">
+<!-- PAGE HEADER -->
+<section class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-3">
+<span class="p-2 rounded-lg bg-surface-container text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[24px]">description</span>
+</span>
+<h1 class="text-on-surface font-headline-lg text-headline-lg tracking-tight">
+            Rapport d'activités
+          </h1>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant pl-11">
+          Août 2026 · SRB – Analamanga
+        </p>
+</div>
+<div class="flex items-center gap-3 pl-11 md:pl-0">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-label-sm font-label-sm bg-surface-container-high text-primary">
+<span class="w-2 h-2 rounded-full bg-primary inline-block"></span>
+          Exportée
+        </span>
+</div>
+</section>
+<!-- BLUE READONLY INFO BANNER -->
+<aside class="relative overflow-hidden rounded-lg bg-surface-container-low p-4 shadow-sm flex items-start sm:items-center gap-3">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
+<div class="flex-shrink-0 w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">info</span>
+</div>
+<div class="flex flex-col sm:flex-row sm:items-center justify-between flex-1 gap-2">
+<p class="font-body-md text-body-md text-on-surface font-medium">
+          Cette saisie est en lecture seule. Elle ne peut plus être modifiée.
+        </p>
+<span class="text-label-sm font-label-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">lock</span>
+          Archivage conforme SSEBF
+        </span>
+</div>
+</aside>
+<!-- TWO COLUMNS LAYOUT -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+<!-- LEFT COLUMN: CONTENU DU RAPPORT (~760px / 8 cols) -->
+<section class="lg:col-span-8 flex flex-col gap-6">
+<div class="rounded-xl bg-surface-container-lowest p-6 shadow-sm flex flex-col gap-6">
+<!-- Section title -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[22px]">inventory</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">
+                Contenu du rapport
+              </h2>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-2.5 py-1 rounded">
+              Ref: ACT-2026-08-042
+            </span>
+</div>
+<!-- Metadata 2x2 grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-surface-container-low/50 p-4 rounded-lg">
+<div class="flex flex-col gap-1 p-2">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">
+                Région
+              </span>
+<span class="font-body-md text-body-md font-semibold text-on-surface">
+                Analamanga
+              </span>
+</div>
+<div class="flex flex-col gap-1 p-2">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">
+                Structure
+              </span>
+<span class="font-body-md text-body-md font-semibold text-on-surface">
+                SRB – Analamanga
+              </span>
+</div>
+<div class="flex flex-col gap-1 p-2">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">
+                Rédacteur
+              </span>
+<span class="font-body-md text-body-md font-semibold text-on-surface flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px] text-secondary">person</span>
+                Hery Rakotoarivelo
+              </span>
+</div>
+<div class="flex flex-col gap-1 p-2">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">
+                Période
+              </span>
+<span class="font-body-md text-body-md font-semibold text-on-surface flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px] text-secondary">calendar_today</span>
+                Août 2026
+              </span>
+</div>
+</div>
+<!-- Subsection Activités réalisées -->
+<div class="flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<h3 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">task_alt</span>
+                Activités réalisées
+              </h3>
+<span class="font-label-sm text-label-sm text-on-surface-variant">2 éléments consignés</span>
+</div>
+<div class="overflow-hidden rounded-lg bg-surface-container-low">
+<table class="w-full text-left">
+<thead class="bg-surface-container text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">
+<tr>
+<th class="py-3 px-4" scope="col">Intitulé</th>
+<th class="py-3 px-4 w-32" scope="col">Date</th>
+<th class="py-3 px-4 w-32 text-right" scope="col">Statut</th>
+</tr>
+</thead>
+<tbody class="font-body-sm text-body-sm divide-y divide-surface-container/50">
+<tr class="bg-surface-container-lowest hover:bg-surface-container-low/40 transition-colors">
+<td class="py-3.5 px-4 font-body-md text-body-md text-on-surface font-medium">
+                      Mission de contrôle des engagements à Ambohidratrimo
+                    </td>
+<td class="py-3.5 px-4 text-on-surface-variant tabular-nums">
+                      08/08/2026
+                    </td>
+<td class="py-3.5 px-4 text-right">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-tertiary-fixed text-on-tertiary-fixed-variant">
+<span class="material-symbols-outlined text-[14px]">check</span>
+                        Réalisée
+                      </span>
+</td>
+</tr>
+<tr class="bg-surface-container-lowest hover:bg-surface-container-low/40 transition-colors">
+<td class="py-3.5 px-4 font-body-md text-body-md text-on-surface font-medium">
+                      Appui à l'élaboration du budget d'un EPN
+                    </td>
+<td class="py-3.5 px-4 text-on-surface-variant tabular-nums">
+                      21/08/2026
+                    </td>
+<td class="py-3.5 px-4 text-right">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-tertiary-fixed text-on-tertiary-fixed-variant">
+<span class="material-symbols-outlined text-[14px]">check</span>
+                        Réalisée
+                      </span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Subsection Difficultés rencontrées et solutions -->
+<div class="flex flex-col gap-2.5">
+<h3 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[20px]">report_problem</span>
+              Difficultés rencontrées et solutions
+            </h3>
+<div class="p-4 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md leading-relaxed flex items-start gap-3">
+<span class="material-symbols-outlined text-outline text-[20px] mt-0.5">format_quote</span>
+<p>Manque de moyens de déplacement pour les missions éloignées.</p>
+</div>
+</div>
+<!-- Section Footer / Navigation Action -->
+<div class="pt-4 flex items-center justify-between">
+<button class="h-11 px-4 rounded-lg bg-surface-container-lowest hover:bg-surface-container-low text-on-surface transition-colors font-label-lg text-label-lg flex items-center gap-2 shadow-sm" onclick="history.back()" type="button">
+<span class="material-symbols-outlined text-[20px]">arrow_back</span>
+<span>Retour à mes saisies</span>
+</button>
+<div class="flex items-center gap-2 text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px] text-tertiary">verified_user</span>
+<span>Contrôle budgétaire SIGBD validé</span>
+</div>
+</div>
+</div>
+</section>
+<!-- RIGHT COLUMN: HISTORIQUE DES ÉTAPES (~360px / 4 cols) -->
+<section class="lg:col-span-4 flex flex-col gap-4">
+<div class="rounded-xl bg-surface-container-lowest p-6 shadow-sm flex flex-col">
+<!-- Card Header -->
+<div class="flex items-center justify-between pb-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[22px]">history</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">
+                Historique des étapes
+              </h2>
+</div>
+<span class="w-6 h-6 rounded-full bg-surface-container flex items-center justify-center font-label-sm text-label-sm text-on-surface font-semibold">
+              7
+            </span>
+</div>
+<!-- Vertical Timeline -->
+<div class="relative pl-6 pt-2 flex flex-col">
+<!-- Continuous vertical line -->
+<div class="absolute left-[11px] top-3.5 bottom-6 w-[2px] bg-surface-container"></div>
+<!-- Step 1: Exportée (Blue) -->
+<div class="relative flex flex-col gap-1.5 pb-6 group">
+<div class="absolute -left-[19px] top-1 w-4 h-4 rounded-full bg-primary ring-4 ring-surface-container-lowest z-10 flex items-center justify-center">
+<span class="w-1.5 h-1.5 rounded-full bg-on-primary"></span>
+</div>
+<div class="flex items-center gap-2 flex-wrap">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-surface-container-high text-primary font-semibold">
+                  Exportée
+                </span>
+<span class="font-body-sm text-body-sm font-semibold text-on-surface tabular-nums">
+                  05/09/2026 à 09:30
+                </span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">
+                Lalao Rasoamanana, Administrateur régional
+              </p>
+</div>
+<!-- Step 2: Validée (Green) -->
+<div class="relative flex flex-col gap-1.5 pb-6 group">
+<div class="absolute -left-[19px] top-1 w-4 h-4 rounded-full bg-tertiary-container ring-4 ring-surface-container-lowest z-10 flex items-center justify-center">
+<span class="w-1.5 h-1.5 rounded-full bg-on-primary"></span>
+</div>
+<div class="flex items-center gap-2 flex-wrap">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-tertiary-fixed text-on-tertiary-fixed-variant font-semibold">
+                  Validée
+                </span>
+<span class="font-body-sm text-body-sm font-semibold text-on-surface tabular-nums">
+                  05/09/2026 à 09:28
+                </span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">
+                Lalao Rasoamanana, Administrateur régional
+              </p>
+</div>
+<!-- Step 3: Soumise (Amber) -->
+<div class="relative flex flex-col gap-1.5 pb-6 group">
+<div class="absolute -left-[19px] top-1 w-4 h-4 rounded-full bg-secondary ring-4 ring-surface-container-lowest z-10 flex items-center justify-center">
+<span class="w-1.5 h-1.5 rounded-full bg-on-primary"></span>
+</div>
+<div class="flex items-center gap-2 flex-wrap">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-secondary-fixed text-on-secondary-fixed font-semibold">
+                  Soumise
+                </span>
+<span class="font-body-sm text-body-sm font-semibold text-on-surface tabular-nums">
+                  04/09/2026 à 14:10
+                </span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">
+                Hery Rakotoarivelo, Client
+              </p>
+</div>
+<!-- Step 4: Brouillon (Gray) -->
+<div class="relative flex flex-col gap-1.5 pb-6 group">
+<div class="absolute -left-[19px] top-1 w-4 h-4 rounded-full bg-outline ring-4 ring-surface-container-lowest z-10 flex items-center justify-center">
+<span class="w-1.5 h-1.5 rounded-full bg-surface-container-lowest"></span>
+</div>
+<div class="flex items-center gap-2 flex-wrap">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-surface-container text-on-surface-variant font-semibold">
+                  Brouillon
+                </span>
+<span class="font-body-sm text-body-sm font-semibold text-on-surface tabular-nums">
+                  04/09/2026 à 11:45
+                </span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">
+                Hery Rakotoarivelo, Client
+              </p>
+<span class="font-label-sm text-label-sm italic text-on-surface-variant flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[14px]">edit_note</span>
+                Corrigé après rejet
+              </span>
+</div>
+<!-- Step 5: Rejetée (Red) -->
+<div class="relative flex flex-col gap-1.5 pb-6 group">
+<div class="absolute -left-[19px] top-1 w-4 h-4 rounded-full bg-error ring-4 ring-surface-container-lowest z-10 flex items-center justify-center">
+<span class="w-1.5 h-1.5 rounded-full bg-on-error"></span>
+</div>
+<div class="flex items-center gap-2 flex-wrap">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-error-container text-on-error-container font-semibold">
+                  Rejetée
+                </span>
+<span class="font-body-sm text-body-sm font-semibold text-on-surface tabular-nums">
+                  03/09/2026 à 16:02
+                </span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">
+                Lalao Rasoamanana, Administrateur régional
+              </p>
+<!-- Reject motivation note -->
+<div class="mt-1 rounded bg-error-container/40 p-2.5 flex items-start gap-2">
+<span class="material-symbols-outlined text-error text-[16px] mt-0.5 flex-shrink-0">cancel</span>
+<p class="font-body-sm text-body-sm text-error leading-snug">
+<strong class="font-semibold">Motif :</strong> Les dates des activités ne sont pas renseignées pour la deuxième mission.
+                </p>
+</div>
+</div>
+<!-- Step 6: Soumise (Amber) -->
+<div class="relative flex flex-col gap-1.5 pb-6 group">
+<div class="absolute -left-[19px] top-1 w-4 h-4 rounded-full bg-secondary ring-4 ring-surface-container-lowest z-10 flex items-center justify-center">
+<span class="w-1.5 h-1.5 rounded-full bg-on-primary"></span>
+</div>
+<div class="flex items-center gap-2 flex-wrap">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-secondary-fixed text-on-secondary-fixed font-semibold">
+                  Soumise
+                </span>
+<span class="font-body-sm text-body-sm font-semibold text-on-surface tabular-nums">
+                  02/09/2026 à 10:20
+                </span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">
+                Hery Rakotoarivelo, Client
+              </p>
+</div>
+<!-- Step 7: Brouillon initial (Gray) -->
+<div class="relative flex flex-col gap-1.5 group">
+<div class="absolute -left-[19px] top-1 w-4 h-4 rounded-full bg-outline ring-4 ring-surface-container-lowest z-10 flex items-center justify-center">
+<span class="w-1.5 h-1.5 rounded-full bg-surface-container-lowest"></span>
+</div>
+<div class="flex items-center gap-2 flex-wrap">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-surface-container text-on-surface-variant font-semibold">
+                  Brouillon
+                </span>
+<span class="font-body-sm text-body-sm font-semibold text-on-surface tabular-nums">
+                  28/08/2026 à 09:05
+                </span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">
+                Hery Rakotoarivelo, Client
+              </p>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+</div></main></div></body></html>

@@ -1,0 +1,392 @@
+<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><meta content="web_dashboard" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"tertiary":"#005231","on-error-container":"#93000a","inverse-surface":"#253140","primary":"#004788","on-surface-variant":"#424751","surface-container-highest":"#d7e3f7","secondary-container":"#bbd6ff","primary-fixed-dim":"#a7c8ff","tertiary-fixed-dim":"#81d8a4","secondary":"#466083","on-secondary-container":"#435d80","on-primary":"#ffffff","on-primary-container":"#c5daff","surface-container-high":"#dde9fd","outline":"#727782","on-error":"#ffffff","background":"#f8f9ff","surface-container-low":"#eff4ff","surface":"#f8f9ff","surface-container-lowest":"#ffffff","secondary-fixed-dim":"#aec8f0","on-primary-fixed-variant":"#004787","surface-variant":"#d7e3f7","surface-tint":"#1f5fa8","on-primary-fixed":"#001c3b","on-tertiary-fixed":"#002111","on-tertiary-fixed-variant":"#005231","surface-container":"#e5eeff","on-secondary":"#ffffff","inverse-on-surface":"#eaf1ff","surface-bright":"#f8f9ff","error":"#ba1a1a","error-container":"#ffdad6","outline-variant":"#c2c6d3","on-tertiary-container":"#93ecb6","on-secondary-fixed-variant":"#2d486a","tertiary-fixed":"#9df5bf","primary-fixed":"#d5e3ff","tertiary-container":"#036d42","inverse-primary":"#a7c8ff","on-background":"#101c2b","surface-dim":"#cfdbef","on-secondary-fixed":"#001c38","on-surface":"#101c2b","on-tertiary":"#ffffff","primary-container":"#1f5fa8","secondary-fixed":"#d3e4ff"},borderRadius:{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},spacing:{"space-lg":"1.5rem","space-md":"1rem","gutter-desktop":"1.5rem","space-xl":"2rem","space-xs":"0.25rem","margin-desktop":"2rem","margin":"1rem","gutter":"1rem","space-sm":"0.5rem"},fontFamily:{"body-lg":["Inter"],"metric-num":["Inter"],"headline-lg":["Inter"],"headline-xl":["Inter"],"label-lg":["Inter"],"headline-sm":["Inter"],"body-md":["Inter"],"label-sm":["Inter"],"label-md":["Inter"],"headline-xl-mobile":["Inter"],"headline-md":["Inter"],"body-sm":["Inter"]},fontSize:{"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"metric-num":["22px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"600"}],"headline-lg":["24px",{"lineHeight":"32px","letterSpacing":"-0.01em","fontWeight":"600"}],"headline-xl":["32px",{"lineHeight":"40px","letterSpacing":"-0.02em","fontWeight":"700"}],"label-lg":["14px",{"lineHeight":"20px","fontWeight":"600"}],"headline-sm":["16px",{"lineHeight":"24px","fontWeight":"600"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}],"label-sm":["11px",{"lineHeight":"14px","letterSpacing":"0.03em","fontWeight":"500"}],"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0.02em","fontWeight":"600"}],"headline-xl-mobile":["24px",{"lineHeight":"32px","letterSpacing":"-0.01em","fontWeight":"700"}],"headline-md":["20px",{"lineHeight":"28px","fontWeight":"600"}],"body-sm":["13px",{"lineHeight":"18px","fontWeight":"400"}]}}}}</script></head><body class="bg-[#F5F7FA] font-body-md text-body-md text-on-surface"><div class="fixed top-0 left-0 right-0 h-1 flex z-50 pointer-events-none"><div class="w-1/2 h-full bg-[#B42318]"></div><div class="w-1/2 h-full bg-[#1E7B4F]"></div></div><aside class="fixed top-1 left-0 bottom-0 w-[240px] bg-[#0B2A4A] z-40 flex flex-col justify-between py-6 px-4 shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="flex flex-col gap-6"><div class="flex items-center gap-3 px-2 py-1"><img src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2lUGRijErRtiEmEtU_m7KXzKXkCYofLQiB11DW5jw7IrHHpB1goNFrfmPYGdw4N4mN_m56NixzXaqjPrsXmdaVoGmUJMIOad5Srwq5PZGQ6myefKzIkcFvjbCkkuyJJFTkr39rdO6Dtw1gKDBwom27gU4-MXOW8uEjLTAdXd_fW27JesK6hoXu4tEWf_oZSMnJpqVe6PuiI9UrhwL4Sl10yzaDP2ucW4h7aWxxlREV2ElrY3jeP4" alt="Ministère de l'Économie et des Finances" style="height: 40px; width: auto; object-fit: contain;"><span class="font-headline-sm text-headline-sm tracking-tight text-white">SIGBD</span></div><nav class="flex flex-col gap-1.5" data-active-classes="bg-primary-container text-on-primary font-label-lg text-label-lg shadow-sm"><a aria-current="page" class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors bg-primary-container text-on-primary font-label-lg text-label-lg shadow-sm" data-path="tableau-de-bord" href="#"><span class="material-symbols-outlined text-[20px]">dashboard</span><span class="">Tableau de bord</span></a><a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/80 hover:bg-white/10 hover:text-white transition-colors font-label-lg text-label-lg" data-path="mes-saisies" href="#"><span class="material-symbols-outlined text-[20px]">description</span><span class="">Mes saisies</span></a></nav></div><div class="px-2 pt-4 border-t border-white/10"><div class="font-label-sm text-label-sm text-white/60 tracking-wider uppercase">DGBF · SSEBF</div></div></aside><div class="pl-[240px]"><header class="fixed top-1 left-[240px] right-0 h-16 bg-surface-container-lowest border-b border-[#E3E8EF] z-30 flex items-center justify-between px-margin-desktop"><div class="flex items-center gap-2"><span class="font-label-md text-label-md text-[#5B6778]">Tableau de bord</span></div><div class="flex items-center gap-4"><div class="flex items-center gap-2"><span class="font-label-lg text-label-lg text-on-surface">Hery Rakotoarivelo</span><span class="inline-flex items-center px-2 py-0.5 rounded text-label-sm font-label-sm bg-[#F5F7FA] text-[#5B6778] border border-[#E3E8EF]">Client</span></div><span class="font-body-md text-body-md text-[#5B6778]">SRB – Analamanga</span><a class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[#5B6778] hover:text-[#B42318] hover:bg-[#FDECEA] transition-colors font-label-md text-label-md" href="#"><span class="material-symbols-outlined text-[18px]">logout</span><span class="">Se déconnecter</span></a></div></header><main class="relative pt-16 w-full bg-[#F5F7FA] min-h-screen px-margin-desktop py-space-xl"><div class="flex flex-col w-full gap-6">
+<!-- BLOCK 1 – Welcome -->
+<div class="flex flex-col gap-1">
+<h1 class="text-[28px] leading-[36px] font-semibold text-[#0B2A4A] tracking-tight">Bonjour, Hery Rakotoarivelo</h1>
+<p class="text-[14px] leading-[20px] text-[#5B6778]">SRB – Analamanga · Aujourd'hui, 07/10/2026</p>
+</div>
+<!-- BLOCK 2 – Alerts -->
+<div class="flex flex-col gap-3">
+<!-- Red Alert Banner -->
+<div class="flex items-center justify-between bg-[#FDECEA] border-l-4 border-[#B42318] rounded-lg p-4 shadow-sm">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#B42318] text-[22px] flex-shrink-0" style="font-variation-settings: 'FILL' 1;">error</span>
+<div class="text-[14px] leading-[20px] text-[#1A2433]">
+<span class="font-semibold text-[#B42318]">Un rapport a été rejeté.</span>
+<span class="text-[#1A2433] ml-1">Recensement du matériel informatique – T3 2026. Consultez le motif et corrigez votre saisie.</span>
+</div>
+</div>
+<button class="h-9 px-3.5 inline-flex items-center justify-center rounded-md font-medium text-[13px] text-[#B42318] bg-white border border-[#E3E8EF] hover:bg-[#FDECEA] hover:border-[#FCA5A5] transition-colors flex-shrink-0 shadow-xs" type="button">
+        Corriger
+      </button>
+</div>
+<!-- Amber Alert Banner -->
+<div class="flex items-center justify-between bg-[#FFF4E0] border-l-4 border-[#B7791F] rounded-lg p-4 shadow-sm">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#B7791F] text-[22px] flex-shrink-0" style="font-variation-settings: 'FILL' 1;">warning</span>
+<div class="text-[14px] leading-[20px] text-[#1A2433]">
+<span class="font-semibold text-[#B7791F]">2 rapports sont en retard.</span>
+<span class="text-[#1A2433] ml-1">Rapport d'activités – Septembre 2026 et Ressources humaines – T3 2026.</span>
+</div>
+</div>
+</div>
+</div>
+<!-- BLOCK 3 – Four summary cards -->
+<div class="grid grid-cols-4 gap-6">
+<!-- Card 1 -->
+<div class="bg-white rounded-xl border border-[#E3E8EF] p-5 shadow-[0_1px_3px_rgba(11,42,74,0.04)] flex flex-col justify-between">
+<span class="text-[32px] leading-[38px] font-semibold text-[#B42318] tracking-tight">2</span>
+<span class="text-[14px] leading-[20px] text-[#5B6778] mt-2 font-medium">En retard</span>
+</div>
+<!-- Card 2 -->
+<div class="bg-white rounded-xl border border-[#E3E8EF] p-5 shadow-[0_1px_3px_rgba(11,42,74,0.04)] flex flex-col justify-between">
+<span class="text-[32px] leading-[38px] font-semibold text-[#4B5563] tracking-tight">1</span>
+<span class="text-[14px] leading-[20px] text-[#5B6778] mt-2 font-medium">Brouillons</span>
+</div>
+<!-- Card 3 -->
+<div class="bg-white rounded-xl border border-[#E3E8EF] p-5 shadow-[0_1px_3px_rgba(11,42,74,0.04)] flex flex-col justify-between">
+<span class="text-[32px] leading-[38px] font-semibold text-[#B7791F] tracking-tight">1</span>
+<span class="text-[14px] leading-[20px] text-[#5B6778] mt-2 font-medium">Soumises</span>
+</div>
+<!-- Card 4 -->
+<div class="bg-white rounded-xl border border-[#E3E8EF] p-5 shadow-[0_1px_3px_rgba(11,42,74,0.04)] flex flex-col justify-between">
+<span class="text-[32px] leading-[38px] font-semibold text-[#B42318] tracking-tight">1</span>
+<span class="text-[14px] leading-[20px] text-[#5B6778] mt-2 font-medium">Rejetées</span>
+</div>
+</div>
+<!-- BLOCK 4 – Mes modules -->
+<div class="bg-white rounded-xl border border-[#E3E8EF] p-6 shadow-[0_1px_4px_rgba(11,42,74,0.03)] flex flex-col">
+<div class="flex flex-col gap-1 pb-4">
+<h2 class="text-[20px] leading-[28px] font-semibold text-[#0B2A4A] tracking-tight">Mes modules</h2>
+<p class="text-[14px] leading-[20px] text-[#5B6778]">Choisissez le module que vous souhaitez renseigner.</p>
+</div>
+<div class="overflow-x-auto mt-2">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-[#FAFCFE] border-b border-[#E3E8EF] text-[12px] font-semibold uppercase tracking-wider text-[#5B6778]">
+<th class="py-3 px-4 font-semibold">Module</th>
+<th class="py-3 px-4 font-semibold">Périodicité</th>
+<th class="py-3 px-4 font-semibold">Période et échéance</th>
+<th class="py-3 px-4 font-semibold">Statut</th>
+<th class="py-3 px-4 font-semibold text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-[#E3E8EF] text-[14px] text-[#1A2433]">
+<!-- GROUP 1 HEADER -->
+<tr class="bg-[#F5F7FA] border-y border-[#E3E8EF]">
+<td class="py-2.5 px-4 font-semibold text-[14px] text-[#1A2433]" colspan="5">
+              Rapports et comptes rendus
+            </td>
+</tr>
+<!-- Row 1 -->
+<tr class="hover:bg-slate-50/60 transition-colors">
+<td class="py-3 px-4 font-medium text-[#1A2433]">Rapport d'activités</td>
+<td class="py-3 px-4 text-[#5B6778]">Mensuelle ou trimestrielle</td>
+<td class="py-3 px-4">
+<span class="text-[#1A2433]">Septembre 2026 · échéance 05/10/2026</span>
+<span class="inline-flex items-center ml-2 px-2 py-0.5 text-xs font-medium text-red-700 bg-red-50 border border-red-300 rounded">En retard de 2 jours</span>
+</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#F0F2F5] text-[#4B5563] border border-[#D1D5DB]">
+                Brouillon
+              </span>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="h-9 px-3.5 inline-flex items-center justify-center rounded-md font-medium text-[13px] text-white bg-[#1F5FA8] hover:bg-[#174a84] transition-colors" type="button">
+                Continuer
+              </button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-slate-50/60 transition-colors">
+<td class="py-3 px-4 font-medium text-[#1A2433]">Compte rendu CRGP</td>
+<td class="py-3 px-4 text-[#5B6778]">Par réunion</td>
+<td class="py-3 px-4 text-[#5B6778]">Au besoin</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#E8F5E9] text-[#1E7B4F] border border-[#86EFAC]">
+                Validée
+              </span>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="h-9 px-3.5 inline-flex items-center justify-center rounded-md font-medium text-[13px] text-white bg-[#1F5FA8] hover:bg-[#174a84] transition-colors" type="button">
+                Nouvelle saisie
+              </button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-slate-50/60 transition-colors">
+<td class="py-3 px-4 font-medium text-[#1A2433]">Compte rendu d'assistance</td>
+<td class="py-3 px-4 text-[#5B6778]">Par intervention</td>
+<td class="py-3 px-4 text-[#5B6778]">Au besoin</td>
+<td class="py-3 px-4 text-[#8A94A6]">Aucune saisie</td>
+<td class="py-3 px-4 text-right">
+<button class="h-9 px-3.5 inline-flex items-center justify-center rounded-md font-medium text-[13px] text-white bg-[#1F5FA8] hover:bg-[#174a84] transition-colors" type="button">
+                Nouvelle saisie
+              </button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-slate-50/60 transition-colors">
+<td class="py-3 px-4 font-medium text-[#1A2433]">Compte rendu de formation</td>
+<td class="py-3 px-4 text-[#5B6778]">Par session</td>
+<td class="py-3 px-4 text-[#5B6778]">Au besoin</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#E8F1FB] text-[#1F5FA8] border border-[#93C5FD]">
+                Exportée
+              </span>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="h-9 px-3.5 inline-flex items-center justify-center rounded-md font-medium text-[13px] text-white bg-[#1F5FA8] hover:bg-[#174a84] transition-colors" type="button">
+                Nouvelle saisie
+              </button>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-slate-50/60 transition-colors">
+<td class="py-3 px-4 font-medium text-[#1A2433]">Ressources humaines</td>
+<td class="py-3 px-4 text-[#5B6778]">Trimestrielle</td>
+<td class="py-3 px-4">
+<span class="text-[#1A2433]">T3 2026 · échéance 03/10/2026</span>
+<span class="inline-flex items-center ml-2 px-2 py-0.5 text-xs font-medium text-red-700 bg-red-50 border border-red-300 rounded">En retard de 4 jours</span>
+</td>
+<td class="py-3 px-4 text-[#8A94A6]">Aucune saisie</td>
+<td class="py-3 px-4 text-right">
+<button class="h-9 px-3.5 inline-flex items-center justify-center rounded-md font-medium text-[13px] text-white bg-[#1F5FA8] hover:bg-[#174a84] transition-colors" type="button">
+                Saisir
+              </button>
+</td>
+</tr>
+<!-- GROUP 2 HEADER -->
+<tr class="bg-[#F5F7FA] border-y border-[#E3E8EF]">
+<td class="py-2.5 px-4 font-semibold text-[14px] text-[#1A2433]" colspan="5">
+              Mises à jour de la base
+            </td>
+</tr>
+<!-- Row 6 -->
+<tr class="hover:bg-slate-50/60 transition-colors">
+<td class="py-3 px-4 font-medium text-[#1A2433]">Nomination Ordonnateur Secondaire</td>
+<td class="py-3 px-4 text-[#5B6778]">À chaque changement</td>
+<td class="py-3 px-4 text-[#5B6778]">Au besoin</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#E8F5E9] text-[#1E7B4F] border border-[#86EFAC]">
+                Validée
+              </span>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="h-9 px-3.5 inline-flex items-center justify-center rounded-md font-medium text-[13px] text-white bg-[#1F5FA8] hover:bg-[#174a84] transition-colors" type="button">
+                Nouvelle saisie
+              </button>
+</td>
+</tr>
+<!-- Row 7 -->
+<tr class="hover:bg-slate-50/60 transition-colors">
+<td class="py-3 px-4 font-medium text-[#1A2433]">Nomination PRMP</td>
+<td class="py-3 px-4 text-[#5B6778]">À chaque changement</td>
+<td class="py-3 px-4 text-[#5B6778]">Au besoin</td>
+<td class="py-3 px-4 text-[#8A94A6]">Aucune saisie</td>
+<td class="py-3 px-4 text-right">
+<button class="h-9 px-3.5 inline-flex items-center justify-center rounded-md font-medium text-[13px] text-white bg-[#1F5FA8] hover:bg-[#174a84] transition-colors" type="button">
+                Nouvelle saisie
+              </button>
+</td>
+</tr>
+<!-- Row 8 -->
+<tr class="hover:bg-slate-50/60 transition-colors">
+<td class="py-3 px-4 font-medium text-[#1A2433]">Nomination membres du Conseil d'Administration EPN</td>
+<td class="py-3 px-4 text-[#5B6778]">À chaque changement</td>
+<td class="py-3 px-4 text-[#5B6778]">Au besoin</td>
+<td class="py-3 px-4 text-[#8A94A6]">Aucune saisie</td>
+<td class="py-3 px-4 text-right">
+<button class="h-9 px-3.5 inline-flex items-center justify-center rounded-md font-medium text-[13px] text-white bg-[#1F5FA8] hover:bg-[#174a84] transition-colors" type="button">
+                Nouvelle saisie
+              </button>
+</td>
+</tr>
+<!-- Row 9 -->
+<tr class="hover:bg-slate-50/60 transition-colors">
+<td class="py-3 px-4 font-medium text-[#1A2433]">Recensement mobilier de bureau</td>
+<td class="py-3 px-4 text-[#5B6778]">Trimestrielle</td>
+<td class="py-3 px-4 text-[#1A2433]">T3 2026 · échéance 15/10/2026</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#FFF4E0] text-[#B7791F] border border-[#FCD34D]">
+                Soumise
+              </span>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="h-9 px-3.5 inline-flex items-center justify-center rounded-md font-medium text-[13px] text-[#1A2433] bg-white border border-[#E3E8EF] hover:bg-[#F5F7FA] transition-colors" type="button">
+                Consulter
+              </button>
+</td>
+</tr>
+<!-- Row 10 -->
+<tr class="hover:bg-slate-50/60 transition-colors">
+<td class="py-3 px-4 font-medium text-[#1A2433]">Recensement matériel informatique</td>
+<td class="py-3 px-4 text-[#5B6778]">Trimestrielle</td>
+<td class="py-3 px-4 text-[#1A2433]">T3 2026 · échéance 15/10/2026</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#FDECEA] text-[#B42318] border border-[#FCA5A5]">
+                Rejetée
+              </span>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="h-9 px-3.5 inline-flex items-center justify-center rounded-md font-medium text-[13px] text-white bg-[#B42318] hover:bg-[#911c13] transition-colors" type="button">
+                Corriger
+              </button>
+</td>
+</tr>
+<!-- Row 11 -->
+<tr class="hover:bg-slate-50/60 transition-colors">
+<td class="py-3 px-4 font-medium text-[#1A2433]">Recensement matériels roulants</td>
+<td class="py-3 px-4 text-[#5B6778]">Trimestrielle</td>
+<td class="py-3 px-4 text-[#1A2433]">T3 2026 · échéance 15/10/2026</td>
+<td class="py-3 px-4 text-[#8A94A6]">Aucune saisie</td>
+<td class="py-3 px-4 text-right">
+<button class="h-9 px-3.5 inline-flex items-center justify-center rounded-md font-medium text-[13px] text-white bg-[#1F5FA8] hover:bg-[#174a84] transition-colors" type="button">
+                Saisir
+              </button>
+</td>
+</tr>
+<!-- Row 12 -->
+<tr class="hover:bg-slate-50/60 transition-colors">
+<td class="py-3 px-4 font-medium text-[#1A2433]">Régie d'avances STD</td>
+<td class="py-3 px-4 text-[#5B6778]">À chaque création</td>
+<td class="py-3 px-4 text-[#5B6778]">Au besoin</td>
+<td class="py-3 px-4 text-[#8A94A6]">Aucune saisie</td>
+<td class="py-3 px-4 text-right">
+<button class="h-9 px-3.5 inline-flex items-center justify-center rounded-md font-medium text-[13px] text-white bg-[#1F5FA8] hover:bg-[#174a84] transition-colors" type="button">
+                Nouvelle saisie
+              </button>
+</td>
+</tr>
+<!-- Row 13 -->
+<tr class="hover:bg-slate-50/60 transition-colors">
+<td class="py-3 px-4 font-medium text-[#1A2433]">Transfert salaires et accessoires EPN</td>
+<td class="py-3 px-4 text-[#5B6778]">À chaque demande</td>
+<td class="py-3 px-4 text-[#5B6778]">Au besoin</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#E5E7EB] text-[#374151] border border-[#9CA3AF]">
+<svg class="w-3.5 h-3.5 text-[#374151]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<path d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+                Archivée
+              </span>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="h-9 px-3.5 inline-flex items-center justify-center rounded-md font-medium text-[13px] text-white bg-[#1F5FA8] hover:bg-[#174a84] transition-colors" type="button">
+                Nouvelle saisie
+              </button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- BLOCK 5 – Mes dernières saisies -->
+<div class="bg-white rounded-xl border border-[#E3E8EF] p-6 shadow-[0_1px_4px_rgba(11,42,74,0.03)] flex flex-col">
+<div class="flex items-center justify-between pb-4">
+<h2 class="text-[20px] leading-[28px] font-semibold text-[#0B2A4A] tracking-tight">Mes dernières saisies</h2>
+<a class="inline-flex items-center gap-1 text-[14px] font-medium text-[#1F5FA8] hover:underline" href="#">
+<span class="">Voir toutes mes saisies</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+</div>
+<div class="overflow-x-auto mt-2">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-[#FAFCFE] border-b border-[#E3E8EF] text-[12px] font-semibold uppercase tracking-wider text-[#5B6778]">
+<th class="py-3 px-4 font-semibold">Module</th>
+<th class="py-3 px-4 font-semibold">Période</th>
+<th class="py-3 px-4 font-semibold">Statut</th>
+<th class="py-3 px-4 font-semibold">Dernière modification</th>
+<th class="py-3 px-4 font-semibold text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-[#E3E8EF] text-[14px] text-[#1A2433]">
+<!-- Item 1 -->
+<tr class="hover:bg-slate-50/60 transition-colors">
+<td class="py-3.5 px-4 font-medium text-[#1A2433]">Recensement du matériel informatique</td>
+<td class="py-3.5 px-4 text-[#5B6778]">T3 2026</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#FDECEA] text-[#B42318] border border-[#FCA5A5]">
+                Rejetée
+              </span>
+</td>
+<td class="py-3.5 px-4 text-[#5B6778] font-mono text-[13px]">06/10/2026</td>
+<td class="py-3.5 px-4 text-right">
+<button class="h-9 px-3.5 inline-flex items-center justify-center rounded-md font-medium text-[13px] text-[#1A2433] bg-white border border-[#E3E8EF] hover:bg-[#F5F7FA] transition-colors" type="button">
+                Ouvrir
+              </button>
+</td>
+</tr>
+<!-- Item 2 -->
+<tr class="hover:bg-slate-50/60 transition-colors">
+<td class="py-3.5 px-4 font-medium text-[#1A2433]">Rapport d'activités</td>
+<td class="py-3.5 px-4 text-[#5B6778]">Septembre 2026</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#F0F2F5] text-[#4B5563] border border-[#D1D5DB]">
+                Brouillon
+              </span>
+</td>
+<td class="py-3.5 px-4 text-[#5B6778] font-mono text-[13px]">06/10/2026</td>
+<td class="py-3.5 px-4 text-right">
+<button class="h-9 px-3.5 inline-flex items-center justify-center rounded-md font-medium text-[13px] text-[#1A2433] bg-white border border-[#E3E8EF] hover:bg-[#F5F7FA] transition-colors" type="button">
+                Ouvrir
+              </button>
+</td>
+</tr>
+<!-- Item 3 -->
+<tr class="hover:bg-slate-50/60 transition-colors">
+<td class="py-3.5 px-4 font-medium text-[#1A2433]">Recensement du mobilier de bureau</td>
+<td class="py-3.5 px-4 text-[#5B6778]">T3 2026</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#FFF4E0] text-[#B7791F] border border-[#FCD34D]">
+                Soumise
+              </span>
+</td>
+<td class="py-3.5 px-4 text-[#5B6778] font-mono text-[13px]">05/10/2026</td>
+<td class="py-3.5 px-4 text-right">
+<button class="h-9 px-3.5 inline-flex items-center justify-center rounded-md font-medium text-[13px] text-[#1A2433] bg-white border border-[#E3E8EF] hover:bg-[#F5F7FA] transition-colors" type="button">
+                Ouvrir
+              </button>
+</td>
+</tr>
+<!-- Item 4 -->
+<tr class="hover:bg-slate-50/60 transition-colors">
+<td class="py-3.5 px-4 font-medium text-[#1A2433]">Compte rendu de formation</td>
+<td class="py-3.5 px-4 text-[#5B6778]">Session du 22/09/2026</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#E8F1FB] text-[#1F5FA8] border border-[#93C5FD]">
+                Exportée
+              </span>
+</td>
+<td class="py-3.5 px-4 text-[#5B6778] font-mono text-[13px]">30/09/2026</td>
+<td class="py-3.5 px-4 text-right">
+<button class="h-9 px-3.5 inline-flex items-center justify-center rounded-md font-medium text-[13px] text-[#1A2433] bg-white border border-[#E3E8EF] hover:bg-[#F5F7FA] transition-colors" type="button">
+                Ouvrir
+              </button>
+</td>
+</tr>
+<!-- Item 5 -->
+<tr class="hover:bg-slate-50/60 transition-colors">
+<td class="py-3.5 px-4 font-medium text-[#1A2433]">Compte rendu CRGP</td>
+<td class="py-3.5 px-4 text-[#5B6778]">Réunion du 10/09/2026</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#E8F5E9] text-[#1E7B4F] border border-[#86EFAC]">
+                Validée
+              </span>
+</td>
+<td class="py-3.5 px-4 text-[#5B6778] font-mono text-[13px]">15/09/2026</td>
+<td class="py-3.5 px-4 text-right">
+<button class="h-9 px-3.5 inline-flex items-center justify-center rounded-md font-medium text-[13px] text-[#1A2433] bg-white border border-[#E3E8EF] hover:bg-[#F5F7FA] transition-colors" type="button">
+                Ouvrir
+              </button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div></main></div>
+
+</body></html>

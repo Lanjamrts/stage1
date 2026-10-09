@@ -1,0 +1,537 @@
+<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><meta content="web_dashboard" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={"darkMode":"class","theme":{"extend":{"colors":{"secondary":"#466083","on-secondary-container":"#435d80","inverse-surface":"#253140","primary-fixed-dim":"#a7c8ff","outline":"#727782","surface-bright":"#f8f9ff","on-primary-fixed":"#001c3b","on-surface-variant":"#424751","tertiary":"#005231","inverse-primary":"#a7c8ff","error-container":"#ffdad6","on-primary-fixed-variant":"#004787","on-tertiary":"#ffffff","surface-container-low":"#eff4ff","on-primary":"#ffffff","primary-fixed":"#d5e3ff","on-secondary":"#ffffff","error":"#ba1a1a","primary":"#004788","surface-container-lowest":"#ffffff","on-background":"#101c2b","surface-dim":"#cfdbef","surface-container-high":"#dde9fd","outline-variant":"#c2c6d3","surface":"#f8f9ff","on-error":"#ffffff","background":"#f8f9ff","on-tertiary-fixed":"#002111","surface-container":"#e5eeff","on-error-container":"#93000a","on-tertiary-container":"#93ecb6","secondary-container":"#bbd6ff","secondary-fixed-dim":"#aec8f0","on-surface":"#101c2b","tertiary-fixed":"#9df5bf","secondary-fixed":"#d3e4ff","primary-container":"#1f5fa8","surface-tint":"#1f5fa8","on-primary-container":"#c5daff","surface-container-highest":"#d7e3f7","tertiary-fixed-dim":"#81d8a4","tertiary-container":"#036d42","on-secondary-fixed-variant":"#2d486a","on-tertiary-fixed-variant":"#005231","on-secondary-fixed":"#001c38","surface-variant":"#d7e3f7","inverse-on-surface":"#eaf1ff"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"margin-desktop":"2rem","space-md":"1rem","space-lg":"1.5rem","gutter":"1rem","space-xl":"2rem","margin":"1rem","space-xs":"0.25rem","gutter-desktop":"1.5rem","space-sm":"0.5rem"},"fontFamily":{"headline-md":["Inter"],"body-sm":["Inter"],"metric-num":["Inter"],"headline-sm":["Inter"],"label-sm":["Inter"],"headline-xl":["Inter"],"label-lg":["Inter"],"headline-lg":["Inter"],"headline-xl-mobile":["Inter"],"label-md":["Inter"],"body-lg":["Inter"],"body-md":["Inter"]},"fontSize":{"headline-md":["20px",{"lineHeight":"28px","fontWeight":"600"}],"body-sm":["13px",{"lineHeight":"18px","fontWeight":"400"}],"metric-num":["22px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"600"}],"headline-sm":["16px",{"lineHeight":"24px","fontWeight":"600"}],"label-sm":["11px",{"lineHeight":"14px","letterSpacing":"0.03em","fontWeight":"500"}],"headline-xl":["32px",{"lineHeight":"40px","letterSpacing":"-0.02em","fontWeight":"700"}],"label-lg":["14px",{"lineHeight":"20px","fontWeight":"600"}],"headline-lg":["24px",{"lineHeight":"32px","letterSpacing":"-0.01em","fontWeight":"600"}],"headline-xl-mobile":["24px",{"lineHeight":"32px","letterSpacing":"-0.01em","fontWeight":"700"}],"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0.02em","fontWeight":"600"}],"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}]}}}}</script></head><body class="bg-surface font-body-md text-on-surface antialiased"><div class="fixed top-0 left-0 right-0 h-1 z-50 flex pointer-events-none"><div class="w-1/2 h-full bg-[#B42318]"></div><div class="w-1/2 h-full bg-[#1E7B4F]"></div></div><aside class="fixed left-0 top-1 bottom-0 w-[240px] bg-[#0B2A4A] z-40 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="flex flex-col"><div class="h-16 px-space-md flex items-center gap-space-sm"><img alt="MEF Emblème" class="w-10 h-10 object-contain rounded-full" src="https://lh3.googleusercontent.com/aida/AEtjO1UOEFzzVWKsKd7D4_tckAmMcRr0d-XGnSpF987DdvxBkNEkYqzOAZkzEnTS_NJ44TY1EjwWdLuVWrr4XjhrK6ySfV31SlW7iRceuUgaAPFsUIe3xvu1P2dq2-KLkfrKjF-ENp96Ef_o6OCngIKSG2LG03JxgDdyQN3J7LHSnUkC1SKua8SLLlcscD7C-r9mJsLUzsgV4GsPnHI5PshDYwwZf2Af_VNq-UuTUnzS3gSLhPz0g6htv1orMA"><span class="font-headline-md text-headline-md font-bold tracking-tight text-white uppercase">SIGBD</span></div><nav class="flex flex-col gap-space-xs px-space-sm mt-space-md" data-active-classes="bg-primary-container text-on-primary-container font-semibold rounded-lg"><a aria-current="page" class="flex items-center gap-space-sm px-space-md py-2.5 transition-all bg-primary-container text-on-primary-container font-semibold rounded-lg" data-path="tableau-de-bord" href="#"><span class="material-symbols-outlined text-[20px]">dashboard</span><span class="font-label-lg text-label-lg">Tableau de bord</span></a><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-lg text-[#bbd6ff] hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="consultation-des-donnees" href="#"><span class="material-symbols-outlined text-[20px]">analytics</span><span class="font-label-lg text-label-lg">Consultation des données</span></a></nav></div><div class="p-space-md bg-[#082038]"><div class="text-center font-label-md text-label-md font-semibold tracking-wider text-[#aec8f0] uppercase">DGBF · SSEBF</div></div></aside><div class="pl-[240px]"><header class="fixed top-1 left-[240px] right-0 h-16 bg-surface-container-lowest z-30 shadow-[0_1px_8px_rgba(0,0,0,0.04)] flex items-center justify-between px-gutter-desktop"><div class="flex items-center gap-space-xs text-on-surface-variant font-body-sm text-body-sm"><span class="material-symbols-outlined text-[18px]">home</span><span class="">/</span><span class="font-label-lg text-label-lg text-on-surface font-semibold">Tableau de bord</span></div><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-sm"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1UOEFzzVWKsKd7D4_tckAmMcRr0d-XGnSpF987DdvxBkNEkYqzOAZkzEnTS_NJ44TY1EjwWdLuVWrr4XjhrK6ySfV31SlW7iRceuUgaAPFsUIe3xvu1P2dq2-KLkfrKjF-ENp96Ef_o6OCngIKSG2LG03JxgDdyQN3J7LHSnUkC1SKua8SLLlcscD7C-r9mJsLUzsgV4GsPnHI5PshDYwwZf2Af_VNq-UuTUnzS3gSLhPz0g6htv1orMA"><div class="flex flex-col text-right"><span class="font-label-lg text-label-lg font-semibold text-on-surface leading-tight">Fanja Rakotomalala</span><span class="font-label-sm text-label-sm text-on-surface-variant leading-none">DGBF</span></div></div><span class="h-6 px-2.5 py-0.5 rounded-full bg-surface-container-highest text-on-surface-variant font-label-sm text-label-sm font-medium">Consultant</span><div class="h-6 w-px bg-surface-container-high"></div><button class="flex items-center gap-1.5 px-space-sm py-1.5 rounded-lg text-error hover:bg-error-container hover:text-on-error-container transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">logout</span><span class="font-label-md text-label-md font-semibold">Se déconnecter</span></button></div></header><main class="w-full pt-16 px-gutter-desktop py-space-xl bg-surface min-h-[calc(100vh-4px)]"><div class="flex flex-col w-full">
+<div class="flex flex-col gap-space-lg pb-space-xl">
+<!-- En-tête de page -->
+<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-space-md">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-space-sm flex-wrap">
+<h1 class="font-headline-lg text-headline-lg text-primary tracking-tight">Tableau de bord</h1>
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-surface-container-highest text-on-surface-variant font-label-sm text-label-sm font-semibold select-none">
+<span class="material-symbols-outlined text-[15px]">lock</span>
+            Lecture seule
+          </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+          Suivi des soumissions par région. Mise à jour le 07/10/2026 à 11:40.
+        </p>
+</div>
+<!-- Filtres de consultation -->
+<div class="flex items-center flex-wrap gap-space-sm">
+<div class="relative min-w-[200px]">
+<label class="sr-only" for="module-select">Module</label>
+<div class="h-11 px-3.5 bg-surface-container-lowest rounded-lg shadow-sm flex items-center justify-between gap-2">
+<div class="flex items-center gap-2 truncate">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">folder_open</span>
+<span class="font-body-md text-body-md text-on-surface truncate">Tous les modules</span>
+</div>
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">expand_more</span>
+</div>
+</div>
+<div class="relative min-w-[220px]">
+<label class="sr-only" for="period-select">Période</label>
+<div class="h-11 px-3.5 bg-surface-container-lowest rounded-lg shadow-sm flex items-center justify-between gap-2">
+<div class="flex items-center gap-2 truncate">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">calendar_today</span>
+<span class="font-body-md text-body-md text-on-surface truncate">Septembre 2026 / T3 2026</span>
+</div>
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">expand_more</span>
+</div>
+</div>
+<button class="h-11 px-space-md rounded-lg bg-surface-container-low text-secondary font-label-lg text-label-lg hover:bg-surface-container-high transition-colors flex items-center gap-1.5 shadow-sm" type="button">
+<span class="material-symbols-outlined text-[18px]">restart_alt</span>
+<span class="">Réinitialiser les filtres</span>
+</button>
+</div>
+</div>
+<!-- Bannière informative spécifique au profil Consultant -->
+
+<!-- 4 Cartes KPI -->
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-gutter-desktop">
+<!-- KPI 1 -->
+<div class="bg-surface-container-lowest rounded-lg p-space-lg shadow-sm flex flex-col justify-between gap-space-md">
+<div class="flex items-start justify-between">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Taux de soumission</span>
+<div class="w-8 h-8 rounded-lg bg-primary-fixed flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">fact_check</span>
+</div>
+</div>
+<div>
+<div class="font-headline-xl text-headline-xl text-primary font-bold tracking-tight">72 %</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Sur 120 attendues au niveau national</p>
+</div>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 72%;"></div>
+</div>
+</div>
+<!-- KPI 2 -->
+<div class="bg-surface-container-lowest rounded-lg p-space-lg shadow-sm flex flex-col justify-between gap-space-md">
+<div class="flex items-start justify-between">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Soumissions reçues</span>
+<div class="w-8 h-8 rounded-lg bg-secondary-fixed flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[20px]">move_to_inbox</span>
+</div>
+</div>
+<div>
+<div class="font-headline-xl text-headline-xl text-on-surface font-bold tracking-tight">86</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Sur les 120 attendues</p>
+</div>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
+<div class="bg-secondary h-full rounded-full" style="width: 71.6%;"></div>
+</div>
+</div>
+<!-- KPI 3 -->
+<div class="bg-surface-container-lowest rounded-lg p-space-lg shadow-sm flex flex-col justify-between gap-space-md">
+<div class="flex items-start justify-between">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">En retard</span>
+<div class="w-8 h-8 rounded-lg bg-error-container flex items-center justify-center text-error">
+<span class="material-symbols-outlined text-[20px]">warning</span>
+</div>
+</div>
+<div>
+<div class="font-headline-xl text-headline-xl text-error font-bold tracking-tight">18</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Échéance dépassée pour la période</p>
+</div>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
+<div class="bg-error h-full rounded-full" style="width: 15%;"></div>
+</div>
+</div>
+<!-- KPI 4 -->
+<div class="bg-surface-container-lowest rounded-lg p-space-lg shadow-sm flex flex-col justify-between gap-space-md">
+<div class="flex items-start justify-between">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Taux de rejet</span>
+<div class="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">assignment_late</span>
+</div>
+</div>
+<div>
+<div class="font-headline-xl text-headline-xl text-on-surface font-bold tracking-tight">10 %</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">9 rejetées sur 86 soumises</p>
+</div>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
+<div class="bg-on-surface-variant h-full rounded-full" style="width: 10.4%;"></div>
+</div>
+</div>
+</div>
+<!-- Section Principale : Graphique & Détail par Région -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-gutter-desktop">
+<!-- Carte Graphique : Barres régionales (5 colonnes sur desktop) -->
+<div class="xl:col-span-5 bg-surface-container-lowest rounded-lg p-space-lg shadow-sm flex flex-col gap-space-md">
+<div class="flex flex-col gap-1">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Distribution territoriale</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Taux de soumission par région</h2>
+</div>
+<!-- Légende -->
+<div class="flex items-center gap-space-md py-1 bg-surface-container-low px-3 rounded text-on-surface-variant font-label-sm text-label-sm">
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-tertiary"></span>
+<span class="">≥ 80% (5 régions)</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-[#B7791F]"></span>
+<span class="">50-79% (7 régions)</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-error"></span>
+<span class="">&lt; 50% (0)</span>
+</div>
+</div>
+<!-- Barres Horizontales SVG / HTML Flex -->
+<div class="flex flex-col gap-2.5 pt-2">
+<!-- Analamanga (92%) -->
+<div class="flex flex-col gap-1">
+<div class="flex justify-between font-label-md text-label-md">
+<span class="text-on-surface font-medium">Analamanga</span>
+<span class="font-metric-num text-body-sm text-tertiary">92%</span>
+</div>
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-tertiary h-full rounded-full" style="width: 92%;"></div>
+</div>
+</div>
+<!-- Vakinankaratra (88%) -->
+<div class="flex flex-col gap-1">
+<div class="flex justify-between font-label-md text-label-md">
+<span class="text-on-surface font-medium">Vakinankaratra</span>
+<span class="font-metric-num text-body-sm text-tertiary">88%</span>
+</div>
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-tertiary h-full rounded-full" style="width: 88%;"></div>
+</div>
+</div>
+<!-- Atsinanana (85%) -->
+<div class="flex flex-col gap-1">
+<div class="flex justify-between font-label-md text-label-md">
+<span class="text-on-surface font-medium">Atsinanana</span>
+<span class="font-metric-num text-body-sm text-tertiary">85%</span>
+</div>
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-tertiary h-full rounded-full" style="width: 85%;"></div>
+</div>
+</div>
+<!-- Boeny (82%) -->
+<div class="flex flex-col gap-1">
+<div class="flex justify-between font-label-md text-label-md">
+<span class="text-on-surface font-medium">Boeny</span>
+<span class="font-metric-num text-body-sm text-tertiary">82%</span>
+</div>
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-tertiary h-full rounded-full" style="width: 82%;"></div>
+</div>
+</div>
+<!-- Diana (80%) -->
+<div class="flex flex-col gap-1">
+<div class="flex justify-between font-label-md text-label-md">
+<span class="text-on-surface font-medium">Diana</span>
+<span class="font-metric-num text-body-sm text-tertiary">80%</span>
+</div>
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-tertiary h-full rounded-full" style="width: 80%;"></div>
+</div>
+</div>
+<!-- Haute Matsiatra (75%) -->
+<div class="flex flex-col gap-1">
+<div class="flex justify-between font-label-md text-label-md">
+<span class="text-on-surface font-medium">Haute Matsiatra</span>
+<span class="font-metric-num text-body-sm text-[#B7791F]">75%</span>
+</div>
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-[#B7791F] h-full rounded-full" style="width: 75%;"></div>
+</div>
+</div>
+<!-- Atsimo-Andrefana (70%) -->
+<div class="flex flex-col gap-1">
+<div class="flex justify-between font-label-md text-label-md">
+<span class="text-on-surface font-medium">Atsimo-Andrefana</span>
+<span class="font-metric-num text-body-sm text-[#B7791F]">70%</span>
+</div>
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-[#B7791F] h-full rounded-full" style="width: 70%;"></div>
+</div>
+</div>
+<!-- Sava (68%) -->
+<div class="flex flex-col gap-1">
+<div class="flex justify-between font-label-md text-label-md">
+<span class="text-on-surface font-medium">Sava</span>
+<span class="font-metric-num text-body-sm text-[#B7791F]">68%</span>
+</div>
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-[#B7791F] h-full rounded-full" style="width: 68%;"></div>
+</div>
+</div>
+<!-- Itasy (66%) -->
+<div class="flex flex-col gap-1">
+<div class="flex justify-between font-label-md text-label-md">
+<span class="text-on-surface font-medium">Itasy</span>
+<span class="font-metric-num text-body-sm text-[#B7791F]">66%</span>
+</div>
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-[#B7791F] h-full rounded-full" style="width: 66%;"></div>
+</div>
+</div>
+<!-- Alaotra-Mangoro (64%) -->
+<div class="flex flex-col gap-1">
+<div class="flex justify-between font-label-md text-label-md">
+<span class="text-on-surface font-medium">Alaotra-Mangoro</span>
+<span class="font-metric-num text-body-sm text-[#B7791F]">64%</span>
+</div>
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-[#B7791F] h-full rounded-full" style="width: 64%;"></div>
+</div>
+</div>
+<!-- Sofia (60%) -->
+<div class="flex flex-col gap-1">
+<div class="flex justify-between font-label-md text-label-md">
+<span class="text-on-surface font-medium">Sofia</span>
+<span class="font-metric-num text-body-sm text-[#B7791F]">60%</span>
+</div>
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-[#B7791F] h-full rounded-full" style="width: 60%;"></div>
+</div>
+</div>
+<!-- Menabe (55%) -->
+<div class="flex flex-col gap-1">
+<div class="flex justify-between font-label-md text-label-md">
+<span class="text-on-surface font-medium">Menabe</span>
+<span class="font-metric-num text-body-sm text-[#B7791F]">55%</span>
+</div>
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-[#B7791F] h-full rounded-full" style="width: 55%;"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Tableau de détail : 12 régions en STRICT LECTURE SEULE (7 colonnes) -->
+<div class="xl:col-span-7 bg-surface-container-lowest rounded-lg p-space-lg shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex flex-col gap-1">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Analyse granulaire</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Détail par région (12 régions)</h2>
+</div>
+<span class="inline-flex items-center gap-1 font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-2.5 py-1 rounded">
+<span class="material-symbols-outlined text-[14px]">visibility</span> Mode consultation
+          </span>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left cursor-default select-none">
+<thead>
+<tr class="h-10 bg-[#0B2A4A] text-white font-label-sm text-label-sm uppercase tracking-wider">
+<th class="px-3 rounded-l">Région</th>
+<th class="px-2 text-right">Attendues</th>
+<th class="px-2 text-right">Reçues</th>
+<th class="px-2 text-right">En retard</th>
+<th class="px-2 text-right">Rejetées</th>
+<th class="px-3 text-right rounded-r">Taux</th>
+</tr>
+</thead>
+<tbody class="font-body-sm text-body-sm divide-y-0">
+<!-- Ligne 1 -->
+<tr class="h-9 bg-surface-container-lowest cursor-default">
+<td class="px-3 font-medium text-on-surface">Analamanga</td>
+<td class="px-2 text-right font-metric-num text-on-surface-variant">25</td>
+<td class="px-2 text-right font-metric-num text-on-surface">23</td>
+<td class="px-2 text-right font-metric-num text-on-surface-variant">Rapport d'activités</td>
+<td class="px-2 text-right font-metric-num text-on-surface-variant">1</td>
+<td class="px-3 text-right font-metric-num text-tertiary font-semibold">92 %</td>
+</tr>
+<!-- Ligne 2 -->
+<tr class="h-9 bg-surface-container-low cursor-default">
+<td class="px-3 font-medium text-on-surface">Vakinankaratra</td>
+<td class="px-2 text-right font-metric-num text-on-surface-variant">17</td>
+<td class="px-2 text-right font-metric-num text-on-surface">15</td>
+<td class="px-2 text-right font-metric-num text-on-surface-variant">Rapport d'activités</td>
+<td class="px-2 text-right font-metric-num text-on-surface-variant">1</td>
+<td class="px-3 text-right font-metric-num text-tertiary font-semibold">88 %</td>
+</tr>
+<!-- Ligne 3 -->
+<tr class="h-9 bg-surface-container-lowest cursor-default">
+<td class="px-3 font-medium text-on-surface">Atsinanana</td>
+<td class="px-2 text-right font-metric-num text-on-surface-variant">13</td>
+<td class="px-2 text-right font-metric-num text-on-surface">11</td>
+<td class="px-2 text-right font-metric-num text-on-surface-variant">Rapport d'activités</td>
+<td class="px-2 text-right font-metric-num text-on-surface-variant">0</td>
+<td class="px-3 text-right font-metric-num text-tertiary font-semibold">85 %</td>
+</tr>
+<!-- Ligne 4 -->
+<tr class="h-9 bg-surface-container-low cursor-default">
+<td class="px-3 font-medium text-on-surface">Boeny</td>
+<td class="px-2 text-right font-metric-num text-on-surface-variant">11</td>
+<td class="px-2 text-right font-metric-num text-on-surface">9</td>
+<td class="px-2 text-right font-metric-num text-on-surface-variant">Rapport d'activités</td>
+<td class="px-2 text-right font-metric-num text-on-surface-variant">1</td>
+<td class="px-3 text-right font-metric-num text-tertiary font-semibold">82 %</td>
+</tr>
+<!-- Ligne 5 -->
+<tr class="h-9 bg-surface-container-lowest cursor-default">
+<td class="px-3 font-medium text-on-surface">Diana</td>
+<td class="px-2 text-right font-metric-num text-on-surface-variant">10</td>
+<td class="px-2 text-right font-metric-num text-on-surface">8</td>
+<td class="px-2 text-right font-metric-num text-on-surface-variant">Rapport d'activités</td>
+<td class="px-2 text-right font-metric-num text-on-surface-variant">1</td>
+<td class="px-3 text-right font-metric-num text-tertiary font-semibold">80 %</td>
+</tr>
+<!-- Ligne 6 -->
+<tr class="h-9 bg-surface-container-low cursor-default">
+<td class="px-3 font-medium text-on-surface">Haute Matsiatra</td>
+<td class="px-2 text-right font-metric-num text-on-surface-variant">8</td>
+<td class="px-2 text-right font-metric-num text-on-surface">6</td>
+<td class="px-2 text-right font-metric-num text-on-surface-variant">Rapport d'activités</td>
+<td class="px-2 text-right font-metric-num text-on-surface-variant">1</td>
+<td class="px-3 text-right font-metric-num text-[#B7791F] font-semibold">75 %</td>
+</tr>
+<!-- Ligne 7 -->
+<tr class="h-9 bg-surface-container-lowest cursor-default">
+<td class="px-3 font-medium text-on-surface">Atsimo-Andrefana</td>
+<td class="px-2 text-right font-metric-num text-on-surface-variant">10</td>
+<td class="px-2 text-right font-metric-num text-on-surface">7</td>
+<td class="px-2 text-right font-metric-num text-error font-semibold">2</td>
+<td class="px-2 text-right font-metric-num text-on-surface-variant">1</td>
+<td class="px-3 text-right font-metric-num text-[#B7791F] font-semibold">70 %</td>
+</tr>
+<!-- Ligne 8 -->
+<tr class="h-9 bg-surface-container-low cursor-default">
+<td class="px-3 font-medium text-on-surface">Sava</td>
+<td class="px-2 text-right font-metric-num text-on-surface-variant">6</td>
+<td class="px-2 text-right font-metric-num text-on-surface">4</td>
+<td class="px-2 text-right font-metric-num text-on-surface-variant">1</td>
+<td class="px-2 text-right font-metric-num text-on-surface-variant">1</td>
+<td class="px-3 text-right font-metric-num text-[#B7791F] font-semibold">68 %</td>
+</tr>
+<!-- Ligne 9 -->
+<tr class="h-9 bg-surface-container-lowest cursor-default">
+<td class="px-3 font-medium text-on-surface">Itasy</td>
+<td class="px-2 text-right font-metric-num text-on-surface-variant">6</td>
+<td class="px-2 text-right font-metric-num text-on-surface">4</td>
+<td class="px-2 text-right font-metric-num text-on-surface-variant">1</td>
+<td class="px-2 text-right font-metric-num text-on-surface-variant">0</td>
+<td class="px-3 text-right font-metric-num text-[#B7791F] font-semibold">66 %</td>
+</tr>
+<!-- Ligne 10 -->
+<tr class="h-9 bg-surface-container-low cursor-default">
+<td class="px-3 font-medium text-on-surface">Alaotra-Mangoro</td>
+<td class="px-2 text-right font-metric-num text-on-surface-variant">5</td>
+<td class="px-2 text-right font-metric-num text-on-surface">3</td>
+<td class="px-2 text-right font-metric-num text-error font-semibold">2</td>
+<td class="px-2 text-right font-metric-num text-on-surface-variant">1</td>
+<td class="px-3 text-right font-metric-num text-[#B7791F] font-semibold">64 %</td>
+</tr>
+<!-- Ligne 11 -->
+<tr class="h-9 bg-surface-container-lowest cursor-default">
+<td class="px-3 font-medium text-on-surface">Sofia</td>
+<td class="px-2 text-right font-metric-num text-on-surface-variant">5</td>
+<td class="px-2 text-right font-metric-num text-on-surface">3</td>
+<td class="px-2 text-right font-metric-num text-error font-semibold">2</td>
+<td class="px-2 text-right font-metric-num text-on-surface-variant">1</td>
+<td class="px-3 text-right font-metric-num text-[#B7791F] font-semibold">60 %</td>
+</tr>
+<!-- Ligne 12 -->
+<tr class="h-9 bg-surface-container-low cursor-default">
+<td class="px-3 font-medium text-on-surface">Menabe</td>
+<td class="px-2 text-right font-metric-num text-on-surface-variant">4</td>
+<td class="px-2 text-right font-metric-num text-on-surface">2</td>
+<td class="px-2 text-right font-metric-num text-error font-semibold">2</td>
+<td class="px-2 text-right font-metric-num text-on-surface-variant">0</td>
+<td class="px-3 text-right font-metric-num text-[#B7791F] font-semibold">55 %</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Section : Structures en retard (6 structures, sans action possible) -->
+<div class="bg-surface-container-lowest rounded-lg p-space-lg shadow-sm flex flex-col gap-space-md">
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+<div class="flex flex-col gap-1">
+<span class="font-label-md text-label-md text-error uppercase tracking-wider font-semibold">Anomalies de calendrier</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Structures en retard de transmission</h2>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">
+          Affichage des 6 entités critiques de l'échéance T3 2026
+        </span>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left cursor-default select-none">
+<thead>
+<tr class="h-10 bg-surface-container text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">
+<th class="px-4 rounded-l">Code Structure</th>
+<th class="px-4">Désignation</th>
+<th class="px-4">Région</th>
+<th class="px-4">Module attendu</th>
+<th class="px-4">Échéance initiale</th>
+<th class="px-4 text-right rounded-r">Statut</th>
+</tr>
+</thead>
+<tbody class="font-body-sm text-body-sm divide-y-0">
+<!-- Structure 1 -->
+<tr class="h-11 bg-surface-container-lowest cursor-default">
+<td class="px-4 font-mono font-medium text-primary">DRBF-07-MEN</td>
+<td class="px-4 text-on-surface font-medium">Direction Régionale Menabe</td>
+<td class="px-4 text-on-surface-variant">Menabe</td>
+<td class="px-4 text-on-surface-variant">Rapport d'activités</td>
+<td class="px-4 text-on-surface-variant">30/09/2026</td>
+<td class="px-4 text-right">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-error bg-error-container font-label-sm text-label-sm font-semibold">
+                  +7j de retard
+                </span>
+</td>
+</tr>
+<!-- Structure 2 -->
+<tr class="h-11 bg-surface-container-low cursor-default">
+<td class="px-4 font-mono font-medium text-primary">SR-SOF-FIN</td>
+<td class="px-4 text-on-surface font-medium">Service Régional des Finances</td>
+<td class="px-4 text-on-surface-variant">Sofia</td>
+<td class="px-4 text-on-surface-variant">Rapport d'activités</td>
+<td class="px-4 text-on-surface-variant">30/09/2026</td>
+<td class="px-4 text-right">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-error bg-error-container font-label-sm text-label-sm font-semibold">
+                  +7j de retard
+                </span>
+</td>
+</tr>
+<!-- Structure 3 -->
+<tr class="h-11 bg-surface-container-lowest cursor-default">
+<td class="px-4 font-mono font-medium text-primary">DR-ALM-BUD</td>
+<td class="px-4 text-on-surface font-medium">Antenne Budgétaire Ambatondrazaka</td>
+<td class="px-4 text-on-surface-variant">Alaotra-Mangoro</td>
+<td class="px-4 text-on-surface-variant">Rapport d'activités</td>
+<td class="px-4 text-on-surface-variant">01/10/2026</td>
+<td class="px-4 text-right">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-error bg-error-container font-label-sm text-label-sm font-semibold">
+                  +6j de retard
+                </span>
+</td>
+</tr>
+<!-- Structure 4 -->
+<tr class="h-11 bg-surface-container-low cursor-default">
+<td class="px-4 font-mono font-medium text-primary">DR-ATA-AGR</td>
+<td class="px-4 text-on-surface font-medium">Délégation Provinciale Toliara</td>
+<td class="px-4 text-on-surface-variant">Atsimo-Andrefana</td>
+<td class="px-4 text-on-surface-variant">Rapport d'activités</td>
+<td class="px-4 text-on-surface-variant">02/10/2026</td>
+<td class="px-4 text-right">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-error bg-error-container font-label-sm text-label-sm font-semibold">
+                  +5j de retard
+                </span>
+</td>
+</tr>
+<!-- Structure 5 -->
+<tr class="h-11 bg-surface-container-lowest cursor-default">
+<td class="px-4 font-mono font-medium text-primary">SAF-ITASY-01</td>
+<td class="px-4 text-on-surface font-medium">Service Administratif et Financier</td>
+<td class="px-4 text-on-surface-variant">Itasy</td>
+<td class="px-4 text-on-surface-variant">Rapport d'activités</td>
+<td class="px-4 text-on-surface-variant">03/10/2026</td>
+<td class="px-4 text-right">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-error bg-error-container font-label-sm text-label-sm font-semibold">
+                  +4j de retard
+                </span>
+</td>
+</tr>
+<!-- Structure 6 -->
+<tr class="h-11 bg-surface-container-low cursor-default">
+<td class="px-4 font-mono font-medium text-primary">DRBF-SAV-04</td>
+<td class="px-4 text-on-surface font-medium">Antenne Sambava</td>
+<td class="px-4 text-on-surface-variant">Sava</td>
+<td class="px-4 text-on-surface-variant">Rapport d'activités</td>
+<td class="px-4 text-on-surface-variant">04/10/2026</td>
+<td class="px-4 text-right">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-error bg-error-container font-label-sm text-label-sm font-semibold">
+                  +3j de retard
+                </span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination / Pied du tableau sans action destructive ni relance -->
+<div class="flex items-center justify-between pt-2">
+<span class="font-body-sm text-body-sm text-on-surface-variant">
+          Affichage de 6 sur 18 structures
+        </span>
+<div class="flex items-center gap-space-sm">
+<span class="font-label-md text-label-md text-on-surface font-medium bg-surface-container-low px-3 py-1 rounded">
+            Page 1 sur 3
+          </span>
+<div class="flex items-center gap-1 text-on-surface-variant">
+<button class="w-8 h-8 rounded flex items-center justify-center opacity-40 cursor-not-allowed" disabled="" type="button">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<button class="w-8 h-8 rounded flex items-center justify-center hover:bg-surface-container-high transition-colors text-on-surface" type="button">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Note réglementaire de bas de page -->
+<div class="bg-surface-container-lowest rounded-lg p-space-md shadow-sm flex items-start gap-space-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px] text-secondary mt-0.5">policy</span>
+<p class="font-body-sm text-body-sm leading-relaxed">
+        Ce tableau de bord compte les soumissions par statut. Le contenu d'un rapport n'est consultable qu'après son export vers la base.
+      </p>
+</div>
+</div>
+</div></main></div>
+
+
+
+</body></html>

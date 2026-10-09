@@ -1,0 +1,428 @@
+<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><meta content="web_dashboard" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"><style>@layer base { html, body { margin: 0; padding: 0; } body { overscroll-behavior: none; } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "error-container": "#ffdad6", "surface": "#f8f9ff", "surface-container-high": "#dde9fd", "on-secondary-fixed": "#001c38", "surface-container-highest": "#d7e3f7", "surface-container-low": "#eff4ff", "on-surface-variant": "#424751", "secondary": "#466083", "primary": "#004788", "primary-fixed-dim": "#a7c8ff", "surface-container-lowest": "#ffffff", "tertiary-container": "#036d42", "on-error": "#ffffff", "inverse-surface": "#253140", "on-error-container": "#93000a", "on-secondary": "#ffffff", "on-background": "#101c2b", "on-secondary-fixed-variant": "#2d486a", "primary-container": "#1f5fa8", "on-primary": "#ffffff", "on-primary-fixed-variant": "#004787", "tertiary-fixed": "#9df5bf", "outline": "#727782", "background": "#f8f9ff", "secondary-fixed-dim": "#aec8f0", "on-tertiary": "#ffffff", "on-primary-container": "#c5daff", "on-tertiary-fixed-variant": "#005231", "surface-tint": "#1f5fa8", "inverse-on-surface": "#eaf1ff", "error": "#ba1a1a", "surface-container": "#e5eeff", "inverse-primary": "#a7c8ff", "surface-dim": "#cfdbef", "secondary-container": "#bbd6ff", "on-tertiary-container": "#93ecb6", "surface-bright": "#f8f9ff", "primary-fixed": "#d5e3ff", "on-primary-fixed": "#001c3b", "outline-variant": "#c2c6d3", "on-surface": "#101c2b", "on-tertiary-fixed": "#002111", "tertiary": "#005231", "secondary-fixed": "d3e4ff", "on-secondary-container": "#435d80", "surface-variant": "#d7e3f7", "tertiary-fixed-dim": "#81d8a4" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-xl": "2rem", "gutter": "1rem", "space-lg": "1.5rem", "space-xs": "0.25rem", "space-sm": "0.5rem", "space-md": "1rem", "gutter-desktop": "1.5rem", "margin-desktop": "2rem", "margin": "1rem" }, "fontFamily": { "headline-md": ["Inter"], "headline-sm": ["Inter"], "body-md": ["Inter"], "headline-xl-mobile": ["Inter"], "label-md": ["Inter"], "headline-lg": ["Inter"], "body-lg": ["Inter"], "label-sm": ["Inter"], "headline-xl": ["Inter"], "body-sm": ["Inter"], "metric-num": ["Inter"], "label-lg": ["Inter"] }, "fontSize": { "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }], "headline-sm": ["16px", { "lineHeight": "24px", "fontWeight": "600" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "headline-xl-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }], "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "500" }], "headline-xl": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }], "metric-num": ["22px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "label-lg": ["14px", { "lineHeight": "20px", "fontWeight": "600" }] } } } };</script></head><body class="bg-background font-body-md text-on-surface"><div class="fixed top-0 left-0 w-full h-[4px] z-[60] flex"><div class="w-1/2 h-full bg-[#B42318]"></div><div class="w-1/2 h-full bg-[#1E7B4F]"></div></div><aside class="fixed left-0 top-[4px] bottom-0 w-[240px] bg-[#0B2A4A] z-50 flex flex-col justify-between select-none"><div class="w-full flex flex-col"><div class="pt-6 px-5 pb-5 border-b border-[#1A3A5E]"><img alt="Ministère de l'Économie et des Finances" class="h-10 w-auto object-contain mb-3" src="https://lh3.googleusercontent.com/aida/AEtjO1UOEFzzVWKsKd7D4_tckAmMcRr0d-XGnSpF987DdvxBkNEkYqzOAZkzEnTS_NJ44TY1EjwWdLuVWrr4XjhrK6ySfV31SlW7iRceuUgaAPFsUIe3xvu1P2dq2-KLkfrKjF-ENp96Ef_o6OCngIKSG2LG03JxgDdyQN3J7LHSnUkC1SKua8SLLlcscD7C-r9mJsLUzsgV4GsPnHI5PshDYwwZf2Af_VNq-UuTUnzS3gSLhPz0g6htv1orMA"><div class="text-white font-headline-md text-headline-md tracking-tight">SIGBD</div></div><nav class="flex flex-col gap-1 p-3" data-active-classes="bg-primary-container text-white font-semibold rounded-lg"><a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-[#153B64] hover:text-white transition-colors font-label-lg text-label-lg" data-path="tableau-de-bord" href="#"><span class="material-symbols-outlined text-[20px]">dashboard</span><span class="">Tableau de bord</span></a><a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-[#153B64] hover:text-white transition-colors font-label-lg text-label-lg" data-path="consultation-des-donnees" href="#"><span class="material-symbols-outlined text-[20px]">table_view</span><span class="">Consultation des données</span></a></nav></div><div class="p-4 border-t border-[#1A3A5E]"><div class="text-slate-400 font-label-sm text-label-sm tracking-wide uppercase">DGBF · SSEBF</div></div></aside><div class="pl-[240px]"><header class="fixed top-[4px] left-[240px] right-0 h-16 bg-surface-container-lowest border-b border-[#E3E8EF] z-40 px-6 flex items-center justify-between"><nav class="flex items-center text-on-surface-variant font-label-sm text-label-sm gap-2"><span class="font-label-sm text-label-sm">Système Informatisé de Gestion de la Base de Données</span><span class="material-symbols-outlined text-[14px]">chevron_right</span><span class="text-on-surface font-label-md text-label-md">Espace Consultation</span></nav><div class="flex items-center gap-4"><div class="flex items-center gap-3"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1UOEFzzVWKsKd7D4_tckAmMcRr0d-XGnSpF987DdvxBkNEkYqzOAZkzEnTS_NJ44TY1EjwWdLuVWrr4XjhrK6ySfV31SlW7iRceuUgaAPFsUIe3xvu1P2dq2-KLkfrKjF-ENp96Ef_o6OCngIKSG2LG03JxgDdyQN3J7LHSnUkC1SKua8SLLlcscD7C-r9mJsLUzsgV4GsPnHI5PshDYwwZf2Af_VNq-UuTUnzS3gSLhPz0g6htv1orMA"><div class="flex flex-col text-right leading-tight"><span class="text-on-surface font-label-lg text-label-lg">Fanja Rakotomalala</span><span class="text-on-surface-variant font-label-sm text-label-sm">DGBF</span></div><span class="px-2.5 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm border border-[#E3E8EF]">Consultant</span></div><div class="h-6 w-[1px] bg-[#E3E8EF]"></div><a class="flex items-center gap-1.5 text-error hover:text-error-container transition-colors font-label-md text-label-md" data-path="connexion" href="#"><span class="material-symbols-outlined text-[18px]">logout</span><span class="">Se déconnecter</span></a></div></header><main class="w-full pt-16 bg-surface min-h-[calc(100vh-4px)] px-margin-desktop py-space-lg"><div class="flex flex-col w-full space-y-6">
+<!-- En-tête et Titre de page -->
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center gap-3">
+<h1 class="text-[28px] leading-[36px] font-semibold text-[#0B2A4A] tracking-tight">
+        Consultation des données
+      </h1>
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container-high text-on-surface-variant text-[12px] font-medium border border-[#E3E8EF]">
+<span class="material-symbols-outlined text-[15px] text-on-surface-variant">lock</span>
+<span class="">Lecture seule</span>
+</span>
+</div>
+<p class="text-[#5B6778] font-body-md text-body-md">
+      Consultez les données validées et enregistrées dans la base, pour toutes les régions.
+    </p>
+</div>
+<!-- Carte Filtres -->
+<section class="bg-surface-container-lowest rounded-xl p-5 border border-[#E3E8EF] shadow-sm">
+<form class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3.5 items-end" id="filter-form">
+<!-- Région -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface-variant" for="filter-region">Région</label>
+<div class="relative">
+<select class="w-full h-[44px] appearance-none bg-surface-container-lowest border border-[#E3E8EF] rounded-lg px-3.5 pr-8 text-[#1A2433] font-body-md text-body-md focus:border-primary-container focus:outline-none transition-colors" id="filter-region">
+<option value="">Toutes les régions</option>
+<option value="Analamanga">Analamanga</option>
+<option value="Atsinanana">Atsinanana</option>
+<option value="Diana">Diana</option>
+</select>
+<span class="material-symbols-outlined pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[20px] text-on-surface-variant">expand_more</span>
+</div>
+</div>
+<!-- Structure -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface-variant" for="filter-structure">Structure</label>
+<div class="relative">
+<select class="w-full h-[44px] appearance-none bg-surface-container-lowest border border-[#E3E8EF] rounded-lg px-3.5 pr-8 text-[#1A2433] font-body-md text-body-md focus:border-primary-container focus:outline-none transition-colors" id="filter-structure">
+<option value="">Toutes les structures</option>
+<option value="SRB">SRB</option>
+<option value="SRSP">SRSP</option>
+<option value="CIRBF">CIRBF</option>
+</select>
+<span class="material-symbols-outlined pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[20px] text-on-surface-variant">expand_more</span>
+</div>
+</div>
+<!-- Module -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface-variant" for="filter-module">Module</label>
+<div class="relative">
+<select class="w-full h-[44px] appearance-none bg-surface-container-lowest border border-[#E3E8EF] rounded-lg px-3.5 pr-8 text-[#1A2433] font-body-md text-body-md focus:border-primary-container focus:outline-none transition-colors" id="filter-module">
+<option value="">Tous les modules</option>
+<option value="Rapport d'activités">Rapport d'activités</option>
+<option value="Ressources humaines">Ressources humaines</option>
+<option value="Compte rendu de formation">Compte rendu de formation</option>
+<option value="Transfert salaires">Transfert salaires</option>
+</select>
+<span class="material-symbols-outlined pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[20px] text-on-surface-variant">expand_more</span>
+</div>
+</div>
+<!-- Période -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface-variant" for="filter-periode">Période</label>
+<div class="relative">
+<select class="w-full h-[44px] appearance-none bg-surface-container-lowest border border-[#E3E8EF] rounded-lg px-3.5 pr-8 text-[#1A2433] font-body-md text-body-md focus:border-primary-container focus:outline-none transition-colors" id="filter-periode">
+<option selected="" value="T3 2026">T3 2026</option>
+<option value="Septembre 2026">Septembre 2026</option>
+<option value="T2 2026">T2 2026</option>
+<option value="T1 2026">T1 2026</option>
+</select>
+<span class="material-symbols-outlined pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[20px] text-on-surface-variant">expand_more</span>
+</div>
+</div>
+<!-- Statut -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface-variant" for="filter-statut">Statut</label>
+<div class="relative">
+<select class="w-full h-[44px] appearance-none bg-surface-container-lowest border border-[#E3E8EF] rounded-lg px-3.5 pr-8 text-[#1A2433] font-body-md text-body-md focus:border-primary-container focus:outline-none transition-colors" id="filter-statut">
+<option value="">Tous les statuts</option>
+<option value="Exportée">Exportée</option>
+<option value="Archivée">Archivée</option>
+</select>
+<span class="material-symbols-outlined pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[20px] text-on-surface-variant">expand_more</span>
+</div>
+</div>
+<!-- Action Réinitialiser -->
+<div class="flex items-center h-[44px]">
+<button class="w-full inline-flex items-center justify-center gap-1.5 h-[44px] px-3 text-primary-container hover:text-primary transition-colors font-label-lg text-label-lg focus:outline-none rounded-lg hover:bg-surface-container-low" id="reset-button" type="button">
+<span class="material-symbols-outlined text-[18px]">restart_alt</span>
+<span class="">Réinitialiser les filtres</span>
+</button>
+</div>
+</form>
+</section>
+<!-- En-tête des résultats -->
+<div class="flex items-center justify-between px-1">
+<div class="flex items-center gap-2">
+<span class="text-[#1A2433] font-headline-sm text-headline-sm font-semibold tracking-tight">8 enregistrements</span>
+<span class="text-on-surface-variant text-[13px]">• Base consolidée DGBF</span>
+</div>
+</div>
+<!-- Carte Tableau de Données -->
+<section class="bg-surface-container-lowest rounded-xl border border-[#E3E8EF] shadow-sm overflow-hidden flex flex-col">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="sticky top-0 bg-[#F5F7FA] border-b border-[#E3E8EF] select-none">
+<tr>
+<th class="py-3 px-4 font-label-md text-label-md text-[#5B6778] uppercase tracking-wider" scope="col">
+<div class="flex items-center gap-1 cursor-pointer hover:text-[#1A2433]">
+<span class="">Région</span>
+<span class="material-symbols-outlined text-[16px] text-outline-variant">unfold_more</span>
+</div>
+</th>
+<th class="py-3 px-4 font-label-md text-label-md text-[#5B6778] uppercase tracking-wider" scope="col">
+<div class="flex items-center gap-1 cursor-pointer hover:text-[#1A2433]">
+<span class="">Structure</span>
+<span class="material-symbols-outlined text-[16px] text-outline-variant">unfold_more</span>
+</div>
+</th>
+<th class="py-3 px-4 font-label-md text-label-md text-[#5B6778] uppercase tracking-wider" scope="col">
+<div class="flex items-center gap-1 cursor-pointer hover:text-[#1A2433]">
+<span class="">Module</span>
+<span class="material-symbols-outlined text-[16px] text-outline-variant">unfold_more</span>
+</div>
+</th>
+<th class="py-3 px-4 font-label-md text-label-md text-[#5B6778] uppercase tracking-wider" scope="col">
+<div class="flex items-center gap-1 cursor-pointer hover:text-[#1A2433]">
+<span class="">Période</span>
+<span class="material-symbols-outlined text-[16px] text-outline-variant">unfold_more</span>
+</div>
+</th>
+<th class="py-3 px-4 font-label-md text-label-md text-[#5B6778] uppercase tracking-wider" scope="col">
+<div class="flex items-center gap-1 cursor-pointer hover:text-[#1A2433]">
+<span class="">Date d'export</span>
+<span class="material-symbols-outlined text-[16px] text-[#1F5FA8]">arrow_downward</span>
+</div>
+</th>
+<th class="py-3 px-4 font-label-md text-label-md text-[#5B6778] uppercase tracking-wider" scope="col">
+<span class="">Statut</span>
+</th>
+<th class="py-3 px-4 font-label-md text-label-md text-[#5B6778] uppercase tracking-wider text-right" scope="col">
+<span class="">Action</span>
+</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-[#E3E8EF] text-[#1A2433] font-body-md text-body-md">
+<!-- Row 1 -->
+<tr class="hover:bg-[#FAFCFE] transition-colors">
+<td class="py-3.5 px-4 font-medium text-[#1A2433]">Analamanga</td>
+<td class="py-3.5 px-4 text-[#1A2433]">SRB – Analamanga</td>
+<td class="py-3.5 px-4 text-[#1A2433]">Rapport d'activités</td>
+<td class="py-3.5 px-4 text-[#5B6778]">Septembre 2026</td>
+<td class="py-3.5 px-4 font-mono text-[13px] text-[#5B6778]">07/10/2026</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[12px] font-medium bg-[#E8F1FB] text-[#1F5FA8] border border-[#CCDFF8]">
+                Exportée
+              </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<button class="inline-flex items-center gap-1.5 h-[34px] px-3 rounded-lg bg-surface-container-lowest border border-[#E3E8EF] text-[#1A2433] hover:bg-[#F5F7FA] hover:border-[#CCD4E0] transition-colors font-label-sm text-label-sm focus:outline-none" type="button">
+<span class="material-symbols-outlined text-[16px] text-secondary">visibility</span>
+<span class="">Consulter</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-[#FAFCFE] transition-colors">
+<td class="py-3.5 px-4 font-medium text-[#1A2433]">Analamanga</td>
+<td class="py-3.5 px-4 text-[#1A2433]">SRSP – Analamanga</td>
+<td class="py-3.5 px-4 text-[#1A2433]">Ressources humaines</td>
+<td class="py-3.5 px-4 text-[#5B6778]">T3 2026</td>
+<td class="py-3.5 px-4 font-mono text-[13px] text-[#5B6778]">07/10/2026</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[12px] font-medium bg-[#E8F1FB] text-[#1F5FA8] border border-[#CCDFF8]">
+                Exportée
+              </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<button class="inline-flex items-center gap-1.5 h-[34px] px-3 rounded-lg bg-surface-container-lowest border border-[#E3E8EF] text-[#1A2433] hover:bg-[#F5F7FA] hover:border-[#CCD4E0] transition-colors font-label-sm text-label-sm focus:outline-none" type="button">
+<span class="material-symbols-outlined text-[16px] text-secondary">visibility</span>
+<span class="">Consulter</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-[#FAFCFE] transition-colors">
+<td class="py-3.5 px-4 font-medium text-[#1A2433]">Analamanga</td>
+<td class="py-3.5 px-4 text-[#1A2433]">CIRBF – Analamanga</td>
+<td class="py-3.5 px-4 text-[#1A2433]">Rapport d'activités</td>
+<td class="py-3.5 px-4 text-[#5B6778]">Septembre 2026</td>
+<td class="py-3.5 px-4 font-mono text-[13px] text-[#5B6778]">06/10/2026</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[12px] font-medium bg-[#E8F1FB] text-[#1F5FA8] border border-[#CCDFF8]">
+                Exportée
+              </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<button class="inline-flex items-center gap-1.5 h-[34px] px-3 rounded-lg bg-surface-container-lowest border border-[#E3E8EF] text-[#1A2433] hover:bg-[#F5F7FA] hover:border-[#CCD4E0] transition-colors font-label-sm text-label-sm focus:outline-none" type="button">
+<span class="material-symbols-outlined text-[16px] text-secondary">visibility</span>
+<span class="">Consulter</span>
+</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-[#FAFCFE] transition-colors">
+<td class="py-3.5 px-4 font-medium text-[#1A2433]">Atsinanana</td>
+<td class="py-3.5 px-4 text-[#1A2433]">SRB – Atsinanana</td>
+<td class="py-3.5 px-4 text-[#1A2433]">Rapport d'activités</td>
+<td class="py-3.5 px-4 text-[#5B6778]">Septembre 2026</td>
+<td class="py-3.5 px-4 font-mono text-[13px] text-[#5B6778]">05/10/2026</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[12px] font-medium bg-[#E8F1FB] text-[#1F5FA8] border border-[#CCDFF8]">
+                Exportée
+              </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<button class="inline-flex items-center gap-1.5 h-[34px] px-3 rounded-lg bg-surface-container-lowest border border-[#E3E8EF] text-[#1A2433] hover:bg-[#F5F7FA] hover:border-[#CCD4E0] transition-colors font-label-sm text-label-sm focus:outline-none" type="button">
+<span class="material-symbols-outlined text-[16px] text-secondary">visibility</span>
+<span class="">Consulter</span>
+</button>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-[#FAFCFE] transition-colors">
+<td class="py-3.5 px-4 font-medium text-[#1A2433]">Atsinanana</td>
+<td class="py-3.5 px-4 text-[#1A2433]">SRSP – Atsinanana</td>
+<td class="py-3.5 px-4 text-[#1A2433]">Ressources humaines</td>
+<td class="py-3.5 px-4 text-[#5B6778]">T3 2026</td>
+<td class="py-3.5 px-4 font-mono text-[13px] text-[#5B6778]">04/10/2026</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[12px] font-medium bg-[#E8F1FB] text-[#1F5FA8] border border-[#CCDFF8]">
+                Exportée
+              </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<button class="inline-flex items-center gap-1.5 h-[34px] px-3 rounded-lg bg-surface-container-lowest border border-[#E3E8EF] text-[#1A2433] hover:bg-[#F5F7FA] hover:border-[#CCD4E0] transition-colors font-label-sm text-label-sm focus:outline-none" type="button">
+<span class="material-symbols-outlined text-[16px] text-secondary">visibility</span>
+<span class="">Consulter</span>
+</button>
+</td>
+</tr>
+<!-- Row 6 -->
+<tr class="hover:bg-[#FAFCFE] transition-colors">
+<td class="py-3.5 px-4 font-medium text-[#1A2433]">Diana</td>
+<td class="py-3.5 px-4 text-[#1A2433]">CIRBF – Diana</td>
+<td class="py-3.5 px-4 text-[#1A2433]">Rapport d'activités</td>
+<td class="py-3.5 px-4 text-[#5B6778]">Septembre 2026</td>
+<td class="py-3.5 px-4 font-mono text-[13px] text-[#5B6778]">03/10/2026</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[12px] font-medium bg-[#E8F1FB] text-[#1F5FA8] border border-[#CCDFF8]">
+                Exportée
+              </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<button class="inline-flex items-center gap-1.5 h-[34px] px-3 rounded-lg bg-surface-container-lowest border border-[#E3E8EF] text-[#1A2433] hover:bg-[#F5F7FA] hover:border-[#CCD4E0] transition-colors font-label-sm text-label-sm focus:outline-none" type="button">
+<span class="material-symbols-outlined text-[16px] text-secondary">visibility</span>
+<span class="">Consulter</span>
+</button>
+</td>
+</tr>
+<!-- Row 7 -->
+<tr class="hover:bg-[#FAFCFE] transition-colors">
+<td class="py-3.5 px-4 font-medium text-[#1A2433]">Diana</td>
+<td class="py-3.5 px-4 text-[#1A2433]">SRB – Diana</td>
+<td class="py-3.5 px-4 text-[#1A2433]">Compte rendu de formation</td>
+<td class="py-3.5 px-4 text-[#5B6778]">Session du 18/09/2026</td>
+<td class="py-3.5 px-4 font-mono text-[13px] text-[#5B6778]">28/09/2026</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[12px] font-medium bg-[#E8F1FB] text-[#1F5FA8] border border-[#CCDFF8]">
+                Exportée
+              </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<button class="inline-flex items-center gap-1.5 h-[34px] px-3 rounded-lg bg-surface-container-lowest border border-[#E3E8EF] text-[#1A2433] hover:bg-[#F5F7FA] hover:border-[#CCD4E0] transition-colors font-label-sm text-label-sm focus:outline-none" type="button">
+<span class="material-symbols-outlined text-[16px] text-secondary">visibility</span>
+<span class="">Consulter</span>
+</button>
+</td>
+</tr>
+<!-- Row 8 -->
+<tr class="hover:bg-[#FAFCFE] transition-colors">
+<td class="py-3.5 px-4 font-medium text-[#1A2433]">Analamanga</td>
+<td class="py-3.5 px-4 text-[#1A2433]">SRB – Analamanga</td>
+<td class="py-3.5 px-4 text-[#1A2433]">Transfert salaires et accessoires EPN</td>
+<td class="py-3.5 px-4 text-[#5B6778]">Demande du 15/03/2026</td>
+<td class="py-3.5 px-4 font-mono text-[13px] text-[#5B6778]">31/03/2026</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[12px] font-medium bg-[#ECEFF3] text-[#4A5568] border border-[#D5DCE4]">
+<span class="material-symbols-outlined text-[14px]">archive</span>
+<span class="">Archivée</span>
+</span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<button class="inline-flex items-center gap-1.5 h-[34px] px-3 rounded-lg bg-surface-container-lowest border border-[#E3E8EF] text-[#1A2433] hover:bg-[#F5F7FA] hover:border-[#CCD4E0] transition-colors font-label-sm text-label-sm focus:outline-none" type="button">
+<span class="material-symbols-outlined text-[16px] text-secondary">visibility</span>
+<span class="">Consulter</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="px-5 py-3.5 bg-surface-container-lowest border-t border-[#E3E8EF] flex flex-col sm:flex-row items-center justify-between gap-4">
+<div class="flex items-center gap-2 text-[#5B6778] font-body-sm text-body-sm">
+<span class="">Affichage</span>
+<div class="relative">
+<select aria-label="Lignes par page" class="h-8 appearance-none bg-surface-container-lowest border border-[#E3E8EF] rounded px-2.5 pr-6 text-[#1A2433] font-label-sm text-label-sm focus:outline-none focus:border-primary-container">
+<option>10 par page</option>
+<option>25 par page</option>
+<option>50 par page</option>
+</select>
+<span class="material-symbols-outlined pointer-events-none absolute right-1.5 top-1/2 -translate-y-1/2 text-[14px] text-on-surface-variant">expand_more</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-[#5B6778] font-label-md text-label-md">Page 1 sur 1</span>
+<div class="inline-flex rounded-lg border border-[#E3E8EF] overflow-hidden">
+<button aria-label="Page précédente" class="w-8 h-8 flex items-center justify-center bg-[#F5F7FA] text-outline-variant cursor-not-allowed" disabled="" type="button">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<div class="w-[1px] bg-[#E3E8EF]"></div>
+<button aria-label="Page suivante" class="w-8 h-8 flex items-center justify-center bg-[#F5F7FA] text-outline-variant cursor-not-allowed" disabled="" type="button">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Note informative de bas de page -->
+<div class="flex items-center gap-2 text-[#5B6778] text-[13px] leading-relaxed pt-1">
+<span class="material-symbols-outlined text-[18px] text-[#1F5FA8] shrink-0">info</span>
+<span class="">Seules les données validées et enregistrées dans la base sont consultables.</span>
+</div>
+<!-- Modal consultation de données (lecture seule) -->
+<div class="fixed inset-0 z-50 bg-[#0B2A4A]/40 backdrop-blur-xs hidden flex items-center justify-center p-4" id="consultation-modal">
+<div class="bg-surface-container-lowest border border-[#E3E8EF] rounded-xl max-w-xl w-full p-6 shadow-2xl relative">
+<div class="flex items-center justify-between pb-4 border-b border-[#E3E8EF]">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-container text-[22px]">description</span>
+<h2 class="text-headline-sm font-headline-sm text-[#0B2A4A]">Détails du document</h2>
+</div>
+<button class="p-1 rounded-lg text-on-surface-variant hover:bg-[#F5F7FA] transition-colors" id="close-modal-btn" type="button">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<div class="py-5 space-y-4 text-body-md font-body-md text-[#1A2433]">
+<div class="grid grid-cols-2 gap-4 bg-surface-container-low p-3.5 rounded-lg">
+<div>
+<div class="text-[11px] font-semibold uppercase text-[#5B6778]">Région</div>
+<div class="font-medium text-[#1A2433] mt-0.5" id="modal-region">-</div>
+</div>
+<div>
+<div class="text-[11px] font-semibold uppercase text-[#5B6778]">Structure émettrice</div>
+<div class="font-medium text-[#1A2433] mt-0.5" id="modal-structure">-</div>
+</div>
+<div>
+<div class="text-[11px] font-semibold uppercase text-[#5B6778]">Module budgétaire</div>
+<div class="font-medium text-[#1A2433] mt-0.5" id="modal-module">-</div>
+</div>
+<div>
+<div class="text-[11px] font-semibold uppercase text-[#5B6778]">Période de référence</div>
+<div class="font-medium text-[#1A2433] mt-0.5" id="modal-periode">-</div>
+</div>
+</div>
+<div class="p-3 bg-surface-container rounded-lg border border-[#E3E8EF] text-[13px] text-[#5B6778] flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-[#1F5FA8]">verified_user</span>
+<span class="">Ce document a été certifié conforme par le délégué du contrôle financier et scellé.</span>
+</div>
+</div>
+<div class="flex justify-end pt-3 border-t border-[#E3E8EF]">
+<button class="h-[44px] px-5 rounded-lg bg-surface-container border border-[#E3E8EF] text-[#1A2433] hover:bg-[#F5F7FA] font-label-lg text-label-lg transition-colors" id="close-modal-footer-btn" type="button">
+          Fermer la vue
+        </button>
+</div>
+</div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const modal = document.getElementById('consultation-modal');
+      const closeModalBtn = document.getElementById('close-modal-btn');
+      const closeModalFooterBtn = document.getElementById('close-modal-footer-btn');
+      const resetBtn = document.getElementById('reset-button');
+      const filterForm = document.getElementById('filter-form');
+
+      const modalRegion = document.getElementById('modal-region');
+      const modalStructure = document.getElementById('modal-structure');
+      const modalModule = document.getElementById('modal-module');
+      const modalPeriode = document.getElementById('modal-periode');
+
+      // Interactivité boutons consulter
+      document.querySelectorAll('tbody tr').forEach(row => {
+        const btn = row.querySelector('button');
+        if (btn) {
+          btn.addEventListener('click', () => {
+            const cells = row.querySelectorAll('td');
+            if (cells.length >= 4) {
+              modalRegion.textContent = cells[0].textContent.trim();
+              modalStructure.textContent = cells[1].textContent.trim();
+              modalModule.textContent = cells[2].textContent.trim();
+              modalPeriode.textContent = cells[3].textContent.trim();
+              modal.classList.remove('hidden');
+            }
+          });
+        }
+      });
+
+      const closeModal = () => modal.classList.add('hidden');
+      closeModalBtn?.addEventListener('click', closeModal);
+      closeModalFooterBtn?.addEventListener('click', closeModal);
+      modal?.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+      });
+
+      // Réinitialiser les filtres
+      resetBtn?.addEventListener('click', () => {
+        document.getElementById('filter-region').value = '';
+        document.getElementById('filter-structure').value = '';
+        document.getElementById('filter-module').value = '';
+        document.getElementById('filter-periode').value = 'T3 2026';
+        document.getElementById('filter-statut').value = '';
+      });
+    });
+  </script>
+</div></main></div>
+
+</body></html>

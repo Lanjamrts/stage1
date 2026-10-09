@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+
+<html lang="fr"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "surface-container-lowest": "#ffffff", "on-error": "#ffffff", "surface-tint": "#1f5fa8", "on-tertiary-container": "#93ecb6", "inverse-surface": "#253140", "primary-fixed-dim": "#a7c8ff", "secondary-container": "#bbd6ff", "outline": "#727782", "on-error-container": "#93000a", "on-primary-fixed-variant": "#004787", "secondary-fixed-dim": "#aec8f0", "error": "#ba1a1a", "error-container": "#ffdad6", "primary-container": "#1f5fa8", "surface-bright": "#f8f9ff", "on-background": "#101c2b", "tertiary": "#005231", "inverse-on-surface": "#eaf1ff", "on-secondary-fixed": "#001c38", "tertiary-fixed-dim": "#81d8a4", "surface-variant": "#d7e3f7", "surface-container-highest": "#d7e3f7", "outline-variant": "#c2c6d3", "surface-container-high": "#dde9fd", "on-tertiary-fixed": "#002111", "on-tertiary-fixed-variant": "#005231", "on-primary-container": "#c5daff", "background": "#f8f9ff", "surface-container": "#e5eeff", "secondary": "#466083", "tertiary-container": "#036d42", "primary": "#004788", "primary-fixed": "#d5e3ff", "surface-container-low": "#eff4ff", "on-secondary-container": "#435d80", "on-surface": "#101c2b", "on-secondary-fixed-variant": "#2d486a", "on-tertiary": "#ffffff", "inverse-primary": "#a7c8ff", "tertiary-fixed": "#9df5bf", "surface": "#f8f9ff", "on-primary": "#ffffff", "on-surface-variant": "#424751", "surface-dim": "#cfdbef", "on-secondary": "#ffffff", "secondary-fixed": "#d3e4ff", "on-primary-fixed": "#001c3b" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-lg": "1.5rem", "margin": "1rem", "space-sm": "0.5rem", "gutter-desktop": "1.5rem", "space-md": "1rem", "margin-desktop": "2rem", "space-xl": "2rem", "space-xs": "0.25rem", "gutter": "1rem" }, "fontFamily": { "metric-num": ["Inter"], "body-sm": ["Inter"], "headline-lg": ["Inter"], "label-sm": ["Inter"], "headline-sm": ["Inter"], "headline-md": ["Inter"], "headline-xl-mobile": ["Inter"], "label-md": ["Inter"], "label-lg": ["Inter"], "body-md": ["Inter"], "body-lg": ["Inter"], "headline-xl": ["Inter"] }, "fontSize": { "metric-num": ["22px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}], "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}], "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}], "label-sm": ["11px", {"lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "500"}], "headline-sm": ["16px", {"lineHeight": "24px", "fontWeight": "600"}], "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}], "headline-xl-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700"}], "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600"}], "label-lg": ["14px", {"lineHeight": "20px", "fontWeight": "600"}], "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}], "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}], "headline-xl": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}] } } } };</script></head><body class="bg-[#F5F7FA] font-body-md text-on-surface antialiased"><div class="fixed top-0 left-0 right-0 h-1 z-50 flex pointer-events-none"><div class="w-1/2 h-full bg-[#B42318]"></div><div class="w-1/2 h-full bg-[#1E7B4F]"></div></div><aside class="fixed top-1 left-0 bottom-0 w-[240px] bg-[#0B2A4A] z-40 flex flex-col justify-between select-none shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="flex flex-col"><div class="h-16 px-space-md flex items-center gap-space-sm border-b border-white/10"><span class="material-symbols-outlined text-white text-[40px] leading-none shrink-0">account_balance</span><span class="text-white font-headline-md tracking-tight uppercase">SIGBD</span></div><nav class="flex flex-col gap-space-xs p-space-sm mt-space-sm" data-active-classes="bg-primary text-on-primary font-label-lg rounded"><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded font-body-md text-slate-300 hover:bg-white/10 hover:text-white transition-colors" data-path="tableau-de-bord" href="#"><span class="material-symbols-outlined text-[20px]">dashboard</span><span>Tableau de bord</span></a><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded font-body-md text-slate-300 hover:bg-white/10 hover:text-white transition-colors" data-path="utilisateurs" href="#"><span class="material-symbols-outlined text-[20px]">group</span><span>Utilisateurs</span></a><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded font-label-lg bg-primary text-on-primary transition-colors" data-path="collecte-et-telechargement" href="#"><span class="material-symbols-outlined text-[20px]">download</span><span>Collecte et téléchargement</span></a><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded font-body-md text-slate-300 hover:bg-white/10 hover:text-white transition-colors" data-path="journal-daudit" href="#"><span class="material-symbols-outlined text-[20px]">history</span><span>Journal d'audit</span></a><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded font-body-md text-slate-300 hover:bg-white/10 hover:text-white transition-colors" data-path="remarques" href="#"><span class="material-symbols-outlined text-[20px]">notes</span><span>Remarques</span></a></nav></div><div class="p-space-md border-t border-white/10"><div class="text-slate-400 font-label-sm tracking-widest uppercase">DGBF · SSEBF</div></div></aside><div class="pl-[240px]"><header class="fixed top-1 left-[240px] right-0 h-16 bg-white z-30 shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-b border-[#E3E8EF] px-gutter-desktop flex items-center justify-between"><div class="flex items-center gap-space-xs text-on-surface-variant font-body-sm"><span class="hover:text-on-surface cursor-pointer">SIGBD</span><span class="material-symbols-outlined text-[16px] text-outline">chevron_right</span><span class="text-on-surface font-label-md">Collecte et téléchargement</span></div><div class="flex items-center gap-space-lg"><div class="flex items-center gap-space-md"><div class="flex flex-col text-right"><span class="text-on-surface font-label-lg">Mamy Andrianarisoa</span><span class="text-on-surface-variant font-label-sm">SSEBF</span></div><span class="inline-flex items-center justify-center px-space-xs py-0.5 rounded bg-surface-container-high text-on-surface-variant font-label-sm border border-outline-variant/50">Admin 1</span><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1UOEFzzVWKsKd7D4_tckAmMcRr0d-XGnSpF987DdvxBkNEkYqzOAZkzEnTS_NJ44TY1EjwWdLuVWrr4XjhrK6ySfV31SlW7iRceuUgaAPFsUIe3xvu1P2dq2-KLkfrKjF-ENp96Ef_o6OCngIKSG2LG03JxgDdyQN3J7LHSnUkC1SKua8SLLlcscD7C-r9mJsLUzsgV4GsPnHI5PshDYwwZf2Af_VNq-UuTUnzS3gSLhPz0g6htv1orMA"/></div><div class="h-6 w-px bg-outline-variant/40"></div><a class="flex items-center gap-space-xs text-on-surface-variant hover:text-error transition-colors font-label-md" data-path="connexion" href="#"><span class="material-symbols-outlined text-[20px]">logout</span><span>Se déconnecter</span></a></div></header><main class="w-full pt-16 min-h-screen px-gutter-desktop py-space-xl bg-[#F5F7FA]"><div class="flex flex-col w-full">
+<div class="max-w-[1120px] w-full mx-auto flex flex-col gap-space-lg">
+<!-- En-tête de page -->
+<div class="flex flex-col gap-1">
+<h1 class="font-headline-lg text-[28px] leading-[36px] font-semibold text-[#0B2A4A] tracking-tight">
+        Collecte et téléchargement
+      </h1>
+<p class="font-body-md text-[#5B6778]">
+        Choisissez les régions et les types de rapport, puis consultez et téléchargez les données publiées dans la base.
+      </p>
+</div>
+<!-- CARTE 1 : Régions -->
+<section class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm border border-[#E3E8EF]">
+<div class="flex items-center justify-between pb-space-md border-b border-[#E3E8EF] mb-space-md">
+<div class="flex items-center gap-space-sm">
+<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-surface-container-high text-primary font-label-md">1</span>
+<h2 class="font-headline-sm text-[#0B2A4A]">Régions</h2>
+</div>
+<div class="flex items-center gap-space-lg">
+<label class="inline-flex items-center gap-space-sm cursor-pointer select-none">
+<input class="w-[18px] h-[18px] rounded text-primary border-[#5B6778] focus:ring-primary focus:ring-offset-0 transition-colors cursor-pointer" id="check-all-regions" type="checkbox"/>
+<span class="font-body-md text-[#0B2A4A] font-medium">Tout sélectionner</span>
+</label>
+<span class="font-body-md text-[#5B6778]" id="region-count">0 région sélectionnée</span>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-y-3 gap-x-8 pt-1">
+<!-- Colonne 1 -->
+<div class="flex flex-col gap-3">
+<label class="inline-flex items-center gap-3 cursor-pointer py-1 group">
+<input class="region-checkbox w-[18px] h-[18px] rounded border-[#5B6778] text-primary focus:ring-primary transition-colors cursor-pointer" name="region" type="checkbox" value="Alaotra-Mangoro"/>
+<span class="font-body-md text-[#1A2433] group-hover:text-primary transition-colors">Alaotra-Mangoro</span>
+</label>
+<label class="inline-flex items-center gap-3 cursor-pointer py-1 group">
+<input class="region-checkbox w-[18px] h-[18px] rounded border-[#5B6778] text-primary focus:ring-primary transition-colors cursor-pointer" name="region" type="checkbox" value="Analamanga"/>
+<span class="font-body-md text-[#1A2433] group-hover:text-primary transition-colors">Analamanga</span>
+</label>
+<label class="inline-flex items-center gap-3 cursor-pointer py-1 group">
+<input class="region-checkbox w-[18px] h-[18px] rounded border-[#5B6778] text-primary focus:ring-primary transition-colors cursor-pointer" name="region" type="checkbox" value="Atsimo-Andrefana"/>
+<span class="font-body-md text-[#1A2433] group-hover:text-primary transition-colors">Atsimo-Andrefana</span>
+</label>
+<label class="inline-flex items-center gap-3 cursor-pointer py-1 group">
+<input class="region-checkbox w-[18px] h-[18px] rounded border-[#5B6778] text-primary focus:ring-primary transition-colors cursor-pointer" name="region" type="checkbox" value="Atsinanana"/>
+<span class="font-body-md text-[#1A2433] group-hover:text-primary transition-colors">Atsinanana</span>
+</label>
+</div>
+<!-- Colonne 2 -->
+<div class="flex flex-col gap-3">
+<label class="inline-flex items-center gap-3 cursor-pointer py-1 group">
+<input class="region-checkbox w-[18px] h-[18px] rounded border-[#5B6778] text-primary focus:ring-primary transition-colors cursor-pointer" name="region" type="checkbox" value="Boeny"/>
+<span class="font-body-md text-[#1A2433] group-hover:text-primary transition-colors">Boeny</span>
+</label>
+<label class="inline-flex items-center gap-3 cursor-pointer py-1 group">
+<input class="region-checkbox w-[18px] h-[18px] rounded border-[#5B6778] text-primary focus:ring-primary transition-colors cursor-pointer" name="region" type="checkbox" value="Diana"/>
+<span class="font-body-md text-[#1A2433] group-hover:text-primary transition-colors">Diana</span>
+</label>
+<label class="inline-flex items-center gap-3 cursor-pointer py-1 group">
+<input class="region-checkbox w-[18px] h-[18px] rounded border-[#5B6778] text-primary focus:ring-primary transition-colors cursor-pointer" name="region" type="checkbox" value="Haute Matsiatra"/>
+<span class="font-body-md text-[#1A2433] group-hover:text-primary transition-colors">Haute Matsiatra</span>
+</label>
+<label class="inline-flex items-center gap-3 cursor-pointer py-1 group">
+<input class="region-checkbox w-[18px] h-[18px] rounded border-[#5B6778] text-primary focus:ring-primary transition-colors cursor-pointer" name="region" type="checkbox" value="Itasy"/>
+<span class="font-body-md text-[#1A2433] group-hover:text-primary transition-colors">Itasy</span>
+</label>
+</div>
+<!-- Colonne 3 -->
+<div class="flex flex-col gap-3">
+<label class="inline-flex items-center gap-3 cursor-pointer py-1 group">
+<input class="region-checkbox w-[18px] h-[18px] rounded border-[#5B6778] text-primary focus:ring-primary transition-colors cursor-pointer" name="region" type="checkbox" value="Menabe"/>
+<span class="font-body-md text-[#1A2433] group-hover:text-primary transition-colors">Menabe</span>
+</label>
+<label class="inline-flex items-center gap-3 cursor-pointer py-1 group">
+<input class="region-checkbox w-[18px] h-[18px] rounded border-[#5B6778] text-primary focus:ring-primary transition-colors cursor-pointer" name="region" type="checkbox" value="Sava"/>
+<span class="font-body-md text-[#1A2433] group-hover:text-primary transition-colors">Sava</span>
+</label>
+<label class="inline-flex items-center gap-3 cursor-pointer py-1 group">
+<input class="region-checkbox w-[18px] h-[18px] rounded border-[#5B6778] text-primary focus:ring-primary transition-colors cursor-pointer" name="region" type="checkbox" value="Sofia"/>
+<span class="font-body-md text-[#1A2433] group-hover:text-primary transition-colors">Sofia</span>
+</label>
+<label class="inline-flex items-center gap-3 cursor-pointer py-1 group">
+<input class="region-checkbox w-[18px] h-[18px] rounded border-[#5B6778] text-primary focus:ring-primary transition-colors cursor-pointer" name="region" type="checkbox" value="Vakinankaratra"/>
+<span class="font-body-md text-[#1A2433] group-hover:text-primary transition-colors">Vakinankaratra</span>
+</label>
+</div>
+</div>
+</section>
+<!-- CARTE 2 : Types de rapport -->
+<section class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm border border-[#E3E8EF]">
+<div class="flex items-center justify-between pb-space-md border-b border-[#E3E8EF] mb-space-md">
+<div class="flex items-center gap-space-sm">
+<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-surface-container-high text-primary font-label-md">2</span>
+<h2 class="font-headline-sm text-[#0B2A4A]">Types de rapport</h2>
+</div>
+<div class="flex items-center gap-space-lg">
+<label class="inline-flex items-center gap-space-sm cursor-pointer select-none">
+<input class="w-[18px] h-[18px] rounded text-primary border-[#5B6778] focus:ring-primary focus:ring-offset-0 transition-colors cursor-pointer" id="check-all-reports" type="checkbox"/>
+<span class="font-body-md text-[#0B2A4A] font-medium">Tout sélectionner</span>
+</label>
+<span class="font-body-md text-[#5B6778]" id="report-count">0 type sélectionné</span>
+</div>
+</div>
+<!-- Groupe 1 : Rapports et comptes rendus -->
+<div class="flex flex-col mb-space-md">
+<h3 class="font-label-lg font-semibold text-[#0B2A4A] mb-space-sm flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+          Rapports et comptes rendus
+        </h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-y-3 gap-x-8 pt-1">
+<label class="inline-flex items-center gap-3 cursor-pointer py-1 group">
+<input class="report-checkbox w-[18px] h-[18px] rounded border-[#5B6778] text-primary focus:ring-primary transition-colors cursor-pointer" name="report_type" type="checkbox" value="Rapport d'activités"/>
+<span class="font-body-md text-[#1A2433] group-hover:text-primary transition-colors">Rapport d'activités</span>
+</label>
+<label class="inline-flex items-center gap-3 cursor-pointer py-1 group">
+<input class="report-checkbox w-[18px] h-[18px] rounded border-[#5B6778] text-primary focus:ring-primary transition-colors cursor-pointer" name="report_type" type="checkbox" value="Compte rendu CRGP"/>
+<span class="font-body-md text-[#1A2433] group-hover:text-primary transition-colors">Compte rendu CRGP</span>
+</label>
+<label class="inline-flex items-center gap-3 cursor-pointer py-1 group">
+<input class="report-checkbox w-[18px] h-[18px] rounded border-[#5B6778] text-primary focus:ring-primary transition-colors cursor-pointer" name="report_type" type="checkbox" value="Compte rendu d'assistance"/>
+<span class="font-body-md text-[#1A2433] group-hover:text-primary transition-colors">Compte rendu d'assistance</span>
+</label>
+<label class="inline-flex items-center gap-3 cursor-pointer py-1 group">
+<input class="report-checkbox w-[18px] h-[18px] rounded border-[#5B6778] text-primary focus:ring-primary transition-colors cursor-pointer" name="report_type" type="checkbox" value="Compte rendu de formation"/>
+<span class="font-body-md text-[#1A2433] group-hover:text-primary transition-colors">Compte rendu de formation</span>
+</label>
+<label class="inline-flex items-center gap-3 cursor-pointer py-1 group">
+<input class="report-checkbox w-[18px] h-[18px] rounded border-[#5B6778] text-primary focus:ring-primary transition-colors cursor-pointer" name="report_type" type="checkbox" value="Ressources humaines"/>
+<span class="font-body-md text-[#1A2433] group-hover:text-primary transition-colors">Ressources humaines</span>
+</label>
+</div>
+</div>
+<div class="h-px w-full bg-[#E3E8EF]/60 my-2"></div>
+<!-- Groupe 2 : Mises à jour de la base -->
+<div class="flex flex-col mt-space-sm">
+<h3 class="font-label-lg font-semibold text-[#0B2A4A] mb-space-sm flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+          Mises à jour de la base
+        </h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-y-3 gap-x-8 pt-1">
+<label class="inline-flex items-center gap-3 cursor-pointer py-1 group">
+<input class="report-checkbox w-[18px] h-[18px] rounded border-[#5B6778] text-primary focus:ring-primary transition-colors cursor-pointer" name="report_type" type="checkbox" value="Nomination Ordonnateur Secondaire"/>
+<span class="font-body-md text-[#1A2433] group-hover:text-primary transition-colors">Nomination Ordonnateur Secondaire</span>
+</label>
+<label class="inline-flex items-center gap-3 cursor-pointer py-1 group">
+<input class="report-checkbox w-[18px] h-[18px] rounded border-[#5B6778] text-primary focus:ring-primary transition-colors cursor-pointer" name="report_type" type="checkbox" value="Nomination PRMP"/>
+<span class="font-body-md text-[#1A2433] group-hover:text-primary transition-colors">Nomination PRMP</span>
+</label>
+<label class="inline-flex items-center gap-3 cursor-pointer py-1 group">
+<input class="report-checkbox w-[18px] h-[18px] rounded border-[#5B6778] text-primary focus:ring-primary transition-colors cursor-pointer" name="report_type" type="checkbox" value="Nomination membres du Conseil d'Administration EPN"/>
+<span class="font-body-md text-[#1A2433] group-hover:text-primary transition-colors">Nomination membres du Conseil d'Administration EPN</span>
+</label>
+<label class="inline-flex items-center gap-3 cursor-pointer py-1 group">
+<input class="report-checkbox w-[18px] h-[18px] rounded border-[#5B6778] text-primary focus:ring-primary transition-colors cursor-pointer" name="report_type" type="checkbox" value="Recensement mobilier de bureau"/>
+<span class="font-body-md text-[#1A2433] group-hover:text-primary transition-colors">Recensement mobilier de bureau</span>
+</label>
+<label class="inline-flex items-center gap-3 cursor-pointer py-1 group">
+<input class="report-checkbox w-[18px] h-[18px] rounded border-[#5B6778] text-primary focus:ring-primary transition-colors cursor-pointer" name="report_type" type="checkbox" value="Recensement matériel informatique"/>
+<span class="font-body-md text-[#1A2433] group-hover:text-primary transition-colors">Recensement matériel informatique</span>
+</label>
+<label class="inline-flex items-center gap-3 cursor-pointer py-1 group">
+<input class="report-checkbox w-[18px] h-[18px] rounded border-[#5B6778] text-primary focus:ring-primary transition-colors cursor-pointer" name="report_type" type="checkbox" value="Recensement matériels roulants"/>
+<span class="font-body-md text-[#1A2433] group-hover:text-primary transition-colors">Recensement matériels roulants</span>
+</label>
+<label class="inline-flex items-center gap-3 cursor-pointer py-1 group">
+<input class="report-checkbox w-[18px] h-[18px] rounded border-[#5B6778] text-primary focus:ring-primary transition-colors cursor-pointer" name="report_type" type="checkbox" value="Régie d'avances STD"/>
+<span class="font-body-md text-[#1A2433] group-hover:text-primary transition-colors">Régie d'avances STD</span>
+</label>
+<label class="inline-flex items-center gap-3 cursor-pointer py-1 group">
+<input class="report-checkbox w-[18px] h-[18px] rounded border-[#5B6778] text-primary focus:ring-primary transition-colors cursor-pointer" name="report_type" type="checkbox" value="Transfert salaires et accessoires EPN"/>
+<span class="font-body-md text-[#1A2433] group-hover:text-primary transition-colors">Transfert salaires et accessoires EPN</span>
+</label>
+</div>
+</div>
+</section>
+<!-- CARTE 3 : Période (facultatif) -->
+<section class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm border border-[#E3E8EF]">
+<div class="flex items-center gap-space-sm pb-space-md border-b border-[#E3E8EF] mb-space-md">
+<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-surface-container-high text-primary font-label-md">3</span>
+<h2 class="font-headline-sm text-[#0B2A4A]">Période (facultatif)</h2>
+</div>
+<div class="max-w-md flex flex-col gap-1.5">
+<label class="font-label-md text-[#5B6778] uppercase tracking-wide" for="select-period">Période</label>
+<div class="relative">
+<select class="w-full h-[44px] rounded-lg bg-surface-container-lowest border border-[#E3E8EF] px-3.5 pr-10 font-body-md text-[#1A2433] appearance-none focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer" id="select-period">
+<option selected="" value="all">Toutes les périodes</option>
+<option value="2025-m1">Janvier 2025</option>
+<option value="2025-q1">1er Trimestre 2025</option>
+<option value="2024-annual">Année budgétaire 2024</option>
+<option value="2024-s2">2nd Semestre 2024</option>
+<option value="2024-s1">1er Semestre 2024</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none text-[20px]">
+            arrow_drop_down
+          </span>
+</div>
+</div>
+</section>
+<!-- LIGNE D'ACTION -->
+<footer class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-space-md pt-2 pb-space-xl">
+<div class="flex items-center gap-space-md">
+<!-- Bouton principal désactivé -->
+<button class="h-[44px] px-space-md rounded-lg bg-[#E3E8EF] text-[#8A94A6] font-label-lg cursor-not-allowed flex items-center gap-2 select-none" disabled="" type="button">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+<span>Afficher les données</span>
+</button>
+<!-- Bouton texte Tout effacer -->
+<button class="h-[44px] px-space-md rounded-lg font-label-lg text-[#5B6778] hover:text-[#1A2433] hover:bg-black/5 active:bg-black/10 transition-colors flex items-center gap-1.5 select-none cursor-pointer" id="btn-reset" type="button">
+<span class="material-symbols-outlined text-[18px]">clear_all</span>
+<span>Tout effacer</span>
+</button>
+</div>
+<!-- Message d'aide -->
+<div class="flex items-center gap-2 text-[#5B6778] font-body-sm">
+<span class="material-symbols-outlined text-[18px] text-outline">info</span>
+<span>Sélectionnez au moins une région et un type de rapport.</span>
+</div>
+</footer>
+</div>
+</div>
+<script>
+  (() => {
+    const regionChecks = Array.from(document.querySelectorAll('.region-checkbox'));
+    const reportChecks = Array.from(document.querySelectorAll('.report-checkbox'));
+    const checkAllRegions = document.getElementById('check-all-regions');
+    const checkAllReports = document.getElementById('check-all-reports');
+    const regionCountLabel = document.getElementById('region-count');
+    const reportCountLabel = document.getElementById('report-count');
+    const btnReset = document.getElementById('btn-reset');
+    const selectPeriod = document.getElementById('select-period');
+
+    function updateCounts() {
+      const selectedRegions = regionChecks.filter(c => c.checked).length;
+      const selectedReports = reportChecks.filter(c => c.checked).length;
+
+      // Update text
+      regionCountLabel.textContent = `${selectedRegions} région${selectedRegions > 1 ? 's' : ''} sélectionnée${selectedRegions > 1 ? 's' : ''}`;
+      reportCountLabel.textContent = `${selectedReports} type${selectedReports > 1 ? 's' : ''} sélectionné${selectedReports > 1 ? 's' : ''}`;
+
+      // Master checkboxes indeterminate state
+      if (checkAllRegions) {
+        checkAllRegions.checked = selectedRegions === regionChecks.length && regionChecks.length > 0;
+        checkAllRegions.indeterminate = selectedRegions > 0 && selectedRegions < regionChecks.length;
+      }
+
+      if (checkAllReports) {
+        checkAllReports.checked = selectedReports === reportChecks.length && reportChecks.length > 0;
+        checkAllReports.indeterminate = selectedReports > 0 && selectedReports < reportChecks.length;
+      }
+    }
+
+    if (checkAllRegions) {
+      checkAllRegions.addEventListener('change', (e) => {
+        regionChecks.forEach(c => { c.checked = e.target.checked; });
+        updateCounts();
+      });
+    }
+
+    if (checkAllReports) {
+      checkAllReports.addEventListener('change', (e) => {
+        reportChecks.forEach(c => { c.checked = e.target.checked; });
+        updateCounts();
+      });
+    }
+
+    regionChecks.forEach(c => c.addEventListener('change', updateCounts));
+    reportChecks.forEach(c => c.addEventListener('change', updateCounts));
+
+    if (btnReset) {
+      btnReset.addEventListener('click', () => {
+        regionChecks.forEach(c => { c.checked = false; });
+        reportChecks.forEach(c => { c.checked = false; });
+        if (checkAllRegions) {
+          checkAllRegions.checked = false;
+          checkAllRegions.indeterminate = false;
+        }
+        if (checkAllReports) {
+          checkAllReports.checked = false;
+          checkAllReports.indeterminate = false;
+        }
+        if (selectPeriod) {
+          selectPeriod.value = 'all';
+        }
+        updateCounts();
+      });
+    }
+
+    updateCounts();
+  })();
+</script></main></div></body></html>

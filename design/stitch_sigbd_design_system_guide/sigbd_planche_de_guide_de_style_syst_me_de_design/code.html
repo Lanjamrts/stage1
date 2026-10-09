@@ -1,0 +1,1529 @@
+<!DOCTYPE html><html lang="fr" class="scroll-smooth"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIGBD – Guide de Style &amp; Système de Design</title>
+  <!-- Google Fonts Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            gov: {
+              navy: '#0B2A4A',
+              blue: '#1F5FA8',
+              'blue-hover': '#174C87',
+              bg: '#F5F7FA',
+              border: '#E3E8EF',
+              text: '#1A2433',
+              'text-sec': '#5B6778',
+              success: '#1E7B4F',
+              warning: '#B7791F',
+              error: '#B42318',
+              info: '#1F5FA8',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Focus styles standards WCAG AA */
+    *:focus-visible {
+      outline: 2px solid #1F5FA8;
+      outline-offset: 2px;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: #F1F4F8;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #C4CDD5;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body class="bg-[#F5F7FA] text-[#1A2433] font-sans antialiased text-[15px] leading-relaxed selection:bg-[#1F5FA8] selection:text-white">
+
+  <!-- Liseré National Supérieur 4px (Moitié Gauche Rouge #B42318, Moitié Droite Verte #1E7B4F) -->
+  <div class="w-full h-1 flex sticky top-0 z-50 shadow-sm" aria-hidden="true">
+    <div class="w-1/2 h-full bg-[#B42318]"></div>
+    <div class="w-1/2 h-full bg-[#1E7B4F]"></div>
+  </div>
+
+  <!-- En-tête Principal de la Planche -->
+  <header class="bg-white border-b border-[#E3E8EF] shadow-sm">
+    <div class="max-w-[1440px] mx-auto px-6 py-5 sm:px-8">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <!-- Emblème et Intitulé Institutionnel -->
+        <div class="flex items-center gap-4">
+          <!-- Emblème médaillon placeholder -->
+          <div class="w-14 h-14 rounded-full bg-[#0B2A4A] border-2 border-white ring-2 ring-[#0B2A4A]/20 flex items-center justify-center shrink-0 text-white shadow-sm" title="Emblème Officiel">
+            <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="9.5"></circle>
+              <!-- Étoile centrale institutionnelle -->
+              <polygon points="12 4 14.2 9 19.5 9.5 15.5 13 16.7 18.5 12 15.5 7.3 18.5 8.5 13 4.5 9.5 9.8 9" fill="currentColor" fill-opacity="0.25"></polygon>
+              <!-- Rameaux de laurier stylisés -->
+              <path d="M7 15c-1-2-1-4 0-6"></path>
+              <path d="M17 15c1-2 1-4 0-6"></path>
+            </svg>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-semibold uppercase tracking-wider text-[#0B2A4A] bg-[#0B2A4A]/5 px-2 py-0.5 rounded border border-[#0B2A4A]/10">Système de Design v1.0</span>
+              <span class="text-xs text-[#5B6778]">· Spécification Technique &amp; Ergonomique</span>
+            </div>
+            <h1 class="text-xl sm:text-2xl font-semibold text-[#0B2A4A] tracking-tight mt-0.5">
+              Ministère de l'Économie et des Finances
+            </h1>
+            <p class="text-xs sm:text-sm text-[#5B6778] font-medium">
+              Direction Générale du Budget et des Finances (DGBF) · <span class="text-[#0B2A4A] font-semibold">SSEBF</span> (Structures Excentriques)
+            </p>
+          </div>
+        </div>
+
+        <!-- Fiche d'identité de l'application -->
+        <div class="bg-[#F5F7FA] border border-[#E3E8EF] rounded-lg p-3 text-xs text-[#5B6778] max-w-md">
+          <div class="font-semibold text-[#0B2A4A] text-sm flex items-center gap-1.5 mb-1">
+            <svg class="w-4 h-4 text-[#1F5FA8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            SIGBD – Système Informatisé de Gestion de la Base de Données
+          </div>
+          <p class="">Guide de référence dédié aux agents et administrateurs régionaux. Interfaces sobres, claires, contrastées (WCAG AA), cibles tactiles min. 40px, sans fioritures.</p>
+        </div>
+      </div>
+
+      <!-- Navigation rapide des 10 sections -->
+      <nav class="flex items-center gap-2 overflow-x-auto py-2.5 mt-4 border-t border-[#E3E8EF] text-xs font-medium text-[#5B6778] custom-scroll">
+        <span class="text-[#1A2433] font-semibold uppercase text-[11px] tracking-wide shrink-0">Sommaire :</span>
+        <a href="#section-1" class="px-2.5 py-1 rounded hover:bg-[#E3E8EF] hover:text-[#0B2A4A] whitespace-nowrap transition-colors">1. Couleurs</a>
+        <a href="#section-2" class="px-2.5 py-1 rounded hover:bg-[#E3E8EF] hover:text-[#0B2A4A] whitespace-nowrap transition-colors">2. Typographie</a>
+        <a href="#section-3" class="px-2.5 py-1 rounded hover:bg-[#E3E8EF] hover:text-[#0B2A4A] whitespace-nowrap transition-colors">3. Badges Statuts</a>
+        <a href="#section-4" class="px-2.5 py-1 rounded hover:bg-[#E3E8EF] hover:text-[#0B2A4A] whitespace-nowrap transition-colors">4. Chips Rôles</a>
+        <a href="#section-5" class="px-2.5 py-1 rounded hover:bg-[#E3E8EF] hover:text-[#0B2A4A] whitespace-nowrap transition-colors">5. Boutons &amp; États</a>
+        <a href="#section-6" class="px-2.5 py-1 rounded hover:bg-[#E3E8EF] hover:text-[#0B2A4A] whitespace-nowrap transition-colors">6. Formulaires</a>
+        <a href="#section-7" class="px-2.5 py-1 rounded hover:bg-[#E3E8EF] hover:text-[#0B2A4A] whitespace-nowrap transition-colors">7. Tableau Éditable</a>
+        <a href="#section-8" class="px-2.5 py-1 rounded hover:bg-[#E3E8EF] hover:text-[#0B2A4A] whitespace-nowrap transition-colors">8. Table de Données</a>
+        <a href="#section-9" class="px-2.5 py-1 rounded hover:bg-[#E3E8EF] hover:text-[#0B2A4A] whitespace-nowrap transition-colors">9. Shell Applicatif</a>
+        <a href="#section-10" class="px-2.5 py-1 rounded hover:bg-[#E3E8EF] hover:text-[#0B2A4A] whitespace-nowrap transition-colors">10. Retours &amp; Feedback</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Contenu Principal : Grille Organisée des 10 Sections -->
+  <main class="max-w-[1440px] mx-auto px-6 py-8 sm:px-8 space-y-12">
+
+    <!-- ==========================================
+         SECTION 1 – COULEURS (PALETTE INSTITUTIONNELLE)
+         ========================================== -->
+    <section id="section-1" class="bg-white rounded-xl border border-[#E3E8EF] p-6 shadow-sm">
+      <div class="flex items-center justify-between border-b border-[#E3E8EF] pb-4 mb-6">
+        <div>
+          <span class="text-xs font-semibold text-[#1F5FA8] uppercase tracking-wider">Système Fondamental</span>
+          <h2 class="text-[20px] font-semibold text-[#0B2A4A]">Section 1 – Palette Chromatique</h2>
+        </div>
+        <span class="text-xs text-[#5B6778] bg-[#F5F7FA] px-2.5 py-1 rounded border border-[#E3E8EF]">Contraste conforme WCAG AA</span>
+      </div>
+
+      <!-- Nuanciers structurés -->
+      <div class="space-y-6">
+        <div>
+          <h3 class="text-xs font-semibold text-[#5B6778] uppercase tracking-wider mb-3">Couleurs Majeures &amp; Structure</h3>
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+            
+            <!-- Navy -->
+            <div class="border border-[#E3E8EF] rounded-lg p-3 bg-white flex flex-col justify-between">
+              <div class="h-16 w-full rounded bg-[#0B2A4A] mb-3 border border-black/5 shadow-inner flex items-center justify-center text-white text-[10px] font-mono">#0B2A4A</div>
+              <div>
+                <p class="font-semibold text-xs text-[#0B2A4A]">Bleu Marine (Navy)</p>
+                <p class="text-[11px] text-[#5B6778]">Sidebar, titres H1/H2</p>
+                <p class="text-[10px] font-mono text-[#1F5FA8] mt-1 font-semibold">#0B2A4A</p>
+              </div>
+            </div>
+
+            <!-- Action Blue -->
+            <div class="border border-[#E3E8EF] rounded-lg p-3 bg-white flex flex-col justify-between">
+              <div class="h-16 w-full rounded bg-[#1F5FA8] mb-3 border border-black/5 shadow-inner flex items-center justify-center text-white text-[10px] font-mono">#1F5FA8</div>
+              <div>
+                <p class="font-semibold text-xs text-[#0B2A4A]">Action Blue</p>
+                <p class="text-[11px] text-[#5B6778]">Boutons, liens actifs</p>
+                <p class="text-[10px] font-mono text-[#1F5FA8] mt-1 font-semibold">#1F5FA8</p>
+              </div>
+            </div>
+
+            <!-- Action Blue Hover -->
+            <div class="border border-[#E3E8EF] rounded-lg p-3 bg-white flex flex-col justify-between">
+              <div class="h-16 w-full rounded bg-[#174C87] mb-3 border border-black/5 shadow-inner flex items-center justify-center text-white text-[10px] font-mono">#174C87</div>
+              <div>
+                <p class="font-semibold text-xs text-[#0B2A4A]">Blue Hover</p>
+                <p class="text-[11px] text-[#5B6778]">Survol interactif</p>
+                <p class="text-[10px] font-mono text-[#1F5FA8] mt-1 font-semibold">#174C87</p>
+              </div>
+            </div>
+
+            <!-- Page Background -->
+            <div class="border border-[#E3E8EF] rounded-lg p-3 bg-white flex flex-col justify-between">
+              <div class="h-16 w-full rounded bg-[#F5F7FA] mb-3 border border-[#E3E8EF] shadow-inner flex items-center justify-center text-[#5B6778] text-[10px] font-mono">#F5F7FA</div>
+              <div>
+                <p class="font-semibold text-xs text-[#0B2A4A]">Page Background</p>
+                <p class="text-[11px] text-[#5B6778]">Fond d'écran global</p>
+                <p class="text-[10px] font-mono text-[#1F5FA8] mt-1 font-semibold">#F5F7FA</p>
+              </div>
+            </div>
+
+            <!-- White -->
+            <div class="border border-[#E3E8EF] rounded-lg p-3 bg-white flex flex-col justify-between">
+              <div class="h-16 w-full rounded bg-[#FFFFFF] mb-3 border border-[#E3E8EF] shadow-inner flex items-center justify-center text-[#5B6778] text-[10px] font-mono">#FFFFFF</div>
+              <div>
+                <p class="font-semibold text-xs text-[#0B2A4A]">Blanc Pur</p>
+                <p class="text-[11px] text-[#5B6778]">Cartes, modales, top bar</p>
+                <p class="text-[10px] font-mono text-[#1F5FA8] mt-1 font-semibold">#FFFFFF</p>
+              </div>
+            </div>
+
+            <!-- Border -->
+            <div class="border border-[#E3E8EF] rounded-lg p-3 bg-white flex flex-col justify-between">
+              <div class="h-16 w-full rounded bg-[#E3E8EF] mb-3 border border-[#C4CDD5] shadow-inner flex items-center justify-center text-[#5B6778] text-[10px] font-mono">#E3E8EF</div>
+              <div>
+                <p class="font-semibold text-xs text-[#0B2A4A]">Bordure Neutre</p>
+                <p class="text-[11px] text-[#5B6778]">Séparateurs, cadres</p>
+                <p class="text-[10px] font-mono text-[#1F5FA8] mt-1 font-semibold">#E3E8EF</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-xs font-semibold text-[#5B6778] uppercase tracking-wider mb-3">Typographie &amp; Niveaux Sémantiques</h3>
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+            
+            <!-- Text Primary -->
+            <div class="border border-[#E3E8EF] rounded-lg p-3 bg-white">
+              <div class="h-12 w-full rounded bg-[#1A2433] mb-2 flex items-center justify-center text-white text-[10px] font-mono">#1A2433</div>
+              <p class="font-semibold text-xs text-[#0B2A4A]">Texte Principal</p>
+              <p class="text-[10px] font-mono text-[#5B6778]">#1A2433</p>
+            </div>
+
+            <!-- Text Secondary -->
+            <div class="border border-[#E3E8EF] rounded-lg p-3 bg-white">
+              <div class="h-12 w-full rounded bg-[#5B6778] mb-2 flex items-center justify-center text-white text-[10px] font-mono">#5B6778</div>
+              <p class="font-semibold text-xs text-[#0B2A4A]">Texte Secondaire</p>
+              <p class="text-[10px] font-mono text-[#5B6778]">#5B6778</p>
+            </div>
+
+            <!-- Success -->
+            <div class="border border-[#E3E8EF] rounded-lg p-3 bg-white">
+              <div class="h-12 w-full rounded bg-[#1E7B4F] mb-2 flex items-center justify-center text-white text-[10px] font-mono">#1E7B4F</div>
+              <p class="font-semibold text-xs text-[#0B2A4A]">Succès (Validé)</p>
+              <p class="text-[10px] font-mono text-[#1E7B4F] font-semibold">#1E7B4F</p>
+            </div>
+
+            <!-- Warning -->
+            <div class="border border-[#E3E8EF] rounded-lg p-3 bg-white">
+              <div class="h-12 w-full rounded bg-[#B7791F] mb-2 flex items-center justify-center text-white text-[10px] font-mono">#B7791F</div>
+              <p class="font-semibold text-xs text-[#0B2A4A]">Avertissement</p>
+              <p class="text-[10px] font-mono text-[#B7791F] font-semibold">#B7791F</p>
+            </div>
+
+            <!-- Error -->
+            <div class="border border-[#E3E8EF] rounded-lg p-3 bg-white">
+              <div class="h-12 w-full rounded bg-[#B42318] mb-2 flex items-center justify-center text-white text-[10px] font-mono">#B42318</div>
+              <p class="font-semibold text-xs text-[#0B2A4A]">Erreur / Rejet</p>
+              <p class="text-[10px] font-mono text-[#B42318] font-semibold">#B42318</p>
+            </div>
+
+            <!-- Info -->
+            <div class="border border-[#E3E8EF] rounded-lg p-3 bg-white">
+              <div class="h-12 w-full rounded bg-[#1F5FA8] mb-2 flex items-center justify-center text-white text-[10px] font-mono">#1F5FA8</div>
+              <p class="font-semibold text-xs text-[#0B2A4A]">Information</p>
+              <p class="text-[10px] font-mono text-[#1F5FA8] font-semibold">#1F5FA8</p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Note d'usage sur la bande tricolore -->
+        <div class="p-3 bg-[#F5F7FA] rounded-lg border-l-4 border-[#B42318] text-xs text-[#5B6778] flex items-center justify-between">
+          <span class=""><strong class="text-[#0B2A4A]">Règle d'or institutionnelle :</strong> Le liseré bicolore supérieur (Rouge #B42318 / Vert #1E7B4F) est strictement réservé à la crête supérieure de l'écran. Il ne doit être réutilisé nulle part ailleurs dans les composants applicatifs.</span>
+          <span class="text-[11px] font-mono bg-white px-2 py-0.5 rounded border border-[#E3E8EF] text-[#0B2A4A]">Hauteur fixe : 4px</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SECTION 2 – TYPOGRAPHIE (INTER)
+         ========================================== -->
+    <section id="section-2" class="bg-white rounded-xl border border-[#E3E8EF] p-6 shadow-sm">
+      <div class="flex items-center justify-between border-b border-[#E3E8EF] pb-4 mb-6">
+        <div>
+          <span class="text-xs font-semibold text-[#1F5FA8] uppercase tracking-wider">Échelle Typographique</span>
+          <h2 class="text-[20px] font-semibold text-[#0B2A4A]">Section 2 – Typographie (Police Inter)</h2>
+        </div>
+        <span class="text-xs font-mono text-[#5B6778] bg-[#F5F7FA] px-2.5 py-1 rounded border border-[#E3E8EF]">font-family: 'Inter', sans-serif</span>
+      </div>
+
+      <div class="divide-y divide-[#E3E8EF]">
+        
+        <!-- H1 -->
+        <div class="py-4 grid grid-cols-1 md:grid-cols-12 gap-3 items-baseline">
+          <div class="md:col-span-3">
+            <span class="font-semibold text-xs text-[#0B2A4A]">Titre de page H1</span>
+            <p class="text-xs text-[#5B6778] font-mono">28px / Semibold (600)</p>
+          </div>
+          <div class="md:col-span-9">
+            <h1 class="text-[28px] font-semibold text-[#0B2A4A] tracking-tight leading-tight">
+              Tableau de bord de suivi budgétaire régional – Exercice 2025
+            </h1>
+          </div>
+        </div>
+
+        <!-- H2 -->
+        <div class="py-4 grid grid-cols-1 md:grid-cols-12 gap-3 items-baseline">
+          <div class="md:col-span-3">
+            <span class="font-semibold text-xs text-[#0B2A4A]">Sous-titre H2</span>
+            <p class="text-xs text-[#5B6778] font-mono">20px / Semibold (600)</p>
+          </div>
+          <div class="md:col-span-9">
+            <h2 class="text-[20px] font-semibold text-[#0B2A4A] tracking-tight">
+              Rapports périodiques transmis par les structures excentriques
+            </h2>
+          </div>
+        </div>
+
+        <!-- Section title -->
+        <div class="py-4 grid grid-cols-1 md:grid-cols-12 gap-3 items-baseline">
+          <div class="md:col-span-3">
+            <span class="font-semibold text-xs text-[#0B2A4A]">Titre de section</span>
+            <p class="text-xs text-[#5B6778] font-mono">16px / Semibold (600)</p>
+          </div>
+          <div class="md:col-span-9">
+            <h3 class="text-[16px] font-semibold text-[#1A2433]">
+              Bordereau récapitulatif des pièces justificatives transmises
+            </h3>
+          </div>
+        </div>
+
+        <!-- Body text -->
+        <div class="py-4 grid grid-cols-1 md:grid-cols-12 gap-3 items-baseline">
+          <div class="md:col-span-3">
+            <span class="font-semibold text-xs text-[#0B2A4A]">Corps de texte (Body)</span>
+            <p class="text-xs text-[#5B6778] font-mono">15px / Regular (400)</p>
+          </div>
+          <div class="md:col-span-9">
+            <p class="text-[15px] text-[#1A2433] leading-relaxed">
+              L'agent du service régional saisit et transmet les états financiers trimestriels pour consolidation par l'ordonnateur central.
+            </p>
+          </div>
+        </div>
+
+        <!-- Table text -->
+        <div class="py-4 grid grid-cols-1 md:grid-cols-12 gap-3 items-baseline">
+          <div class="md:col-span-3">
+            <span class="font-semibold text-xs text-[#0B2A4A]">Texte tableau (Table)</span>
+            <p class="text-xs text-[#5B6778] font-mono">14px / Regular ou Medium</p>
+          </div>
+          <div class="md:col-span-9">
+            <p class="text-[14px] text-[#1A2433]">
+              Engagement n° 2025-0482 · Crédits de fonctionnement ordinaire du service régional
+            </p>
+          </div>
+        </div>
+
+        <!-- Helper text -->
+        <div class="py-4 grid grid-cols-1 md:grid-cols-12 gap-3 items-baseline">
+          <div class="md:col-span-3">
+            <span class="font-semibold text-xs text-[#0B2A4A]">Texte d'aide (Helper text)</span>
+            <p class="text-xs text-[#5B6778] font-mono">12px / Regular (400)</p>
+          </div>
+          <div class="md:col-span-9">
+            <p class="text-[12px] text-[#5B6778]">
+              Format PDF uniquement, taille maximale 10 Mo par document justificatif scanné.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SECTION 3 – BADGES DE STATUT & SECTION 4 – ROLE CHIPS
+         ========================================== -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      
+      <!-- SECTION 3 : STATUS BADGES -->
+      <section id="section-3" class="lg:col-span-7 bg-white rounded-xl border border-[#E3E8EF] p-6 shadow-sm flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between border-b border-[#E3E8EF] pb-4 mb-6">
+            <div>
+              <span class="text-xs font-semibold text-[#1F5FA8] uppercase tracking-wider">Indicateurs de Workflow</span>
+              <h2 class="text-[20px] font-semibold text-[#0B2A4A]">Section 3 – Badges de Statut</h2>
+            </div>
+            <span class="text-xs text-[#5B6778]">Pilules adoucies avec pastille/icône</span>
+          </div>
+
+          <p class="text-xs text-[#5B6778] mb-4">Exactement les six statuts requis pour le suivi des rapports budgétaires :</p>
+          
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            
+            <!-- Brouillon -->
+            <div class="p-3 rounded-lg border border-[#E3E8EF] bg-[#F5F7FA] flex flex-col items-start gap-2">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-[#E3E8EF] text-[#475467]">
+                <span class="w-2 h-2 rounded-full bg-[#667085]"></span>
+                Brouillon
+              </span>
+              <span class="text-[11px] text-[#5B6778]">Gris neutre · Saisie initiale</span>
+            </div>
+
+            <!-- Soumise -->
+            <div class="p-3 rounded-lg border border-[#E3E8EF] bg-[#F5F7FA] flex flex-col items-start gap-2">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-[#FEF3F2]/0 bg-amber-50 text-[#B7791F] border border-amber-200">
+                <span class="w-2 h-2 rounded-full bg-[#B7791F]"></span>
+                Soumise
+              </span>
+              <span class="text-[11px] text-[#5B6778]">Ambre · En attente validation</span>
+            </div>
+
+            <!-- Rejetée -->
+            <div class="p-3 rounded-lg border border-[#E3E8EF] bg-[#F5F7FA] flex flex-col items-start gap-2">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-[#FEF3F2] text-[#B42318] border border-red-200">
+                <span class="w-2 h-2 rounded-full bg-[#B42318]"></span>
+                Rejetée
+              </span>
+              <span class="text-[11px] text-[#5B6778]">Rouge · Corrections requises</span>
+            </div>
+
+            <!-- Validée -->
+            <div class="p-3 rounded-lg border border-[#E3E8EF] bg-[#F5F7FA] flex flex-col items-start gap-2">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-[#EBF7EE] text-[#1E7B4F] border border-green-200">
+                <span class="w-2 h-2 rounded-full bg-[#1E7B4F]"></span>
+                Validée
+              </span>
+              <span class="text-[11px] text-[#5B6778]">Vert · Conforme ordonnateur</span>
+            </div>
+
+            <!-- Exportée -->
+            <div class="p-3 rounded-lg border border-[#E3E8EF] bg-[#F5F7FA] flex flex-col items-start gap-2">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-[#EBF3FC] text-[#1F5FA8] border border-blue-200">
+                <span class="w-2 h-2 rounded-full bg-[#1F5FA8]"></span>
+                Exportée
+              </span>
+              <span class="text-[11px] text-[#5B6778]">Bleu · Transmise au central</span>
+            </div>
+
+            <!-- Archivée -->
+            <div class="p-3 rounded-lg border border-[#E3E8EF] bg-[#F5F7FA] flex flex-col items-start gap-2">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-[#344054] text-white">
+                <svg class="w-3 h-3 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
+                </svg>
+                Archivée
+              </span>
+              <span class="text-[11px] text-[#5B6778]">Gris foncé · Clôturé</span>
+            </div>
+
+          </div>
+        </div>
+        <p class="text-[11px] text-[#5B6778] mt-4 pt-3 border-t border-[#E3E8EF]">Lisibilité garantie : contraste minimum texte/fond supérieur à 4.5:1.</p>
+      </section>
+
+      <!-- SECTION 4 : ROLE CHIPS -->
+      <section id="section-4" class="lg:col-span-5 bg-white rounded-xl border border-[#E3E8EF] p-6 shadow-sm flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between border-b border-[#E3E8EF] pb-4 mb-6">
+            <div>
+              <span class="text-xs font-semibold text-[#1F5FA8] uppercase tracking-wider">Habilitations Profils</span>
+              <h2 class="text-[20px] font-semibold text-[#0B2A4A]">Section 4 – Chips de Rôles</h2>
+            </div>
+            <span class="text-xs text-[#5B6778]">5 Rôles Neutres</span>
+          </div>
+
+          <p class="text-xs text-[#5B6778] mb-4">Jetons discrets désignant le profil d'autorisation dans le bandeau et les fiches :</p>
+
+          <div class="flex flex-wrap gap-2.5 items-center">
+            
+            <!-- Client -->
+            <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-[#F1F4F8] text-[#1A2433] border border-[#D0D7E2] shadow-xs">
+              Client
+            </span>
+
+            <!-- Admin 2 -->
+            <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-[#F1F4F8] text-[#1A2433] border border-[#D0D7E2] shadow-xs">
+              Admin 2
+            </span>
+
+            <!-- Admin 1 -->
+            <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-[#0B2A4A]/10 text-[#0B2A4A] border border-[#0B2A4A]/25 font-semibold shadow-xs">
+              Admin 1
+            </span>
+
+            <!-- Développeur -->
+            <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-[#F1F4F8] text-[#1A2433] border border-[#D0D7E2] shadow-xs">
+              Développeur
+            </span>
+
+            <!-- Consultant -->
+            <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-[#F1F4F8] text-[#1A2433] border border-[#D0D7E2] shadow-xs">
+              Consultant
+            </span>
+
+          </div>
+
+          <!-- Contexte d'utilisation -->
+          <div class="mt-6 p-3 bg-[#F5F7FA] rounded-lg border border-[#E3E8EF] text-xs text-[#5B6778]">
+            <span class="font-semibold text-[#0B2A4A]">Positionnement :</span> Placé aux côtés de l'identité de l'agent dans la barre supérieure et dans l'en-tête de validation des rapports budgétaires.
+          </div>
+        </div>
+        <p class="text-[11px] text-[#5B6778] mt-4 pt-3 border-t border-[#E3E8EF]">Style neutre sans surcharge visuelle pour privilégier la sérénité des utilisateurs.</p>
+      </section>
+
+    </div>
+
+    <!-- ==========================================
+         SECTION 5 – BOUTONS & ÉTATS D'INTERACTION
+         ========================================== -->
+    <section id="section-5" class="bg-white rounded-xl border border-[#E3E8EF] p-6 shadow-sm">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#E3E8EF] pb-4 mb-6 gap-2">
+        <div>
+          <span class="text-xs font-semibold text-[#1F5FA8] uppercase tracking-wider">Composants d'Action</span>
+          <h2 class="text-[20px] font-semibold text-[#0B2A4A]">Section 5 – Boutons &amp; États Interactifs</h2>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-[#0B2A4A] bg-[#F5F7FA] px-2.5 py-1 rounded border border-[#E3E8EF] font-mono">Hauteur : 44px</span>
+          <span class="text-xs text-[#0B2A4A] bg-[#F5F7FA] px-2.5 py-1 rounded border border-[#E3E8EF] font-mono">Rayon : 8px (rounded-lg)</span>
+        </div>
+      </div>
+
+      <!-- Grille matricielle des états -->
+      <div class="overflow-x-auto custom-scroll pb-2">
+        <table class="w-full text-left text-xs min-w-[760px]">
+          <thead>
+            <tr class="border-b border-[#E3E8EF] text-[#5B6778]">
+              <th class="py-3 px-3 font-semibold uppercase text-[11px]">Type de Bouton</th>
+              <th class="py-3 px-3 font-semibold uppercase text-[11px]">Par défaut (Default)</th>
+              <th class="py-3 px-3 font-semibold uppercase text-[11px]">Survol (Hover)</th>
+              <th class="py-3 px-3 font-semibold uppercase text-[11px]">Focus Clavier (Focus Ring)</th>
+              <th class="py-3 px-3 font-semibold uppercase text-[11px]">Désactivé (Disabled)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#E3E8EF]">
+            
+            <!-- Primaire (Bleu #1F5FA8) -->
+            <tr>
+              <td class="py-4 px-3 font-semibold text-[#0B2A4A]">
+                Principal (Primary)
+                <p class="text-[11px] text-[#5B6778] font-normal">Action prioritaire unique</p>
+              </td>
+              <!-- Default -->
+              <td class="py-4 px-3">
+                <button type="button" class="h-[44px] px-5 rounded-lg bg-[#1F5FA8] text-white font-medium text-[14px] shadow-xs inline-flex items-center justify-center hover:bg-[#174C87] transition-colors">
+                  Enregistrer
+                </button>
+              </td>
+              <!-- Hover visual simulated -->
+              <td class="py-4 px-3">
+                <button type="button" class="h-[44px] px-5 rounded-lg bg-[#174C87] text-white font-medium text-[14px] shadow-xs inline-flex items-center justify-center">
+                  Enregistrer
+                </button>
+              </td>
+              <!-- Focus ring simulated -->
+              <td class="py-4 px-3">
+                <button type="button" class="h-[44px] px-5 rounded-lg bg-[#1F5FA8] text-white font-medium text-[14px] ring-2 ring-offset-2 ring-[#1F5FA8] inline-flex items-center justify-center">
+                  Enregistrer
+                </button>
+              </td>
+              <!-- Disabled -->
+              <td class="py-4 px-3">
+                <button type="button" disabled="" class="h-[44px] px-5 rounded-lg bg-[#E3E8EF] text-[#8C98A9] font-medium text-[14px] cursor-not-allowed inline-flex items-center justify-center">
+                  Enregistrer
+                </button>
+              </td>
+            </tr>
+
+            <!-- Secondaire (Blanc avec bordure #E3E8EF) -->
+            <tr>
+              <td class="py-4 px-3 font-semibold text-[#0B2A4A]">
+                Secondaire (Secondary)
+                <p class="text-[11px] text-[#5B6778] font-normal">Annulation, actions neutres</p>
+              </td>
+              <!-- Default -->
+              <td class="py-4 px-3">
+                <button type="button" class="h-[44px] px-5 rounded-lg bg-white border border-[#E3E8EF] text-[#1A2433] font-medium text-[14px] shadow-xs inline-flex items-center justify-center hover:bg-[#F5F7FA] transition-colors">
+                  Fermer
+                </button>
+              </td>
+              <!-- Hover visual -->
+              <td class="py-4 px-3">
+                <button type="button" class="h-[44px] px-5 rounded-lg bg-[#F5F7FA] border border-[#CCD5E0] text-[#0B2A4A] font-medium text-[14px] shadow-xs inline-flex items-center justify-center">
+                  Fermer
+                </button>
+              </td>
+              <!-- Focus ring -->
+              <td class="py-4 px-3">
+                <button type="button" class="h-[44px] px-5 rounded-lg bg-white border border-[#1F5FA8] text-[#1A2433] font-medium text-[14px] ring-2 ring-offset-2 ring-[#1F5FA8] inline-flex items-center justify-center">
+                  Fermer
+                </button>
+              </td>
+              <!-- Disabled -->
+              <td class="py-4 px-3">
+                <button type="button" disabled="" class="h-[44px] px-5 rounded-lg bg-white border border-[#E3E8EF] text-[#8C98A9] opacity-60 font-medium text-[14px] cursor-not-allowed inline-flex items-center justify-center">
+                  Fermer
+                </button>
+              </td>
+            </tr>
+
+            <!-- Danger (Rouge #B42318) -->
+            <tr>
+              <td class="py-4 px-3 font-semibold text-[#B42318]">
+                Danger / Rejet
+                <p class="text-[11px] text-[#5B6778] font-normal">Suppression, refus de visa</p>
+              </td>
+              <!-- Default -->
+              <td class="py-4 px-3">
+                <button type="button" class="h-[44px] px-5 rounded-lg bg-[#B42318] text-white font-medium text-[14px] shadow-xs inline-flex items-center justify-center hover:bg-[#911C13] transition-colors">
+                  Rejeter le rapport
+                </button>
+              </td>
+              <!-- Hover visual -->
+              <td class="py-4 px-3">
+                <button type="button" class="h-[44px] px-5 rounded-lg bg-[#911C13] text-white font-medium text-[14px] shadow-xs inline-flex items-center justify-center">
+                  Rejeter le rapport
+                </button>
+              </td>
+              <!-- Focus ring -->
+              <td class="py-4 px-3">
+                <button type="button" class="h-[44px] px-5 rounded-lg bg-[#B42318] text-white font-medium text-[14px] ring-2 ring-offset-2 ring-[#B42318] inline-flex items-center justify-center">
+                  Rejeter le rapport
+                </button>
+              </td>
+              <!-- Disabled -->
+              <td class="py-4 px-3">
+                <button type="button" disabled="" class="h-[44px] px-5 rounded-lg bg-[#FEE4E2] text-[#F97066] font-medium text-[14px] cursor-not-allowed inline-flex items-center justify-center">
+                  Rejeter le rapport
+                </button>
+              </td>
+            </tr>
+
+            <!-- Bouton Texte -->
+            <tr>
+              <td class="py-4 px-3 font-semibold text-[#0B2A4A]">
+                Bouton Lien / Texte
+                <p class="text-[11px] text-[#5B6778] font-normal">Actions tertiaires</p>
+              </td>
+              <td class="py-4 px-3">
+                <button type="button" class="h-[44px] px-3 rounded-lg text-[#1F5FA8] font-medium text-[14px] hover:underline inline-flex items-center justify-center">
+                  Voir l'historique
+                </button>
+              </td>
+              <td class="py-4 px-3">
+                <button type="button" class="h-[44px] px-3 rounded-lg text-[#174C87] bg-[#F1F4F8] font-medium text-[14px] underline inline-flex items-center justify-center">
+                  Voir l'historique
+                </button>
+              </td>
+              <td class="py-4 px-3">
+                <button type="button" class="h-[44px] px-3 rounded-lg text-[#1F5FA8] ring-2 ring-[#1F5FA8] font-medium text-[14px] inline-flex items-center justify-center">
+                  Voir l'historique
+                </button>
+              </td>
+              <td class="py-4 px-3">
+                <button type="button" disabled="" class="h-[44px] px-3 rounded-lg text-[#8C98A9] cursor-not-allowed font-medium text-[14px] inline-flex items-center justify-center">
+                  Voir l'historique
+                </button>
+              </td>
+            </tr>
+
+            <!-- Bouton Icône Seul -->
+            <tr>
+              <td class="py-4 px-3 font-semibold text-[#0B2A4A]">
+                Bouton Icône
+                <p class="text-[11px] text-[#5B6778] font-normal">Actions contextuelles compactes</p>
+              </td>
+              <td class="py-4 px-3">
+                <button type="button" class="w-[44px] h-[44px] rounded-lg border border-[#E3E8EF] bg-white text-[#1A2433] hover:bg-[#F5F7FA] inline-flex items-center justify-center shadow-xs" title="Télécharger">
+                  <svg class="w-5 h-5 text-[#5B6778]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                </button>
+              </td>
+              <td class="py-4 px-3">
+                <button type="button" class="w-[44px] h-[44px] rounded-lg border border-[#CCD5E0] bg-[#F5F7FA] text-[#0B2A4A] inline-flex items-center justify-center shadow-xs">
+                  <svg class="w-5 h-5 text-[#0B2A4A]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                </button>
+              </td>
+              <td class="py-4 px-3">
+                <button type="button" class="w-[44px] h-[44px] rounded-lg border border-[#1F5FA8] bg-white ring-2 ring-offset-2 ring-[#1F5FA8] inline-flex items-center justify-center">
+                  <svg class="w-5 h-5 text-[#1F5FA8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                </button>
+              </td>
+              <td class="py-4 px-3">
+                <button type="button" disabled="" class="w-[44px] h-[44px] rounded-lg border border-[#E3E8EF] bg-white text-[#C4CDD5] cursor-not-allowed inline-flex items-center justify-center">
+                  <svg class="w-5 h-5 text-[#C4CDD5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                </button>
+              </td>
+            </tr>
+
+            <!-- Bouton avec Spinner de Chargement -->
+            <tr>
+              <td class="py-4 px-3 font-semibold text-[#0B2A4A]">
+                Bouton en Chargement
+                <p class="text-[11px] text-[#5B6778] font-normal">État d'attente réseau/requête</p>
+              </td>
+              <td class="py-4 px-3" colspan="4">
+                <div class="flex items-center gap-4">
+                  <button type="button" disabled="" class="h-[44px] px-5 rounded-lg bg-[#1F5FA8] text-white font-medium text-[14px] inline-flex items-center justify-center gap-2.5 cursor-wait opacity-90 shadow-xs">
+                    <svg class="w-4 h-4 text-white animate-spin" viewBox="0 0 24 24" fill="none">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                    </svg>
+                    Transmission en cours...
+                  </button>
+                  <span class="text-[12px] text-[#5B6778]">Empêche les doubles soumissions accidentelles des bordereaux.</span>
+                </div>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SECTION 6 – CHAMPS DE FORMULAIRE & ÉTATS
+         ========================================== -->
+    <section id="section-6" class="bg-white rounded-xl border border-[#E3E8EF] p-6 shadow-sm">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#E3E8EF] pb-4 mb-6 gap-2">
+        <div>
+          <span class="text-xs font-semibold text-[#1F5FA8] uppercase tracking-wider">Composants de Saisie</span>
+          <h2 class="text-[20px] font-semibold text-[#0B2A4A]">Section 6 – Champs de Formulaire &amp; Spécifications des États</h2>
+        </div>
+        <div class="text-xs text-[#5B6778]">
+          Labels : 14px semibold · Astérisque rouge obligatoire <span class="text-[#B42318] font-bold">*</span> · Aide : 12px
+        </div>
+      </div>
+
+      <!-- Présentation comparative des états -->
+      <div class="mb-8">
+        <h3 class="text-xs font-semibold text-[#5B6778] uppercase tracking-wider mb-4">États Fonctionnels Normalisés (Exemple Input Texte)</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          
+          <!-- État Default -->
+          <div class="p-3.5 rounded-lg border border-[#E3E8EF] bg-white">
+            <span class="inline-block text-[10px] font-semibold uppercase px-2 py-0.5 rounded bg-[#F1F4F8] text-[#5B6778] mb-2">Par Défaut</span>
+            <label class="block text-[14px] font-semibold text-[#1A2433] mb-1">
+              Libellé du compte <span class="text-[#B42318]">*</span>
+            </label>
+            <input type="text" value="Dépenses d'exploitation" class="w-full h-11 px-3 text-[14px] bg-white border border-[#E3E8EF] rounded-lg text-[#1A2433] focus:outline-none" readonly="">
+            <p class="text-[12px] text-[#5B6778] mt-1.5">Intitulé normé officiel.</p>
+          </div>
+
+          <!-- État Focus -->
+          <div class="p-3.5 rounded-lg border border-[#1F5FA8]/30 bg-blue-50/20">
+            <span class="inline-block text-[10px] font-semibold uppercase px-2 py-0.5 rounded bg-[#1F5FA8] text-white mb-2">Focus (Anneau 2px)</span>
+            <label class="block text-[14px] font-semibold text-[#1A2433] mb-1">
+              Libellé du compte <span class="text-[#B42318]">*</span>
+            </label>
+            <input type="text" value="Dépenses d'exploitation|" class="w-full h-11 px-3 text-[14px] bg-white border border-[#1F5FA8] ring-2 ring-[#1F5FA8] ring-offset-1 rounded-lg text-[#1A2433] focus:outline-none" readonly="">
+            <p class="text-[12px] text-[#1F5FA8] font-medium mt-1.5">Champ actif en cours d'édition.</p>
+          </div>
+
+          <!-- État Erreur -->
+          <div class="p-3.5 rounded-lg border border-[#B42318]/30 bg-red-50/20">
+            <span class="inline-block text-[10px] font-semibold uppercase px-2 py-0.5 rounded bg-[#B42318] text-white mb-2">Erreur Validée</span>
+            <label class="block text-[14px] font-semibold text-[#1A2433] mb-1">
+              Libellé du compte <span class="text-[#B42318]">*</span>
+            </label>
+            <input type="text" value="" placeholder="Champ vide..." class="w-full h-11 px-3 text-[14px] bg-white border-2 border-[#B42318] rounded-lg text-[#1A2433] focus:outline-none" readonly="">
+            <p class="text-[12px] text-[#B42318] font-medium mt-1.5 flex items-center gap-1">
+              <svg class="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+              Ce champ est obligatoire.
+            </p>
+          </div>
+
+          <!-- État Disabled -->
+          <div class="p-3.5 rounded-lg border border-[#E3E8EF] bg-[#F5F7FA]">
+            <span class="inline-block text-[10px] font-semibold uppercase px-2 py-0.5 rounded bg-[#E3E8EF] text-[#5B6778] mb-2">Désactivé (Disabled)</span>
+            <label class="block text-[14px] font-semibold text-[#8C98A9] mb-1">
+              Libellé du compte
+            </label>
+            <input type="text" disabled="" value="Verrouillé par l'administrateur" class="w-full h-11 px-3 text-[14px] bg-[#E9ECEF] border border-[#D0D7E2] rounded-lg text-[#8C98A9] cursor-not-allowed" readonly="">
+            <p class="text-[12px] text-[#8C98A9] mt-1.5">Action non autorisée pour ce rôle.</p>
+          </div>
+
+          <!-- État Read-Only -->
+          <div class="p-3.5 rounded-lg border border-[#E3E8EF] bg-white">
+            <span class="inline-block text-[10px] font-semibold uppercase px-2 py-0.5 rounded bg-[#F1F4F8] text-[#5B6778] mb-2">Lecture Seule (Read-Only)</span>
+            <label class="block text-[14px] font-semibold text-[#1A2433] mb-1">
+              Code imputation budgétaire
+            </label>
+            <input type="text" readonly="" value="IMP-2025-EXC-09" class="w-full h-11 px-3 text-[14px] bg-[#F8F9FA] border border-[#E3E8EF] rounded-lg text-[#1A2433] font-mono cursor-default">
+            <p class="text-[12px] text-[#5B6778] mt-1.5">Valeur fixe générée par le système.</p>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Typologie des éléments de saisie demandés -->
+      <div>
+        <h3 class="text-xs font-semibold text-[#5B6778] uppercase tracking-wider mb-4">Catalogue des Composants de Saisie Spécifiques</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          
+          <!-- 1. Input Numérique -->
+          <div class="p-4 rounded-lg border border-[#E3E8EF] bg-white">
+            <label class="block text-[14px] font-semibold text-[#1A2433] mb-1">
+              Montant engagé (en Ariary) <span class="text-[#B42318]">*</span>
+            </label>
+            <div class="relative">
+              <input type="text" value="12 450 000" class="w-full h-11 pl-3 pr-12 text-[14px] font-mono text-right border border-[#E3E8EF] rounded-lg focus:border-[#1F5FA8] focus:ring-2 focus:ring-[#1F5FA8] focus:outline-none">
+              <span class="absolute right-3 top-2.5 text-xs font-semibold text-[#5B6778]">MGA</span>
+            </div>
+            <p class="text-[12px] text-[#5B6778] mt-1.5">Saisir uniquement les montants certifiés.</p>
+          </div>
+
+          <!-- 2. Date Picker -->
+          <div class="p-4 rounded-lg border border-[#E3E8EF] bg-white">
+            <label class="block text-[14px] font-semibold text-[#1A2433] mb-1">
+              Date d'ordonnancement <span class="text-[#B42318]">*</span>
+            </label>
+            <div class="relative">
+              <input type="date" value="2025-03-31" class="w-full h-11 px-3 text-[14px] border border-[#E3E8EF] rounded-lg focus:border-[#1F5FA8] focus:ring-2 focus:ring-[#1F5FA8] focus:outline-none text-[#1A2433]">
+            </div>
+            <p class="text-[12px] text-[#5B6778] mt-1.5">Date figurant sur la pièce d'exécution.</p>
+          </div>
+
+          <!-- 3. Liste Déroulante (Dropdown) -->
+          <div class="p-4 rounded-lg border border-[#E3E8EF] bg-white">
+            <label class="block text-[14px] font-semibold text-[#1A2433] mb-1">
+              Structure déconcentrée émettrice <span class="text-[#B42318]">*</span>
+            </label>
+            <select class="w-full h-11 px-3 text-[14px] border border-[#E3E8EF] rounded-lg bg-white focus:border-[#1F5FA8] focus:ring-2 focus:ring-[#1F5FA8] focus:outline-none text-[#1A2433]">
+              <option value="">Sélectionnez une structure régionale...</option>
+              <option value="1" selected="">SRB – Analamanga (Service Régional)</option>
+              <option value="2">SRB – Vakinankaratra</option>
+              <option value="3">SRB – Atsinanana</option>
+              <option value="4">SRB – Boeny</option>
+            </select>
+            <p class="text-[12px] text-[#5B6778] mt-1.5">Affectation territoriale de la saisie.</p>
+          </div>
+
+          <!-- 4. Mot de passe avec icône oeil -->
+          <div class="p-4 rounded-lg border border-[#E3E8EF] bg-white">
+            <label class="block text-[14px] font-semibold text-[#1A2433] mb-1">
+              Mot de passe d'authentification <span class="text-[#B42318]">*</span>
+            </label>
+            <div class="relative">
+              <input type="password" value="MotDePasseSecurise2025!" class="w-full h-11 pl-3 pr-11 text-[14px] border border-[#E3E8EF] rounded-lg focus:border-[#1F5FA8] focus:ring-2 focus:ring-[#1F5FA8] focus:outline-none">
+              <button type="button" class="absolute right-0 top-0 h-11 w-11 flex items-center justify-center text-[#5B6778] hover:text-[#0B2A4A]" title="Afficher ou masquer le mot de passe">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+              </button>
+            </div>
+            <p class="text-[12px] text-[#5B6778] mt-1.5">Au moins 12 caractères et un symbole.</p>
+          </div>
+
+          <!-- 5. Cases à Cocher & Boutons Radio -->
+          <div class="p-4 rounded-lg border border-[#E3E8EF] bg-white">
+            <label class="block text-[14px] font-semibold text-[#1A2433] mb-2">Options &amp; Modalités de Visa</label>
+            <div class="space-y-3">
+              <!-- Checkbox -->
+              <label class="flex items-start gap-2.5 cursor-pointer">
+                <input type="checkbox" checked="" class="mt-0.5 w-4 h-4 rounded border-[#E3E8EF] text-[#1F5FA8] focus:ring-[#1F5FA8]">
+                <span class="text-[14px] text-[#1A2433]">Certifier l'exactitude des pièces jointes</span>
+              </label>
+
+              <!-- Radios -->
+              <div class="pt-1 flex items-center gap-4 text-[14px]">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="periode" checked="" class="w-4 h-4 text-[#1F5FA8] focus:ring-[#1F5FA8]">
+                  <span class="">Trimestriel</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="periode" class="w-4 h-4 text-[#1F5FA8] focus:ring-[#1F5FA8]">
+                  <span class="">Annuel</span>
+                </label>
+              </div>
+            </div>
+            <p class="text-[12px] text-[#5B6778] mt-2">Cibles tactiles respectant min. 40px avec marges.</p>
+          </div>
+
+          <!-- 6. Téléversement de Fichier (File Upload Zone) -->
+          <div class="p-4 rounded-lg border border-[#E3E8EF] bg-white">
+            <label class="block text-[14px] font-semibold text-[#1A2433] mb-1">
+              Joindre une pièce justificative <span class="text-[#B42318]">*</span>
+            </label>
+            <div class="border-2 border-dashed border-[#CCD5E0] hover:border-[#1F5FA8] bg-[#F5F7FA] rounded-lg p-4 text-center cursor-pointer transition-colors">
+              <svg class="w-8 h-8 mx-auto text-[#5B6778] mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+              </svg>
+              <p class="text-xs font-semibold text-[#0B2A4A]">Glissez un bordereau scanné ici ou <span class="text-[#1F5FA8] underline">parcourir</span></p>
+              <p class="text-[11px] text-[#5B6778] mt-0.5">Formats acceptés : PDF, TIFF, JPG (max. 10 Mo)</p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 7. Zone de texte longue avec compteur 0 / 2000 (Pleine largeur) -->
+        <div class="mt-6 p-4 rounded-lg border border-[#E3E8EF] bg-white">
+          <div class="flex items-center justify-between mb-1">
+            <label class="text-[14px] font-semibold text-[#1A2433]">
+              Observations motivées et justifications budgétaires <span class="text-[#B42318]">*</span>
+            </label>
+            <span class="text-[12px] font-mono text-[#5B6778] bg-[#F5F7FA] px-2 py-0.5 rounded border border-[#E3E8EF]">
+              248 / 2000 caractères
+            </span>
+          </div>
+          <textarea rows="3" class="w-full p-3 text-[14px] border border-[#E3E8EF] rounded-lg text-[#1A2433] focus:border-[#1F5FA8] focus:ring-2 focus:ring-[#1F5FA8] focus:outline-none" placeholder="Renseignez ici les motifs précis des dépassements ou régularisations demandées...">Les crédits supplémentaires sollicités concernent le reliquat d'indemnités kilométriques du personnel de contrôle pour la tournée d'inspection effectuée au cours du premier trimestre 2025 conformément à l'ordre de mission n° 045/DGBF.</textarea>
+          <div class="flex items-center justify-between text-[12px] text-[#5B6778] mt-1.5">
+            <span class="">Rédigez un compte-rendu clair et intelligible pour la commission de validation centrale.</span>
+            <span class="text-[#1E7B4F] flex items-center gap-1 font-medium">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+              Brouillon sauvegardé automatiquement
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SECTION 7 – TABLEAU ÉDITABLE RÉPÉTABLE
+         ========================================== -->
+    <section id="section-7" class="bg-white rounded-xl border border-[#E3E8EF] p-6 shadow-sm">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#E3E8EF] pb-4 mb-6 gap-2">
+        <div>
+          <span class="text-xs font-semibold text-[#1F5FA8] uppercase tracking-wider">Structure de Saisie Multiple</span>
+          <h2 class="text-[20px] font-semibold text-[#0B2A4A]">Section 7 – Champ Tableau Répétable (Saisie dynamique)</h2>
+        </div>
+        <span class="text-xs text-[#5B6778] bg-[#F5F7FA] px-2.5 py-1 rounded border border-[#E3E8EF]">3 colonnes : Intitulé, Date, Statut</span>
+      </div>
+
+      <div class="border border-[#E3E8EF] rounded-lg overflow-hidden bg-white shadow-xs">
+        <table class="w-full text-left text-[14px]">
+          <thead class="bg-[#F5F7FA] border-b border-[#E3E8EF] text-[#0B2A4A]">
+            <tr>
+              <th class="py-3 px-4 font-semibold text-xs uppercase tracking-wider">Intitulé de la dépense</th>
+              <th class="py-3 px-4 font-semibold text-xs uppercase tracking-wider w-48">Date d'engagement</th>
+              <th class="py-3 px-4 font-semibold text-xs uppercase tracking-wider w-40">Statut</th>
+              <th class="py-3 px-4 font-semibold text-xs uppercase tracking-wider w-16 text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#E3E8EF]">
+            
+            <!-- Ligne 1 -->
+            <tr class="hover:bg-[#F9FAFB] transition-colors">
+              <td class="py-3 px-4">
+                <input type="text" value="Fournitures de bureau et consommables informatiques T1" class="w-full h-10 px-3 text-[14px] border border-[#E3E8EF] rounded-md focus:border-[#1F5FA8] focus:ring-1 focus:ring-[#1F5FA8] focus:outline-none">
+              </td>
+              <td class="py-3 px-4">
+                <input type="date" value="2025-02-14" class="w-full h-10 px-3 text-[14px] border border-[#E3E8EF] rounded-md focus:border-[#1F5FA8] focus:ring-1 focus:ring-[#1F5FA8] focus:outline-none">
+              </td>
+              <td class="py-3 px-4">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#EBF7EE] text-[#1E7B4F] border border-green-200">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#1E7B4F]"></span>
+                  Validée
+                </span>
+              </td>
+              <td class="py-3 px-4 text-center">
+                <button type="button" class="w-10 h-10 rounded-md text-[#B42318] hover:bg-red-50 flex items-center justify-center mx-auto transition-colors" title="Supprimer la ligne">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
+              </td>
+            </tr>
+
+            <!-- Ligne 2 -->
+            <tr class="hover:bg-[#F9FAFB] transition-colors">
+              <td class="py-3 px-4">
+                <input type="text" value="Carburant et lubrifiants des véhicules de service" class="w-full h-10 px-3 text-[14px] border border-[#E3E8EF] rounded-md focus:border-[#1F5FA8] focus:ring-1 focus:ring-[#1F5FA8] focus:outline-none">
+              </td>
+              <td class="py-3 px-4">
+                <input type="date" value="2025-03-02" class="w-full h-10 px-3 text-[14px] border border-[#E3E8EF] rounded-md focus:border-[#1F5FA8] focus:ring-1 focus:ring-[#1F5FA8] focus:outline-none">
+              </td>
+              <td class="py-3 px-4">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#E3E8EF] text-[#475467]">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#667085]"></span>
+                  Brouillon
+                </span>
+              </td>
+              <td class="py-3 px-4 text-center">
+                <button type="button" class="w-10 h-10 rounded-md text-[#B42318] hover:bg-red-50 flex items-center justify-center mx-auto transition-colors" title="Supprimer la ligne">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+        
+        <!-- Pied de tableau avec bouton Ajouter une ligne -->
+        <div class="p-3 bg-[#F5F7FA] border-t border-[#E3E8EF] flex items-center justify-between">
+          <button type="button" class="h-10 px-4 rounded-lg bg-white border border-[#CCD5E0] hover:bg-[#F1F4F8] text-[#1F5FA8] font-semibold text-xs inline-flex items-center gap-2 shadow-xs transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            Ajouter une ligne
+          </button>
+          <span class="text-xs text-[#5B6778]">Total : 2 lignes actives</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SECTION 8 – TABLEAU DE DONNÉES COMPLET (DATA TABLE)
+         ========================================== -->
+    <section id="section-8" class="bg-white rounded-xl border border-[#E3E8EF] p-6 shadow-sm">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#E3E8EF] pb-4 mb-6 gap-2">
+        <div>
+          <span class="text-xs font-semibold text-[#1F5FA8] uppercase tracking-wider">Composant Métier Central</span>
+          <h2 class="text-[20px] font-semibold text-[#0B2A4A]">Section 8 – Tableau de Données (Data Table)</h2>
+        </div>
+        <span class="text-xs text-[#5B6778]">En-têtes triables · Survol · Action Examiner · Pagination · État vide</span>
+      </div>
+
+      <!-- Barre de filtrage contextualisée -->
+      <div class="p-3 bg-[#F5F7FA] border border-[#E3E8EF] rounded-t-lg flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div class="flex items-center gap-2">
+          <span class="font-semibold text-[#0B2A4A]">Registres budgétaires :</span>
+          <span class="text-[#5B6778]">Direction des Structures Excentriques</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <input type="text" placeholder="Rechercher par référence..." class="h-9 px-3 rounded border border-[#E3E8EF] text-xs bg-white text-[#1A2433] focus:outline-none focus:ring-1 focus:ring-[#1F5FA8]">
+          <button type="button" class="h-9 px-3 rounded bg-white border border-[#E3E8EF] text-[#5B6778] hover:text-[#0B2A4A] inline-flex items-center gap-1.5 font-medium">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+            Filtrer
+          </button>
+        </div>
+      </div>
+
+      <!-- Table Scrollable avec sticky header -->
+      <div class="border-x border-b border-[#E3E8EF] overflow-x-auto max-h-[380px] custom-scroll">
+        <table class="w-full text-left text-[14px] min-w-[980px]">
+          <thead class="bg-[#F8FAFC] sticky top-0 z-10 border-b border-[#E3E8EF] text-[#0B2A4A] shadow-xs">
+            <tr>
+              <th class="py-3 px-4 font-semibold text-xs tracking-wider cursor-pointer hover:bg-[#F1F4F8] transition-colors">
+                <div class="flex items-center gap-1.5">
+                  Référence Rapport
+                  <svg class="w-3.5 h-3.5 text-[#1F5FA8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path></svg>
+                </div>
+              </th>
+              <th class="py-3 px-4 font-semibold text-xs tracking-wider cursor-pointer hover:bg-[#F1F4F8] transition-colors">
+                <div class="flex items-center gap-1.5">
+                  Structure Régionale
+                  <svg class="w-3.5 h-3.5 text-[#5B6778]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path></svg>
+                </div>
+              </th>
+              <th class="py-3 px-4 font-semibold text-xs tracking-wider cursor-pointer hover:bg-[#F1F4F8] transition-colors">
+                <div class="flex items-center gap-1.5">
+                  Période
+                  <svg class="w-3.5 h-3.5 text-[#5B6778]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path></svg>
+                </div>
+              </th>
+              <th class="py-3 px-4 font-semibold text-xs tracking-wider text-right">Montant Exécuté</th>
+              <th class="py-3 px-4 font-semibold text-xs tracking-wider">Statut</th>
+              <th class="py-3 px-4 font-semibold text-xs tracking-wider text-right">Action</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#E3E8EF] bg-white">
+            
+            <!-- Ligne 1 -->
+            <tr class="hover:bg-[#F1F5F9] transition-colors">
+              <td class="py-3.5 px-4 font-mono font-semibold text-xs text-[#0B2A4A]">RAP-2025-T1-ANL-001</td>
+              <td class="py-3.5 px-4 text-[#1A2433]">SRB – Analamanga</td>
+              <td class="py-3.5 px-4 text-[#5B6778]">1er Trimestre 2025</td>
+              <td class="py-3.5 px-4 font-mono text-right font-medium text-[#1A2433]">128 450 000 MGA</td>
+              <td class="py-3.5 px-4">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#EBF7EE] text-[#1E7B4F] border border-green-200">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#1E7B4F]"></span>
+                  Validée
+                </span>
+              </td>
+              <td class="py-3.5 px-4 text-right">
+                <button type="button" class="h-8 px-3 rounded bg-white border border-[#1F5FA8] text-[#1F5FA8] hover:bg-[#1F5FA8] hover:text-white font-medium text-xs shadow-xs transition-colors">
+                  Examiner
+                </button>
+              </td>
+            </tr>
+
+            <!-- Ligne 2 -->
+            <tr class="hover:bg-[#F1F5F9] transition-colors">
+              <td class="py-3.5 px-4 font-mono font-semibold text-xs text-[#0B2A4A]">RAP-2025-T1-VAK-014</td>
+              <td class="py-3.5 px-4 text-[#1A2433]">SRB – Vakinankaratra</td>
+              <td class="py-3.5 px-4 text-[#5B6778]">1er Trimestre 2025</td>
+              <td class="py-3.5 px-4 font-mono text-right font-medium text-[#1A2433]">84 120 000 MGA</td>
+              <td class="py-3.5 px-4">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-50 text-[#B7791F] border border-amber-200">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#B7791F]"></span>
+                  Soumise
+                </span>
+              </td>
+              <td class="py-3.5 px-4 text-right">
+                <button type="button" class="h-8 px-3 rounded bg-white border border-[#1F5FA8] text-[#1F5FA8] hover:bg-[#1F5FA8] hover:text-white font-medium text-xs shadow-xs transition-colors">
+                  Examiner
+                </button>
+              </td>
+            </tr>
+
+            <!-- Ligne 3 -->
+            <tr class="hover:bg-[#F1F5F9] transition-colors">
+              <td class="py-3.5 px-4 font-mono font-semibold text-xs text-[#0B2A4A]">RAP-2025-T1-ATS-008</td>
+              <td class="py-3.5 px-4 text-[#1A2433]">SRB – Atsinanana</td>
+              <td class="py-3.5 px-4 text-[#5B6778]">1er Trimestre 2025</td>
+              <td class="py-3.5 px-4 font-mono text-right font-medium text-[#1A2433]">62 900 000 MGA</td>
+              <td class="py-3.5 px-4">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#FEF3F2] text-[#B42318] border border-red-200">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#B42318]"></span>
+                  Rejetée
+                </span>
+              </td>
+              <td class="py-3.5 px-4 text-right">
+                <button type="button" class="h-8 px-3 rounded bg-white border border-[#1F5FA8] text-[#1F5FA8] hover:bg-[#1F5FA8] hover:text-white font-medium text-xs shadow-xs transition-colors">
+                  Examiner
+                </button>
+              </td>
+            </tr>
+
+            <!-- Ligne 4 -->
+            <tr class="hover:bg-[#F1F5F9] transition-colors">
+              <td class="py-3.5 px-4 font-mono font-semibold text-xs text-[#0B2A4A]">RAP-2025-T1-BOE-003</td>
+              <td class="py-3.5 px-4 text-[#1A2433]">SRB – Boeny</td>
+              <td class="py-3.5 px-4 text-[#5B6778]">1er Trimestre 2025</td>
+              <td class="py-3.5 px-4 font-mono text-right font-medium text-[#1A2433]">45 300 000 MGA</td>
+              <td class="py-3.5 px-4">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#EBF3FC] text-[#1F5FA8] border border-blue-200">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#1F5FA8]"></span>
+                  Exportée
+                </span>
+              </td>
+              <td class="py-3.5 px-4 text-right">
+                <button type="button" class="h-8 px-3 rounded bg-white border border-[#1F5FA8] text-[#1F5FA8] hover:bg-[#1F5FA8] hover:text-white font-medium text-xs shadow-xs transition-colors">
+                  Examiner
+                </button>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination & Sélecteur de lignes -->
+      <div class="p-4 bg-white border-x border-b border-[#E3E8EF] rounded-b-lg flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#5B6778]">
+        <div class="flex items-center gap-2">
+          <span class="">Lignes par page :</span>
+          <select class="h-8 px-2 border border-[#E3E8EF] rounded bg-white text-[#1A2433] focus:outline-none">
+            <option>10</option>
+            <option selected="">25</option>
+            <option>50</option>
+          </select>
+          <span class="text-[#8C98A9]">| Affichage 1 à 4 sur 112 résultats</span>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <span class="font-medium text-[#1A2433]">Page 1 sur 5</span>
+          <div class="inline-flex rounded-md shadow-xs">
+            <button type="button" disabled="" class="h-8 px-2.5 rounded-l border border-[#E3E8EF] bg-[#F5F7FA] text-[#8C98A9] cursor-not-allowed">
+              Précédent
+            </button>
+            <button type="button" class="h-8 px-2.5 rounded-r border-t border-b border-r border-[#E3E8EF] bg-white text-[#1F5FA8] hover:bg-[#F5F7FA]">
+              Suivant
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- État Vide (Empty State) spécifié -->
+      <div class="mt-6 p-8 border-2 border-dashed border-[#E3E8EF] rounded-lg bg-[#F8FAFC] text-center">
+        <div class="w-12 h-12 mx-auto rounded-full bg-[#E3E8EF] flex items-center justify-center text-[#5B6778] mb-3">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <p class="text-sm font-semibold text-[#0B2A4A]">Aucun résultat pour ces filtres.</p>
+        <p class="text-xs text-[#5B6778] max-w-sm mx-auto mt-1">
+          Vérifiez les critères saisis ou réinitialisez les sélecteurs de date et de structure régionale.
+        </p>
+        <button type="button" class="mt-3 text-xs font-semibold text-[#1F5FA8] hover:underline">
+          Réinitialiser tous les filtres
+        </button>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SECTION 9 – SHELL APPLICATIF (ARCHITECTURE DE PAGE)
+         ========================================== -->
+    <section id="section-9" class="bg-white rounded-xl border border-[#E3E8EF] p-6 shadow-sm">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#E3E8EF] pb-4 mb-6 gap-2">
+        <div>
+          <span class="text-xs font-semibold text-[#1F5FA8] uppercase tracking-wider">Cadre Structurel Permanent</span>
+          <h2 class="text-[20px] font-semibold text-[#0B2A4A]">Section 9 – Application Shell (Navigation &amp; En-tête)</h2>
+        </div>
+        <div class="text-xs text-[#5B6778] flex items-center gap-2">
+          <span class="">Sidebar : 240px fixe (#0B2A4A)</span>
+          <span class="">·</span>
+          <span class="">Top bar : 64px blanche</span>
+        </div>
+      </div>
+
+      <!-- Maquette miniature haute fidélité du Shell -->
+      <div class="border border-[#0B2A4A]/20 rounded-xl overflow-hidden shadow-md bg-[#F5F7FA]">
+        
+        <!-- Liseré supérieur sur la maquette shell -->
+        <div class="w-full h-1 flex" aria-hidden="true">
+          <div class="w-1/2 h-full bg-[#B42318]"></div>
+          <div class="w-1/2 h-full bg-[#1E7B4F]"></div>
+        </div>
+
+        <div class="flex min-h-[460px] flex-col lg:flex-row">
+          
+          <!-- SIDEBAR GAUCHE 240px -->
+          <aside class="w-full lg:w-[240px] bg-[#0B2A4A] text-white flex flex-col justify-between shrink-0">
+            <div>
+              <!-- Emblème et entête sidebar -->
+              <div class="p-4 border-b border-white/10 flex items-center gap-3"><img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBq4YIWu5foX3v5Z9UTI5DYwbBb887eAZlbReJXZjDkp18qQ41Vyw2yiSjNjrUWhyimu_n3c55OUQ8BoEOE4zCxySudQDd5G-PCJ6nQgwAxmy3wpxQ1TxgyRw4lLRvNvkctlT2TW5iDHt_qFZxasm29Oshovb4OxE3e3sBfsvj0GhEFF6wGABTAmfbJ9_Qzj-N97VBl-BWKOwC7s_j-99NXUIAuSH5uqPLKMOb5kU6zqVsf4VUw0nM" alt="Ministère de l'Économie et des Finances" style="height: 40px; width: auto; object-fit: contain;"><div class="font-bold text-sm tracking-tight leading-tight">SIGBD</div></div>
+
+              <!-- Menu avec 5 éléments placeholder requis -->
+              <nav class="p-2 space-y-1">
+                
+                <!-- 1. Tableau de bord (Item Actif / Highlighted) -->
+                <a href="javascript:void(0)" class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-[#1F5FA8] text-white text-xs font-semibold shadow-xs">
+                  <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                  <span class="">Tableau de bord</span>
+                </a>
+
+                <!-- 2. Saisie des rapports -->
+                <a href="javascript:void(0)" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/80 hover:bg-white/10 hover:text-white text-xs font-medium transition-colors">
+                  <svg class="w-4 h-4 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                  <span class="">Saisie des rapports</span>
+                </a>
+
+                <!-- 3. Validation régionale -->
+                <a href="javascript:void(0)" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/80 hover:bg-white/10 hover:text-white text-xs font-medium transition-colors">
+                  <svg class="w-4 h-4 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                  <span class="">Validation régionale</span>
+                </a>
+
+                <!-- 4. Consolidation centrale -->
+                <a href="javascript:void(0)" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/80 hover:bg-white/10 hover:text-white text-xs font-medium transition-colors">
+                  <svg class="w-4 h-4 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                  <span class="">Consolidation centrale</span>
+                </a>
+
+                <!-- 5. Téléchargements & Exports -->
+                <a href="javascript:void(0)" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/80 hover:bg-white/10 hover:text-white text-xs font-medium transition-colors">
+                  <svg class="w-4 h-4 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                  <span class="">Téléchargements &amp; Exports</span>
+                </a>
+
+              </nav>
+            </div>
+
+            <!-- Bas de sidebar -->
+            <div class="p-3 border-t border-white/10 text-[11px] text-white/60">DGBF · SSEBF</div>
+          </aside>
+
+          <!-- CONTENU DROITE : TOPBAR 64px + ZONE DE CONTENU -->
+          <div class="flex-1 flex flex-col min-w-0">
+            
+            <!-- TOP BAR (Blanche, 64px, bordure inférieure 1px) -->
+            <header class="h-16 bg-white border-b border-[#E3E8EF] px-6 flex items-center justify-between gap-4 shrink-0">
+              
+              <!-- Fil d'Ariane (Breadcrumb) à gauche -->
+              <nav class="flex items-center gap-2 text-xs text-[#5B6778]" aria-label="Fil d'Ariane">
+                <span class="">Accueil</span>
+                <span class="text-[#CCD5E0]">/</span>
+                <span class="">Rapports périodiques</span>
+                <span class="text-[#CCD5E0]">/</span>
+                <span class="text-[#0B2A4A] font-semibold">Exercice 2025</span>
+              </nav>
+
+              <!-- Identité utilisateur à droite -->
+              <div class="flex items-center gap-3 text-xs">
+                
+                <!-- Nom utilisateur & Structure -->
+                <div class="text-right hidden sm:block">
+                  <div class="font-semibold text-[#1A2433] leading-tight">Hery Rakotoarivelo</div>
+                  <div class="text-[11px] text-[#5B6778]">SRB – Analamanga</div>
+                </div>
+
+                <!-- Role Chip -->
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-[#0B2A4A]/10 text-[#0B2A4A] border border-[#0B2A4A]/20">
+                  Admin 1
+                </span>
+
+                <div class="h-6 w-px bg-[#E3E8EF] mx-1"></div>
+
+                <!-- Bouton texte déconnexion avec icône -->
+                <button type="button" class="h-9 px-2.5 rounded text-[#B42318] hover:bg-red-50 font-medium text-xs inline-flex items-center gap-1.5 transition-colors">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                  </svg>
+                  <span class="">Se déconnecter</span>
+                </button>
+              </div>
+            </header>
+
+            <!-- Zone de page factice dans la coquille -->
+            <div class="p-6 bg-[#F5F7FA] flex-1">
+              <div class="border-2 border-dashed border-[#CCD5E0] rounded-xl p-8 text-center text-[#5B6778]">
+                <p class="text-sm font-semibold text-[#0B2A4A]">Zone d'injection de la page dynamique (Inner Content Slot)</p>
+                <p class="text-xs text-[#5B6778] mt-1">Les pages fonctionnelles (saisie, validation, synthèse) s'intègrent dans ce cadre fixe sans recharger la navigation.</p>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SECTION 10 – COMPOSANTS DE RETOUR & FEEDBACK
+         ========================================== -->
+    <section id="section-10" class="bg-white rounded-xl border border-[#E3E8EF] p-6 shadow-sm">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#E3E8EF] pb-4 mb-6 gap-2">
+        <div>
+          <span class="text-xs font-semibold text-[#1F5FA8] uppercase tracking-wider">Communication &amp; Notifications</span>
+          <h2 class="text-[20px] font-semibold text-[#0B2A4A]">Section 10 – Composants de Feedback &amp; Dialogue Système</h2>
+        </div>
+        <span class="text-xs text-[#5B6778]">Alertes · Bannières de rejet · Modales · Tiroir · Toast · Onglets · Stepper</span>
+      </div>
+
+      <div class="space-y-8">
+        
+        <!-- 1. Les 4 Alertes Système Standard -->
+        <div>
+          <h3 class="text-xs font-semibold text-[#5B6778] uppercase tracking-wider mb-3">1. Alertes en Ligne Normalisées (4 Variantes)</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            <!-- Succès -->
+            <div class="p-4 rounded-lg bg-[#EBF7EE] border border-green-200 text-[#1E7B4F] flex items-start gap-3">
+              <svg class="w-5 h-5 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+              <div class="text-xs">
+                <strong class="font-semibold block text-[13px]">Bordereau transmis avec succès</strong>
+                Le rapport budgétaire a été horodaté et envoyé à l'administrateur régional pour visa.
+              </div>
+            </div>
+
+            <!-- Avertissement -->
+            <div class="p-4 rounded-lg bg-amber-50 border border-amber-200 text-[#B7791F] flex items-start gap-3">
+              <svg class="w-5 h-5 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+              <div class="text-xs">
+                <strong class="font-semibold block text-[13px]">Date limite de transmission proche</strong>
+                La clôture de saisie pour le 1er trimestre intervient dans 48 heures.
+              </div>
+            </div>
+
+            <!-- Erreur -->
+            <div class="p-4 rounded-lg bg-[#FEF3F2] border border-red-200 text-[#B42318] flex items-start gap-3">
+              <svg class="w-5 h-5 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+              <div class="text-xs">
+                <strong class="font-semibold block text-[13px]">Incohérence arithmétique détectée</strong>
+                La somme des lignes saisies ne correspond pas au total général mandaté.
+              </div>
+            </div>
+
+            <!-- Information -->
+            <div class="p-4 rounded-lg bg-[#EBF3FC] border border-blue-200 text-[#1F5FA8] flex items-start gap-3">
+              <svg class="w-5 h-5 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+              <div class="text-xs">
+                <strong class="font-semibold block text-[13px]">Nouvelle circulaire budgétaire</strong>
+                Consultez la note d'orientation n° 12-2025 relative aux frais de déplacement.
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 2. Bannière de rejet rouge prééminente (Prominent Rejection Banner) -->
+        <div>
+          <h3 class="text-xs font-semibold text-[#5B6778] uppercase tracking-wider mb-3">2. Bannière de Rejet Prééminente</h3>
+          <div class="p-5 rounded-xl bg-[#FEF3F2] border-2 border-[#B42318] shadow-sm">
+            <div class="flex items-start gap-3.5">
+              <div class="w-10 h-10 rounded-full bg-[#B42318] text-white flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M6 18L18 6M6 6l12 12"></path></svg>
+              </div>
+              <div class="flex-1">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                  <h4 class="text-[17px] font-bold text-[#B42318]">Rapport rejeté</h4>
+                  <span class="text-xs font-medium text-[#B42318] bg-white px-2.5 py-0.5 rounded border border-[#B42318]/30">Visa refusé</span>
+                </div>
+                <p class="text-[14px] text-[#1A2433] mt-1 font-medium">
+                  <strong>Motif du rejet :</strong> Pièce justificative n° 03 illisible et absence du visa préalable du contrôleur financier régional pour la ligne d'imputation carburant.
+                </p>
+                <div class="mt-3 pt-2.5 border-t border-[#B42318]/20 flex flex-wrap items-center justify-between gap-2 text-xs text-[#5B6778]">
+                  <span class=""><strong>Auteur du rejet :</strong> Jean-Pierre Razafindrakoto (Administrateur Central · DGBF)</span>
+                  <span class=""><strong>Date :</strong> 03 avril 2025 à 14:28</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Modale de confirmation & Tiroir latéral (Drawer) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          
+          <!-- Modale de confirmation -->
+          <div class="lg:col-span-7 p-6 rounded-xl border border-[#E3E8EF] bg-[#F8FAFC]">
+            <h3 class="text-xs font-semibold text-[#5B6778] uppercase tracking-wider mb-3">3. Modale de Confirmation</h3>
+            <div class="bg-white rounded-lg border border-[#CCD5E0] shadow-lg max-w-md mx-auto p-5">
+              <div class="flex items-start gap-3">
+                <div class="w-10 h-10 rounded-full bg-amber-100 text-[#B7791F] flex items-center justify-center shrink-0">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                </div>
+                <div>
+                  <h4 class="text-[16px] font-semibold text-[#0B2A4A]">Confirmer l'action</h4>
+                  <p class="text-xs text-[#5B6778] mt-1 leading-relaxed">
+                    Êtes-vous certain de vouloir soumettre définitivement ce rapport budgétaire ? Une fois soumis, aucune modification ne pourra être apportée sans l'accord de l'ordonnateur.
+                  </p>
+                </div>
+              </div>
+              <div class="mt-5 pt-3 border-t border-[#E3E8EF] flex justify-end gap-3">
+                <button type="button" class="h-10 px-4 rounded-lg bg-white border border-[#E3E8EF] text-[#1A2433] text-xs font-semibold hover:bg-[#F5F7FA]">
+                  Annuler
+                </button>
+                <button type="button" class="h-10 px-4 rounded-lg bg-[#1F5FA8] text-white text-xs font-semibold hover:bg-[#174C87]">
+                  Confirmer
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tiroir latéral (Drawer) & Toast -->
+          <div class="lg:col-span-5 space-y-6">
+            
+            <!-- Drawer simulation -->
+            <div class="p-4 rounded-xl border border-[#E3E8EF] bg-white">
+              <h3 class="text-xs font-semibold text-[#5B6778] uppercase tracking-wider mb-2">4. Tiroir Latéral (Right Drawer)</h3>
+              <div class="border border-[#CCD5E0] rounded-lg bg-[#F8FAFC] p-3 text-xs">
+                <div class="flex items-center justify-between pb-2 border-b border-[#E3E8EF]">
+                  <span class="font-semibold text-[#0B2A4A]">Détail du bordereau #402</span>
+                  <button type="button" class="text-[#5B6778] hover:text-[#0B2A4A]">×</button>
+                </div>
+                <div class="py-3 space-y-2 text-[#5B6778]">
+                  <p class=""><strong>Bénéficiaire :</strong> Service des Domaines</p>
+                  <p class=""><strong>Code Imputation :</strong> 611-04-2025</p>
+                  <p class=""><strong>Pièces scannées :</strong> 3 fichiers PDF</p>
+                </div>
+                <button type="button" class="w-full h-8 rounded bg-[#1F5FA8] text-white text-[11px] font-semibold">Télécharger l'archive ZIP</button>
+              </div>
+            </div>
+
+            <!-- Toast Notification -->
+            <div class="p-4 rounded-xl border border-[#E3E8EF] bg-white">
+              <h3 class="text-xs font-semibold text-[#5B6778] uppercase tracking-wider mb-2">5. Notification Toast Flottante</h3>
+              <div class="flex items-center justify-between p-3 rounded-lg bg-[#0B2A4A] text-white shadow-md text-xs">
+                <div class="flex items-center gap-2">
+                  <svg class="w-4 h-4 text-[#1E7B4F]" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                  <span class="">Export Excel généré avec succès.</span>
+                </div>
+                <button type="button" class="text-white/60 hover:text-white text-sm ml-2">×</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 4. Onglets (Tabs), Stepper 4 étapes, Barre de progression, Skeleton loader & Autosave -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-2">
+          
+          <!-- Tabs & Stepper -->
+          <div class="p-4 rounded-xl border border-[#E3E8EF] bg-white">
+            <h3 class="text-xs font-semibold text-[#5B6778] uppercase tracking-wider mb-3">6. Onglets de Navigation (Tabs)</h3>
+            <div class="border-b border-[#E3E8EF] flex text-xs font-semibold">
+              <button type="button" class="pb-2.5 px-3 border-b-2 border-[#1F5FA8] text-[#1F5FA8]">Général</button>
+              <button type="button" class="pb-2.5 px-3 border-b-2 border-transparent text-[#5B6778] hover:text-[#0B2A4A]">Pièces Jointes (4)</button>
+              <button type="button" class="pb-2.5 px-3 border-b-2 border-transparent text-[#5B6778] hover:text-[#0B2A4A]">Historique</button>
+            </div>
+
+            <!-- Stepper 4 étapes -->
+            <h3 class="text-xs font-semibold text-[#5B6778] uppercase tracking-wider mt-5 mb-3">7. Stepper de Workflow (4 étapes)</h3>
+            <div class="flex items-center justify-between text-[11px] text-[#5B6778]">
+              <!-- Étape 1 : faite -->
+              <div class="flex flex-col items-center">
+                <span class="w-6 h-6 rounded-full bg-[#1E7B4F] text-white flex items-center justify-center font-bold text-[10px]">✓</span>
+                <span class="mt-1 text-[#1E7B4F] font-medium">Saisie</span>
+              </div>
+              <div class="flex-1 h-0.5 bg-[#1E7B4F] mx-1"></div>
+
+              <!-- Étape 2 : active -->
+              <div class="flex flex-col items-center">
+                <span class="w-6 h-6 rounded-full bg-[#1F5FA8] text-white flex items-center justify-center font-bold text-[10px]">2</span>
+                <span class="mt-1 text-[#1F5FA8] font-bold">Vérif.</span>
+              </div>
+              <div class="flex-1 h-0.5 bg-[#E3E8EF] mx-1"></div>
+
+              <!-- Étape 3 : suivante -->
+              <div class="flex flex-col items-center">
+                <span class="w-6 h-6 rounded-full bg-[#E3E8EF] text-[#5B6778] flex items-center justify-center font-medium text-[10px]">3</span>
+                <span class="mt-1 text-[#8C98A9]">Visa</span>
+              </div>
+              <div class="flex-1 h-0.5 bg-[#E3E8EF] mx-1"></div>
+
+              <!-- Étape 4 : finale -->
+              <div class="flex flex-col items-center">
+                <span class="w-6 h-6 rounded-full bg-[#E3E8EF] text-[#5B6778] flex items-center justify-center font-medium text-[10px]">4</span>
+                <span class="mt-1 text-[#8C98A9]">Export</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Barre de progression & Autosave Indicator -->
+          <div class="p-4 rounded-xl border border-[#E3E8EF] bg-white">
+            <h3 class="text-xs font-semibold text-[#5B6778] uppercase tracking-wider mb-2">8. Barre de Progression</h3>
+            <div class="space-y-1.5 mb-5">
+              <div class="flex justify-between text-xs text-[#5B6778]">
+                <span class="">Taux de transmission régionale</span>
+                <span class="font-bold text-[#0B2A4A]">75%</span>
+              </div>
+              <div class="w-full h-2.5 rounded-full bg-[#E3E8EF] overflow-hidden">
+                <div class="h-full bg-[#1F5FA8] rounded-full" style="width: 75%"></div>
+              </div>
+            </div>
+
+            <!-- Autosave indicator requis -->
+            <h3 class="text-xs font-semibold text-[#5B6778] uppercase tracking-wider mb-2">9. Indicateur d'Enregistrement Automatique</h3>
+            <div class="p-3 rounded-lg bg-[#EBF7EE] border border-green-200 flex items-center gap-2 text-xs text-[#1E7B4F] font-medium">
+              <svg class="w-4 h-4 text-[#1E7B4F] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span class="">Brouillon enregistré à 10:42</span>
+            </div>
+            <p class="text-[11px] text-[#5B6778] mt-2">Prévient les pertes de données lors des coupures de connexion.</p>
+          </div>
+
+          <!-- Skeleton Loader -->
+          <div class="p-4 rounded-xl border border-[#E3E8EF] bg-white">
+            <h3 class="text-xs font-semibold text-[#5B6778] uppercase tracking-wider mb-3">10. Skeleton Loader (Chargement Sobre)</h3>
+            <div class="space-y-3 animate-pulse">
+              <div class="h-4 bg-[#E3E8EF] rounded w-3/4"></div>
+              <div class="h-3 bg-[#E3E8EF] rounded w-full"></div>
+              <div class="h-3 bg-[#E3E8EF] rounded w-5/6"></div>
+              <div class="h-8 bg-[#E3E8EF] rounded w-1/3 mt-2"></div>
+            </div>
+            <p class="text-[11px] text-[#5B6778] mt-4">Composant léger sans surcharge GPU, adapté aux débits réseaux limités.</p>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Pied de page officiel du Guide de Style -->
+  <footer class="bg-white border-t border-[#E3E8EF] py-8 text-center text-xs text-[#5B6778] mt-12">
+    <div class="max-w-[1440px] mx-auto px-6">
+      <p class="font-semibold text-[#0B2A4A]">SIGBD · Ministère de l'Économie et des Finances</p>
+      <p class="mt-1 text-[11px]">Direction Générale du Budget et des Finances (DGBF) · Service des Structures Excentriques du Budget et des Finances (SSEBF)</p>
+      <p class="mt-2 text-[10px] text-[#8C98A9]">Planche de style de référence UI/UX conforme aux critères d'accessibilité WCAG AA · Conçu pour les réseaux publics à débit modéré.</p>
+    </div>
+  </footer>
+
+
+
+
+
+</body></html>

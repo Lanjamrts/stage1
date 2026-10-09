@@ -1,0 +1,462 @@
+<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><meta content="web_dashboard" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "on-surface-variant": "#424751", "outline-variant": "#c2c6d3", "inverse-on-surface": "#eaf1ff", "secondary-fixed-dim": "#aec8f0", "on-tertiary-container": "#93ecb6", "primary-fixed": "#d5e3ff", "secondary": "#466083", "surface": "#f8f9ff", "on-error": "#ffffff", "on-secondary-fixed-variant": "#2d486a", "on-tertiary-fixed-variant": "#005231", "tertiary-fixed-dim": "#81d8a4", "surface-container": "#e5eeff", "surface-bright": "#f8f9ff", "on-primary-fixed": "#001c3b", "inverse-surface": "#253140", "on-tertiary": "#ffffff", "on-primary-fixed-variant": "#004787", "secondary-container": "#bbd6ff", "surface-dim": "#cfdbef", "surface-container-low": "#eff4ff", "outline": "#727782", "on-error-container": "#93000a", "surface-container-highest": "#d7e3f7", "primary-fixed-dim": "#a7c8ff", "secondary-fixed": "#d3e4ff", "on-background": "#101c2b", "error-container": "#ffdad6", "on-secondary-container": "#435d80", "tertiary-fixed": "#9df5bf", "on-primary": "#ffffff", "surface-container-lowest": "#ffffff", "primary": "#004788", "surface-variant": "#d7e3f7", "surface-tint": "#1f5fa8", "on-secondary": "#ffffff", "on-primary-container": "#c5daff", "on-surface": "#101c2b", "on-secondary-fixed": "#001c38", "tertiary": "#005231", "tertiary-container": "#036d42", "primary-container": "#1f5fa8", "on-tertiary-fixed": "#002111", "background": "#f8f9ff", "inverse-primary": "#a7c8ff", "surface-container-high": "#dde9fd", "error": "#ba1a1a" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "margin-desktop": "2rem", "margin": "1rem", "space-sm": "0.5rem", "space-xs": "0.25rem", "space-md": "1rem", "gutter-desktop": "1.5rem", "space-lg": "1.5rem", "space-xl": "2rem", "gutter": "1rem" }, "fontFamily": { "label-md": [ "Inter" ], "headline-lg": [ "Inter" ], "label-sm": [ "Inter" ], "headline-xl-mobile": [ "Inter" ], "body-sm": [ "Inter" ], "body-md": [ "Inter" ], "metric-num": [ "Inter" ], "label-lg": [ "Inter" ], "headline-md": [ "Inter" ], "headline-xl": [ "Inter" ], "headline-sm": [ "Inter" ], "body-lg": [ "Inter" ] }, "fontSize": { "label-md": [ "12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" } ], "headline-lg": [ "24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" } ], "label-sm": [ "11px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "500" } ], "headline-xl-mobile": [ "24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700" } ], "body-sm": [ "13px", { "lineHeight": "18px", "fontWeight": "400" } ], "body-md": [ "14px", { "lineHeight": "20px", "fontWeight": "400" } ], "metric-num": [ "22px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" } ], "label-lg": [ "14px", { "lineHeight": "20px", "fontWeight": "600" } ], "headline-md": [ "20px", { "lineHeight": "28px", "fontWeight": "600" } ], "headline-xl": [ "32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" } ], "headline-sm": [ "16px", { "lineHeight": "24px", "fontWeight": "600" } ], "body-lg": [ "16px", { "lineHeight": "24px", "fontWeight": "400" } ] } } } };</script></head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased"><div class="fixed top-0 left-0 right-0 h-1 z-50 flex pointer-events-none"><div class="w-1/2 h-full bg-[#B42318]"></div><div class="w-1/2 h-full bg-[#1E7B4F]"></div></div><aside class="fixed left-0 top-1 bottom-0 w-[240px] bg-[#0B2A4A] z-40 flex flex-col justify-between select-none"><div class="flex flex-col"><div class="h-16 px-space-md flex items-center gap-space-sm border-b border-[#1A3A5E]"><img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXIj0AnfxtNsy4p68pX-0NBL4Z8ir1RM9ZrSF2pLSjoOOD5ulWGlohkwbzory1gDrSK6nqD7OCTBzhW6emwFmc2vXXgKeRtW9AN2hI2MVI8an_V7O_q0TFRSd-tmPw73eaY7P0QdIub_jPv_DhRT3i_sifE5dE3sSYAfMVjcndvhsyLOtgrNkOa-nkouTSX4fKJRVs1r2NSKcZM5CgRB5F5kSUc8JdV3yAf4AepP3ovD2QpusFwjQ" alt="Ministère de l'Économie et des Finances" style="height: 40px; width: auto; object-fit: contain;"><span class="font-headline-sm text-headline-sm text-white tracking-wide leading-none">SIGBD</span></div><nav class="px-space-sm pt-space-md flex flex-col gap-1" data-active-classes="bg-[#1F5FA8] text-white font-label-lg"><a class="flex items-center gap-space-sm px-space-sm py-2.5 rounded text-[#A0B8D4] hover:bg-[#133E6E] hover:text-white font-label-md text-label-md transition-colors" data-path="tableau-de-bord" href="#"><span class="material-symbols-outlined text-[20px]">dashboard</span><span class="">Tableau de bord</span></a><a class="flex items-center gap-space-sm px-space-sm py-2.5 rounded text-[#A0B8D4] hover:bg-[#133E6E] hover:text-white font-label-md text-label-md transition-colors" data-path="mes-saisies" href="#"><span class="material-symbols-outlined text-[20px]">edit_document</span><span class="">Mes saisies</span></a></nav></div><div class="p-space-md border-t border-[#1A3A5E]"><div class="font-label-sm text-label-sm text-[#7E9DBF] flex flex-col gap-0.5"><span class="">DGBF · SSEBF</span></div></div></aside><div class="pl-[240px]"><header class="fixed top-1 left-[240px] right-0 h-16 bg-surface-container-lowest border-b border-[#E3E8EF] z-30 flex items-center justify-between px-gutter-desktop"><div class="flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant"><span class="text-on-surface font-label-md text-label-md">Tableau de bord</span><span class="material-symbols-outlined text-outline text-[16px]">chevron_right</span><span class="">Rapport d'activités</span><span class="material-symbols-outlined text-outline text-[16px]">chevron_right</span><span class="text-primary font-label-md text-label-md">Septembre 2026</span></div><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-sm"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div><div class="flex flex-col text-right"><div class="flex items-center gap-2"><span class="font-label-lg text-label-lg text-on-surface">Hery Rakotoarivelo</span><span class="px-2 py-0.5 rounded text-[11px] font-label-sm font-semibold bg-[#E8F5E9] text-[#1E7B4F] border border-[#1E7B4F]/20 leading-tight">Client</span></div><span class="font-body-sm text-body-sm text-on-surface-variant">SRB – Analamanga</span></div></div><div class="h-6 w-px bg-[#E3E8EF]"></div><a class="flex items-center gap-1.5 text-error hover:text-[#911C13] font-label-md text-label-md transition-colors" data-path="connexion" href="#"><span class="material-symbols-outlined text-[18px]">logout</span><span class="">Se déconnecter</span></a></div></header><main class="w-full pt-[68px] min-h-screen bg-[#F5F7FA] px-gutter-desktop py-margin-desktop"><div class="flex flex-col w-full">
+<div class="w-full max-w-[880px] mx-auto pb-28">
+<!-- Fil d'Ariane & En-tête -->
+<div class="mb-space-lg">
+<nav class="flex items-center gap-2 mb-3">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Tableau de bord</a>
+<span class="material-symbols-outlined text-outline text-[16px]">chevron_right</span>
+<span class="font-label-md text-label-md text-on-surface-variant">Ressources humaines</span>
+<span class="material-symbols-outlined text-outline text-[16px]">chevron_right</span>
+<span class="font-label-md text-label-md text-primary">T3 2026</span>
+</nav>
+<div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-[#0B2A4A] tracking-tight">Ressources humaines</h1>
+<p class="font-body-md text-body-md text-[#5B6778] mt-1">T3 2026 · SRB – Analamanga</p>
+</div>
+<div class="flex flex-col items-start sm:items-end gap-1.5 self-start">
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-high text-[#5B6778] font-label-sm text-label-sm">
+<span class="w-2 h-2 rounded-full bg-[#5B6778]"></span>
+<span class="">Brouillon</span>
+</div>
+<div class="flex items-center gap-1.5 text-tertiary font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px] text-tertiary">check_circle</span>
+<span class="text-[#5B6778]">Brouillon enregistré à 11:05</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Conteneur des Sections -->
+<div class="flex flex-col gap-6">
+<!-- Section 1: Informations Générales -->
+<section class="bg-surface-container-lowest rounded-xl p-6 shadow-sm">
+<div class="flex items-center gap-3 mb-6 pb-4 border-b border-surface-container">
+<span class="w-8 h-8 rounded-lg bg-primary-container text-on-primary flex items-center justify-center font-label-lg text-label-lg font-semibold shrink-0">1</span>
+<h2 class="font-headline-md text-headline-md text-[#0B2A4A]">Informations générales</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface-variant">Structure</label>
+<div class="h-11 px-3.5 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md flex items-center select-none cursor-not-allowed">
+<span class="material-symbols-outlined text-outline text-[18px] mr-2">domain</span>
+<span class="">SRB – Analamanga</span>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface-variant flex items-center gap-1" for="periode-select">
+<span class="">Période</span>
+<span class="text-error font-bold">*</span>
+</label>
+<div class="relative">
+<select class="w-full h-11 pl-3.5 pr-10 rounded-lg bg-surface-container-lowest text-on-surface font-body-md text-body-md appearance-none focus:outline-none focus:bg-surface-container-low transition-colors cursor-pointer" id="periode-select">
+<option selected="" value="T3-2026">T3 2026 (Juillet – Septembre)</option>
+<option value="T2-2026">T2 2026 (Avril – Juin)</option>
+<option value="T1-2026">T1 2026 (Janvier – Mars)</option>
+<option value="T4-2025">T4 2025 (Octobre – Décembre)</option>
+</select>
+<span class="material-symbols-outlined text-outline text-[20px] absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">expand_more</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: Effectif par catégorie, grade et sexe -->
+<section class="bg-surface-container-lowest rounded-xl p-6 shadow-sm">
+<div class="flex flex-col gap-1 mb-6 pb-4 border-b border-surface-container">
+<div class="flex items-center gap-3">
+<span class="w-8 h-8 rounded-lg bg-primary-container text-on-primary flex items-center justify-center font-label-lg text-label-lg font-semibold shrink-0">2</span>
+<h2 class="font-headline-md text-headline-md text-[#0B2A4A] flex items-center gap-1">
+<span class="">Effectif par catégorie, grade et sexe</span>
+<span class="text-error font-bold">*</span>
+</h2>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant ml-11">
+            Indiquez le nombre d'agents. Ne saisissez aucun nom.
+          </p>
+</div>
+<div class="overflow-x-auto rounded-lg bg-surface-container-lowest">
+<table class="w-full text-left border-collapse" id="effectif-table">
+<thead>
+<tr class="bg-surface-container-low text-on-surface-variant font-label-md text-label-md h-10">
+<th class="px-4 py-2 font-semibold w-1/4">Catégorie</th>
+<th class="px-4 py-2 font-semibold w-1/3">Grade</th>
+<th class="px-4 py-2 font-semibold w-1/4">Sexe</th>
+<th class="px-4 py-2 font-semibold w-24 text-right">Effectif</th>
+<th class="px-3 py-2 font-semibold w-12 text-center">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container" id="effectif-rows">
+<!-- Ligne 1 -->
+<tr class="h-14 hover:bg-surface-container-low/50 transition-colors">
+<td class="px-3 py-2">
+<div class="relative">
+<select class="w-full h-10 pl-3 pr-8 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md appearance-none focus:outline-none focus:bg-surface-container">
+<option selected="">Catégorie A</option>
+<option>Catégorie B</option>
+<option>Catégorie C</option>
+<option>Catégorie D</option>
+</select>
+<span class="material-symbols-outlined text-outline text-[18px] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none">expand_more</span>
+</div>
+</td>
+<td class="px-3 py-2">
+<input class="w-full h-10 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:outline-none focus:bg-surface-container" placeholder="Ex. Ingénieur, Rédacteur" type="text" value="Attaché d'administration">
+</td>
+<td class="px-3 py-2">
+<div class="relative">
+<select class="w-full h-10 pl-3 pr-8 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md appearance-none focus:outline-none focus:bg-surface-container">
+<option selected="">Femme</option>
+<option>Homme</option>
+</select>
+<span class="material-symbols-outlined text-outline text-[18px] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none">expand_more</span>
+</div>
+</td>
+<td class="px-3 py-2">
+<input class="w-full h-10 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md text-right font-metric-num focus:outline-none focus:bg-surface-container" min="0" type="number" value="3">
+</td>
+<td class="px-2 py-2 text-center">
+<button class="w-9 h-9 rounded-lg flex items-center justify-center text-outline hover:text-error hover:bg-error-container/40 transition-colors" onclick="this.closest('tr').remove()" title="Supprimer la ligne" type="button">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</td>
+</tr>
+<!-- Ligne 2 -->
+<tr class="h-14 hover:bg-surface-container-low/50 transition-colors">
+<td class="px-3 py-2">
+<div class="relative">
+<select class="w-full h-10 pl-3 pr-8 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md appearance-none focus:outline-none focus:bg-surface-container">
+<option selected="">Catégorie A</option>
+<option>Catégorie B</option>
+<option>Catégorie C</option>
+<option>Catégorie D</option>
+</select>
+<span class="material-symbols-outlined text-outline text-[18px] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none">expand_more</span>
+</div>
+</td>
+<td class="px-3 py-2">
+<input class="w-full h-10 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:outline-none focus:bg-surface-container" placeholder="Ex. Ingénieur, Rédacteur" type="text" value="Attaché d'administration">
+</td>
+<td class="px-3 py-2">
+<div class="relative">
+<select class="w-full h-10 pl-3 pr-8 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md appearance-none focus:outline-none focus:bg-surface-container">
+<option>Femme</option>
+<option selected="">Homme</option>
+</select>
+<span class="material-symbols-outlined text-outline text-[18px] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none">expand_more</span>
+</div>
+</td>
+<td class="px-3 py-2">
+<input class="w-full h-10 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md text-right font-metric-num focus:outline-none focus:bg-surface-container" min="0" type="number" value="2">
+</td>
+<td class="px-2 py-2 text-center">
+<button class="w-9 h-9 rounded-lg flex items-center justify-center text-outline hover:text-error hover:bg-error-container/40 transition-colors" onclick="this.closest('tr').remove()" title="Supprimer la ligne" type="button">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</td>
+</tr>
+<!-- Ligne 3 -->
+<tr class="h-14 hover:bg-surface-container-low/50 transition-colors">
+<td class="px-3 py-2">
+<div class="relative">
+<select class="w-full h-10 pl-3 pr-8 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md appearance-none focus:outline-none focus:bg-surface-container">
+<option>Catégorie A</option>
+<option selected="">Catégorie B</option>
+<option>Catégorie C</option>
+<option>Catégorie D</option>
+</select>
+<span class="material-symbols-outlined text-outline text-[18px] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none">expand_more</span>
+</div>
+</td>
+<td class="px-3 py-2">
+<input class="w-full h-10 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:outline-none focus:bg-surface-container" placeholder="Ex. Ingénieur, Rédacteur" type="text" value="Secrétaire de bureau">
+</td>
+<td class="px-3 py-2">
+<div class="relative">
+<select class="w-full h-10 pl-3 pr-8 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md appearance-none focus:outline-none focus:bg-surface-container">
+<option selected="">Femme</option>
+<option>Homme</option>
+</select>
+<span class="material-symbols-outlined text-outline text-[18px] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none">expand_more</span>
+</div>
+</td>
+<td class="px-3 py-2">
+<input class="w-full h-10 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md text-right font-metric-num focus:outline-none focus:bg-surface-container" min="0" type="number" value="4">
+</td>
+<td class="px-2 py-2 text-center">
+<button class="w-9 h-9 rounded-lg flex items-center justify-center text-outline hover:text-error hover:bg-error-container/40 transition-colors" onclick="this.closest('tr').remove()" title="Supprimer la ligne" type="button">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</td>
+</tr>
+<!-- Ligne 4 -->
+<tr class="h-14 hover:bg-surface-container-low/50 transition-colors">
+<td class="px-3 py-2">
+<div class="relative">
+<select class="w-full h-10 pl-3 pr-8 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md appearance-none focus:outline-none focus:bg-surface-container">
+<option>Catégorie A</option>
+<option>Catégorie B</option>
+<option selected="">Catégorie C</option>
+<option>Catégorie D</option>
+</select>
+<span class="material-symbols-outlined text-outline text-[18px] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none">expand_more</span>
+</div>
+</td>
+<td class="px-3 py-2">
+<input class="w-full h-10 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:outline-none focus:bg-surface-container" placeholder="Ex. Ingénieur, Rédacteur" type="text" value="Agent d'exécution">
+</td>
+<td class="px-3 py-2">
+<div class="relative">
+<select class="w-full h-10 pl-3 pr-8 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md appearance-none focus:outline-none focus:bg-surface-container">
+<option>Femme</option>
+<option selected="">Homme</option>
+</select>
+<span class="material-symbols-outlined text-outline text-[18px] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none">expand_more</span>
+</div>
+</td>
+<td class="px-3 py-2">
+<input class="w-full h-10 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md text-right font-metric-num focus:outline-none focus:bg-surface-container" min="0" type="number" value="6">
+</td>
+<td class="px-2 py-2 text-center">
+<button class="w-9 h-9 rounded-lg flex items-center justify-center text-outline hover:text-error hover:bg-error-container/40 transition-colors" onclick="this.closest('tr').remove()" title="Supprimer la ligne" type="button">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="mt-4">
+<button class="h-11 px-4 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface font-label-lg text-label-lg flex items-center gap-2 transition-colors" id="btn-add-effectif" type="button">
+<span class="material-symbols-outlined text-[20px] text-primary">add</span>
+<span class="">Ajouter une ligne</span>
+</button>
+</div>
+</section>
+<!-- Section 3: Mouvements de personnel -->
+<section class="bg-surface-container-lowest rounded-xl p-6 shadow-sm">
+<div class="flex flex-col gap-1 mb-6 pb-4 border-b border-surface-container">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="w-8 h-8 rounded-lg bg-primary-container text-on-primary flex items-center justify-center font-label-lg text-label-lg font-semibold shrink-0">3</span>
+<h2 class="font-headline-md text-headline-md text-[#0B2A4A]">Mouvements de personnel</h2>
+</div>
+<span class="px-2.5 py-0.5 rounded bg-surface-container-high text-[#5B6778] font-label-sm text-label-sm">Facultatif</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant ml-11">
+            Facultatif. Indiquez les arrivées, départs et affectations du trimestre, en nombre.
+          </p>
+</div>
+<div class="overflow-x-auto rounded-lg bg-surface-container-lowest">
+<table class="w-full text-left border-collapse" id="mouvements-table">
+<thead>
+<tr class="bg-surface-container-low text-on-surface-variant font-label-md text-label-md h-10">
+<th class="px-4 py-2 font-semibold w-2/3">Type de mouvement</th>
+<th class="px-4 py-2 font-semibold w-1/4 text-right">Nombre</th>
+<th class="px-3 py-2 font-semibold w-12 text-center">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container" id="mouvements-rows">
+<!-- Ligne 1 -->
+<tr class="h-14 hover:bg-surface-container-low/50 transition-colors">
+<td class="px-3 py-2">
+<div class="relative">
+<select class="w-full h-10 pl-3 pr-8 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md appearance-none focus:outline-none focus:bg-surface-container">
+<option selected="">Arrivée</option>
+<option>Départ</option>
+<option>Affectation</option>
+<option>Détachement</option>
+</select>
+<span class="material-symbols-outlined text-outline text-[18px] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none">expand_more</span>
+</div>
+</td>
+<td class="px-3 py-2">
+<input class="w-full h-10 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md text-right font-metric-num focus:outline-none focus:bg-surface-container" min="0" type="number" value="2">
+</td>
+<td class="px-2 py-2 text-center">
+<button class="w-9 h-9 rounded-lg flex items-center justify-center text-outline hover:text-error hover:bg-error-container/40 transition-colors" onclick="this.closest('tr').remove()" title="Supprimer la ligne" type="button">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</td>
+</tr>
+<!-- Ligne 2 -->
+<tr class="h-14 hover:bg-surface-container-low/50 transition-colors">
+<td class="px-3 py-2">
+<div class="relative">
+<select class="w-full h-10 pl-3 pr-8 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md appearance-none focus:outline-none focus:bg-surface-container">
+<option>Arrivée</option>
+<option selected="">Départ</option>
+<option>Affectation</option>
+<option>Détachement</option>
+</select>
+<span class="material-symbols-outlined text-outline text-[18px] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none">expand_more</span>
+</div>
+</td>
+<td class="px-3 py-2">
+<input class="w-full h-10 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md text-right font-metric-num focus:outline-none focus:bg-surface-container" min="0" type="number" value="1">
+</td>
+<td class="px-2 py-2 text-center">
+<button class="w-9 h-9 rounded-lg flex items-center justify-center text-outline hover:text-error hover:bg-error-container/40 transition-colors" onclick="this.closest('tr').remove()" title="Supprimer la ligne" type="button">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</td>
+</tr>
+<!-- Ligne 3 -->
+<tr class="h-14 hover:bg-surface-container-low/50 transition-colors">
+<td class="px-3 py-2">
+<div class="relative">
+<select class="w-full h-10 pl-3 pr-8 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md appearance-none focus:outline-none focus:bg-surface-container">
+<option>Arrivée</option>
+<option>Départ</option>
+<option selected="">Affectation</option>
+<option>Détachement</option>
+</select>
+<span class="material-symbols-outlined text-outline text-[18px] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none">expand_more</span>
+</div>
+</td>
+<td class="px-3 py-2">
+<input class="w-full h-10 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md text-right font-metric-num focus:outline-none focus:bg-surface-container" min="0" type="number" value="1">
+</td>
+<td class="px-2 py-2 text-center">
+<button class="w-9 h-9 rounded-lg flex items-center justify-center text-outline hover:text-error hover:bg-error-container/40 transition-colors" onclick="this.closest('tr').remove()" title="Supprimer la ligne" type="button">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="mt-4">
+<button class="h-11 px-4 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface font-label-lg text-label-lg flex items-center gap-2 transition-colors" id="btn-add-mouvement" type="button">
+<span class="material-symbols-outlined text-[20px] text-primary">add</span>
+<span class="">Ajouter une ligne</span>
+</button>
+</div>
+</section>
+<!-- Section 4: Besoins en personnel et en formation -->
+<section class="bg-surface-container-lowest rounded-xl p-6 shadow-sm">
+<div class="flex items-center justify-between mb-6 pb-4 border-b border-surface-container">
+<div class="flex items-center gap-3">
+<span class="w-8 h-8 rounded-lg bg-primary-container text-on-primary flex items-center justify-center font-label-lg text-label-lg font-semibold shrink-0">4</span>
+<h2 class="font-headline-md text-headline-md text-[#0B2A4A]">Besoins en personnel et en formation</h2>
+</div>
+<span class="px-2.5 py-0.5 rounded bg-surface-container-high text-[#5B6778] font-label-sm text-label-sm">Facultatif</span>
+</div>
+<div class="flex flex-col gap-2">
+<textarea class="w-full p-3.5 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:outline-none focus:bg-surface-container resize-y transition-colors leading-relaxed" id="besoins-textarea" maxlength="2000" placeholder="Exprimez ici les difficultés éventuelles, besoins de recrutement ou formations prioritaires pour la période..." rows="4">Besoin de deux agents supplémentaires au bureau de la solde. Formation souhaitée sur l'utilisation des outils informatiques de suivi.</textarea>
+<div class="flex justify-end">
+<span class="font-label-sm text-label-sm text-[#5B6778]" id="char-counter">139 / 2000</span>
+</div>
+</div>
+</section>
+</div>
+</div>
+<!-- Barre d'action fixe en bas -->
+<div class="fixed bottom-0 left-[240px] right-0 h-[72px] bg-surface-container-lowest shadow-[0_-4px_16px_rgba(11,42,74,0.06)] z-30 flex items-center">
+<div class="w-full max-w-[880px] mx-auto px-6 flex items-center justify-between">
+<div>
+<button class="h-11 px-4 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low font-label-lg text-label-lg transition-colors flex items-center" type="button">
+          Annuler
+        </button>
+</div>
+<div class="flex items-center gap-3">
+<button class="h-11 px-5 rounded-lg bg-surface-container-low hover:bg-surface-container text-[#1A2433] font-label-lg text-label-lg transition-colors flex items-center gap-2" type="button">
+<span class="material-symbols-outlined text-[18px] text-outline">save</span>
+<span class="">Enregistrer en brouillon</span>
+</button>
+<button class="h-11 px-6 rounded-lg bg-primary hover:bg-[#174C87] text-on-primary font-label-lg text-label-lg transition-colors flex items-center gap-2 shadow-sm" type="button">
+<span class="">Soumettre</span>
+<span class="material-symbols-outlined text-[18px]">send</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<script>
+  // Compteur dynamique pour la zone de texte
+  const textarea = document.getElementById('besoins-textarea');
+  const counter = document.getElementById('char-counter');
+  if (textarea && counter) {
+    textarea.addEventListener('input', () => {
+      counter.textContent = `${textarea.value.length} / 2000`;
+    });
+  }
+
+  // Ajout dynamique de ligne dans le tableau Effectif
+  const btnAddEffectif = document.getElementById('btn-add-effectif');
+  const effectifRows = document.getElementById('effectif-rows');
+  if (btnAddEffectif && effectifRows) {
+    btnAddEffectif.addEventListener('click', () => {
+      const tr = document.createElement('tr');
+      tr.className = 'h-14 hover:bg-surface-container-low/50 transition-colors';
+      tr.innerHTML = `
+        <td class="px-3 py-2">
+          <div class="relative">
+            <select class="w-full h-10 pl-3 pr-8 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md appearance-none focus:outline-none focus:bg-surface-container">
+              <option>Catégorie A</option>
+              <option>Catégorie B</option>
+              <option>Catégorie C</option>
+              <option>Catégorie D</option>
+            </select>
+            <span class="material-symbols-outlined text-outline text-[18px] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none">expand_more</span>
+          </div>
+        </td>
+        <td class="px-3 py-2">
+          <input type="text" class="w-full h-10 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:outline-none focus:bg-surface-container" placeholder="Ex. Ingénieur, Rédacteur"/>
+        </td>
+        <td class="px-3 py-2">
+          <div class="relative">
+            <select class="w-full h-10 pl-3 pr-8 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md appearance-none focus:outline-none focus:bg-surface-container">
+              <option>Femme</option>
+              <option>Homme</option>
+            </select>
+            <span class="material-symbols-outlined text-outline text-[18px] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none">expand_more</span>
+          </div>
+        </td>
+        <td class="px-3 py-2">
+          <input type="number" min="0" value="0" class="w-full h-10 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md text-right font-metric-num focus:outline-none focus:bg-surface-container"/>
+        </td>
+        <td class="px-2 py-2 text-center">
+          <button type="button" onclick="this.closest('tr').remove()" class="w-9 h-9 rounded-lg flex items-center justify-center text-outline hover:text-error hover:bg-error-container/40 transition-colors" title="Supprimer la ligne">
+            <span class="material-symbols-outlined text-[20px]">delete</span>
+          </button>
+        </td>
+      `;
+      effectifRows.appendChild(tr);
+    });
+  }
+
+  // Ajout dynamique de ligne dans le tableau Mouvements
+  const btnAddMouvement = document.getElementById('btn-add-mouvement');
+  const mouvementsRows = document.getElementById('mouvements-rows');
+  if (btnAddMouvement && mouvementsRows) {
+    btnAddMouvement.addEventListener('click', () => {
+      const tr = document.createElement('tr');
+      tr.className = 'h-14 hover:bg-surface-container-low/50 transition-colors';
+      tr.innerHTML = `
+        <td class="px-3 py-2">
+          <div class="relative">
+            <select class="w-full h-10 pl-3 pr-8 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md appearance-none focus:outline-none focus:bg-surface-container">
+              <option>Arrivée</option>
+              <option>Départ</option>
+              <option>Affectation</option>
+              <option>Détachement</option>
+            </select>
+            <span class="material-symbols-outlined text-outline text-[18px] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none">expand_more</span>
+          </div>
+        </td>
+        <td class="px-3 py-2">
+          <input type="number" min="0" value="0" class="w-full h-10 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md text-right font-metric-num focus:outline-none focus:bg-surface-container"/>
+        </td>
+        <td class="px-2 py-2 text-center">
+          <button type="button" onclick="this.closest('tr').remove()" class="w-9 h-9 rounded-lg flex items-center justify-center text-outline hover:text-error hover:bg-error-container/40 transition-colors" title="Supprimer la ligne">
+            <span class="material-symbols-outlined text-[20px]">delete</span>
+          </button>
+        </td>
+      `;
+      mouvementsRows.appendChild(tr);
+    });
+  }
+</script></main></div>
+
+</body></html>

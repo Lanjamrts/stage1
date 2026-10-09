@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+
+<html lang="fr"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"on-primary-fixed-variant":"#004787","on-surface":"#101c2b","outline":"#727782","tertiary-fixed-dim":"#81d8a4","surface-container-high":"#dde9fd","inverse-primary":"#a7c8ff","primary-fixed-dim":"#a7c8ff","background":"#f8f9ff","primary-fixed":"#d5e3ff","on-tertiary":"#ffffff","surface-container-low":"#eff4ff","surface-container-highest":"#d7e3f7","secondary":"#466083","on-primary-fixed":"#001c3b","on-tertiary-fixed-variant":"#005231","error":"#ba1a1a","on-secondary":"#ffffff","secondary-fixed":"#d3e4ff","outline-variant":"#c2c6d3","tertiary":"#005231","error-container":"#ffdad6","inverse-on-surface":"#eaf1ff","on-secondary-container":"#435d80","primary-container":"#1f5fa8","on-surface-variant":"#424751","tertiary-container":"#036d42","tertiary-fixed":"#9df5bf","secondary-fixed-dim":"#aec8f0","on-background":"#101c2b","on-tertiary-fixed":"#002111","on-tertiary-container":"#93ecb6","surface-bright":"#f8f9ff","on-error-container":"#93000a","on-primary-container":"#c5daff","surface-tint":"#1f5fa8","surface-container-lowest":"#ffffff","surface-dim":"#cfdbef","surface-variant":"#d7e3f7","inverse-surface":"#253140","on-primary":"#ffffff","on-error":"#ffffff","primary":"#004788","on-secondary-fixed":"#001c38","secondary-container":"#bbd6ff","surface-container":"#e5eeff","on-secondary-fixed-variant":"#2d486a","surface":"#f8f9ff"},borderRadius:{DEFAULT:"0.25rem",lg:"0.5rem",xl:"0.75rem",full:"9999px"},spacing:{"gutter":"1rem","gutter-desktop":"1.5rem","space-md":"1rem","space-xl":"2rem","space-lg":"1.5rem","margin-desktop":"2rem","space-xs":"0.25rem","space-sm":"0.5rem","margin":"1rem"},fontFamily:{"label-lg":["Inter"],"body-lg":["Inter"],"headline-md":["Inter"],"metric-num":["Inter"],"body-md":["Inter"],"body-sm":["Inter"],"headline-lg":["Inter"],"headline-sm":["Inter"],"headline-xl":["Inter"],"label-sm":["Inter"],"label-md":["Inter"],"headline-xl-mobile":["Inter"]},fontSize:{"label-lg":["14px",{lineHeight:"20px",fontWeight:"600"}],"body-lg":["16px",{lineHeight:"24px",fontWeight:"400"}],"headline-md":["20px",{lineHeight:"28px",fontWeight:"600"}],"metric-num":["22px",{lineHeight:"28px",letterSpacing:"-0.01em",fontWeight:"600"}],"body-md":["14px",{lineHeight:"20px",fontWeight:"400"}],"body-sm":["13px",{lineHeight:"18px",fontWeight:"400"}],"headline-lg":["24px",{lineHeight:"32px",letterSpacing:"-0.01em",fontWeight:"600"}],"headline-sm":["16px",{lineHeight:"24px",fontWeight:"600"}],"headline-xl":["32px",{lineHeight:"40px",letterSpacing:"-0.02em",fontWeight:"700"}],"label-sm":["11px",{lineHeight:"14px",letterSpacing:"0.03em",fontWeight:"500"}],"label-md":["12px",{lineHeight:"16px",letterSpacing:"0.02em",fontWeight:"600"}],"headline-xl-mobile":["24px",{lineHeight:"32px",letterSpacing:"-0.01em",fontWeight:"700"}]}}}}</script></head><body class="bg-[#F5F7FA] font-body-md text-on-surface antialiased"><div class="fixed top-0 left-0 right-0 h-1 z-50 flex"><div class="w-1/2 h-full bg-[#B42318]"></div><div class="w-1/2 h-full bg-[#1E7B4F]"></div></div><aside class="fixed left-0 top-1 bottom-0 w-[240px] bg-[#0B2A4A] z-40 flex flex-col justify-between select-none"><div class="flex flex-col"><div class="px-5 pt-6 pb-6 flex items-center gap-3"><img alt="MEF Emblem" class="h-10 w-auto object-contain flex-shrink-0" src="https://lh3.googleusercontent.com/aida/AEtjO1UOEFzzVWKsKd7D4_tckAmMcRr0d-XGnSpF987DdvxBkNEkYqzOAZkzEnTS_NJ44TY1EjwWdLuVWrr4XjhrK6ySfV31SlW7iRceuUgaAPFsUIe3xvu1P2dq2-KLkfrKjF-ENp96Ef_o6OCngIKSG2LG03JxgDdyQN3J7LHSnUkC1SKua8SLLlcscD7C-r9mJsLUzsgV4GsPnHI5PshDYwwZf2Af_VNq-UuTUnzS3gSLhPz0g6htv1orMA"/><span class="font-headline-lg text-headline-lg text-white font-bold tracking-tight">SIGBD</span></div><nav class="flex flex-col px-3 gap-1" data-active-classes="bg-primary-container text-on-primary font-label-lg text-label-lg rounded"><a class="flex items-center gap-3 px-3 h-11 rounded font-label-lg text-label-lg text-secondary-fixed hover:bg-white/10 hover:text-white transition-colors" data-path="parametrage" href="#"><span class="material-symbols-outlined text-[20px]">tune</span><span>Paramétrage</span></a><a class="flex items-center gap-3 px-3 h-11 rounded font-label-lg text-label-lg text-secondary-fixed hover:bg-white/10 hover:text-white transition-colors" data-path="remarques" href="#"><span class="material-symbols-outlined text-[20px]">comment</span><span>Remarques</span></a><a class="flex items-center gap-3 px-3 h-11 rounded font-label-lg text-label-lg text-secondary-fixed hover:bg-white/10 hover:text-white transition-colors" data-path="journal-daudit" href="#"><span class="material-symbols-outlined text-[20px]">history</span><span>Journal d'audit</span></a></nav></div><div class="px-5 py-5 border-t border-white/10"><p class="font-label-sm text-label-sm text-secondary-fixed-dim uppercase tracking-wider">DGBF · SSEBF</p><p class="font-body-sm text-body-sm text-secondary-fixed/70 mt-0.5">Ministère de l'Économie et des Finances</p></div></aside><div class="pl-[240px]"><header class="fixed top-1 left-[240px] right-0 h-16 bg-white border-b border-[#E3E8EF] z-30 flex items-center justify-between px-gutter-desktop"><div class="flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant"><span class="material-symbols-outlined text-[18px] text-secondary">home</span><span>/</span><span class="font-label-md text-label-md text-on-surface">SIGBD</span><span>/</span><span class="font-label-md text-label-md text-primary font-semibold">Console Technique</span></div><div class="flex items-center gap-6"><div class="flex flex-col items-end"><div class="flex items-center gap-2"><span class="font-label-lg text-label-lg text-[#1A2433]">Tiana Ratsimba</span><span class="px-2 py-0.5 rounded bg-surface-container-high text-secondary font-label-sm text-label-sm">Développeur</span></div><span class="font-body-sm text-body-sm text-on-surface-variant">DGBF – Cellule Informatique</span></div><div class="h-8 w-[1px] bg-[#E3E8EF]"></div><a class="flex items-center gap-1.5 font-label-md text-label-md text-[#B42318] hover:bg-error-container/30 px-3 py-2 rounded transition-colors" data-path="connexion" href="#"><span class="material-symbols-outlined text-[18px]">logout</span><span>Se déconnecter</span></a></div></header><main class="w-full pt-16 min-h-screen bg-[#F5F7FA] p-gutter-desktop"><div class="flex flex-col w-full">
+<!-- Sub-header / Breadcrumb Context & System Title -->
+<div class="flex flex-col gap-1 pb-6">
+<div class="flex items-center gap-2 font-label-md text-label-md text-secondary">
+<span>Paramétrage</span>
+<span class="text-outline-variant">/</span>
+<span class="text-primary font-semibold">Listes de référence</span>
+</div>
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mt-2">
+<div>
+<h1 class="font-headline-xl text-headline-xl text-on-surface tracking-tight">Paramétrage</h1>
+<p class="font-body-md text-body-md text-secondary mt-1">
+          Définissez les canevas, les listes de référence et les règles de contrôle.
+        </p>
+</div>
+<!-- Quick Registry Operational Status Pill -->
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container-high/60 border border-outline-variant/40 self-start md:self-auto">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-tertiary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-tertiary"></span>
+</span>
+<span class="font-label-sm text-label-sm text-secondary font-medium tracking-wide">Base de nomenclature synchronisée (v2.4)</span>
+</div>
+</div>
+</div>
+<!-- Primary Navigation Tabs -->
+<div class="flex items-center gap-8 border-b border-outline-variant/60 mb-6">
+<button class="relative pb-3 font-label-lg text-label-lg text-secondary hover:text-on-surface transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">view_kanban</span>
+<span>Canevas des modules</span>
+</button>
+<button class="relative pb-3 font-label-lg text-label-lg text-primary font-semibold flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">list_alt</span>
+<span>Listes de référence</span>
+<span class="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-full"></span>
+</button>
+</div>
+<!-- Main Content Two-Column Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+<!-- LEFT COLUMN: Categories Navigation Panel -->
+<div class="lg:col-span-3 w-full">
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant/60 shadow-sm overflow-hidden">
+<div class="px-5 py-4 border-b border-outline-variant/40 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[20px]">folder_special</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">Listes</span>
+</div>
+<span class="font-label-sm text-label-sm text-secondary font-medium uppercase tracking-wider">6 Référentiels</span>
+</div>
+<div class="p-3 flex flex-col gap-1.5" id="reference-list-nav">
+<!-- Item 1: Régions -->
+<button class="group flex items-center justify-between w-full px-3.5 py-2.5 rounded-lg text-secondary hover:bg-surface-container-low transition-colors text-left" type="button">
+<div class="flex items-center gap-2.5 min-w-0">
+<span class="material-symbols-outlined text-[18px] text-secondary/70 group-hover:text-primary transition-colors">map</span>
+<span class="font-label-lg text-label-lg truncate">Régions</span>
+</div>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-surface-container text-secondary group-hover:bg-surface-container-high transition-colors font-medium tabular-nums">12</span>
+</button>
+<!-- Item 2: Structures (SELECTED) -->
+<button class="flex items-center justify-between w-full px-3.5 py-2.5 rounded-lg bg-surface-container-high text-primary font-semibold text-left transition-colors relative shadow-xs" type="button">
+<div class="flex items-center gap-2.5 min-w-0">
+<span class="material-symbols-outlined text-[18px] text-primary" style="font-variation-settings: 'FILL' 1;">corporate_fare</span>
+<span class="font-label-lg text-label-lg truncate text-primary font-semibold">Structures</span>
+</div>
+<span class="font-label-sm text-label-sm px-2.5 py-0.5 rounded-full bg-primary-container text-on-primary font-semibold tabular-nums shadow-xs">46</span>
+</button>
+<!-- Item 3: Directions -->
+<button class="group flex items-center justify-between w-full px-3.5 py-2.5 rounded-lg text-secondary hover:bg-surface-container-low transition-colors text-left" type="button">
+<div class="flex items-center gap-2.5 min-w-0">
+<span class="material-symbols-outlined text-[18px] text-secondary/70 group-hover:text-primary transition-colors">account_tree</span>
+<span class="font-label-lg text-label-lg truncate">Directions</span>
+</div>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-surface-container text-secondary group-hover:bg-surface-container-high transition-colors font-medium tabular-nums">23</span>
+</button>
+<!-- Item 4: Services -->
+<button class="group flex items-center justify-between w-full px-3.5 py-2.5 rounded-lg text-secondary hover:bg-surface-container-low transition-colors text-left" type="button">
+<div class="flex items-center gap-2.5 min-w-0">
+<span class="material-symbols-outlined text-[18px] text-secondary/70 group-hover:text-primary transition-colors">home_repair_service</span>
+<span class="font-label-lg text-label-lg truncate">Services</span>
+</div>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-surface-container text-secondary group-hover:bg-surface-container-high transition-colors font-medium tabular-nums">38</span>
+</button>
+<!-- Item 5: Grades -->
+<button class="group flex items-center justify-between w-full px-3.5 py-2.5 rounded-lg text-secondary hover:bg-surface-container-low transition-colors text-left" type="button">
+<div class="flex items-center gap-2.5 min-w-0">
+<span class="material-symbols-outlined text-[18px] text-secondary/70 group-hover:text-primary transition-colors">badge</span>
+<span class="font-label-lg text-label-lg truncate">Grades</span>
+</div>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-surface-container text-secondary group-hover:bg-surface-container-high transition-colors font-medium tabular-nums">14</span>
+</button>
+<!-- Item 6: Périodes -->
+<button class="group flex items-center justify-between w-full px-3.5 py-2.5 rounded-lg text-secondary hover:bg-surface-container-low transition-colors text-left" type="button">
+<div class="flex items-center gap-2.5 min-w-0">
+<span class="material-symbols-outlined text-[18px] text-secondary/70 group-hover:text-primary transition-colors">calendar_month</span>
+<span class="font-label-lg text-label-lg truncate">Périodes</span>
+</div>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-surface-container text-secondary group-hover:bg-surface-container-high transition-colors font-medium tabular-nums">8</span>
+</button>
+</div>
+<!-- Reference System Meta Footnote -->
+<div class="p-3 bg-surface-container-low/50 border-t border-outline-variant/40 mt-2">
+<div class="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[16px] text-secondary">verified_user</span>
+<span>Validé par SSEBF Audit</span>
+</div>
+</div>
+</div>
+<!-- Quick Registry Distribution Insight (Light Visual Context) -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant/60 shadow-sm p-4 mt-4 hidden xl:block">
+<span class="font-label-md text-label-md text-secondary uppercase tracking-wider block mb-2">Répartition territoriale</span>
+<div class="space-y-2">
+<div>
+<div class="flex justify-between font-label-sm text-label-sm mb-1 text-on-surface">
+<span>Analamanga</span>
+<span class="font-semibold text-primary">45%</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 45%;"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between font-label-sm text-label-sm mb-1 text-on-surface">
+<span>Atsinanana</span>
+<span class="font-semibold text-secondary">30%</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-secondary rounded-full" style="width: 30%;"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between font-label-sm text-label-sm mb-1 text-on-surface">
+<span>Diana & Autres</span>
+<span class="font-semibold text-secondary">25%</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-outline rounded-full" style="width: 25%;"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- RIGHT COLUMN: Reference Values Management Table -->
+<div class="lg:col-span-9 w-full flex flex-col">
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant/60 shadow-sm overflow-hidden flex flex-col">
+<!-- Table Card Header -->
+<div class="p-5 border-b border-outline-variant/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white">
+<div class="flex items-center gap-3">
+<h2 class="font-headline-md text-headline-md text-on-surface font-semibold tracking-tight">Structures</h2>
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-surface-container-high text-primary font-semibold border border-primary/20">
+              46 éléments
+            </span>
+</div>
+<!-- Add Value Action Button (Standardized 44px height) -->
+<button class="h-11 px-4 rounded-lg bg-primary hover:bg-[#174C87] active:bg-[#133E6E] text-on-primary font-label-lg text-label-lg flex items-center justify-center gap-2 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" type="button">
+<span class="material-symbols-outlined text-[20px]">add</span>
+<span>Ajouter une valeur</span>
+</button>
+</div>
+<!-- Filters & Search Controls Strip -->
+<div class="p-4 bg-surface-container-low/40 border-b border-outline-variant/60 flex flex-col md:flex-row items-center gap-3">
+<!-- Search Field -->
+<div class="relative w-full flex-1">
+<span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-secondary text-[20px] pointer-events-none">search</span>
+<input class="w-full h-11 pl-10 pr-4 rounded-lg bg-white border border-outline-variant/80 text-on-surface placeholder:text-on-surface-variant/70 font-body-md text-body-md focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all shadow-xs" placeholder="Rechercher par code ou libellé dans la liste..." type="text"/>
+</div>
+<!-- Region Filter Dropdown -->
+<div class="relative w-full md:w-64">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-secondary text-[18px] pointer-events-none">filter_alt</span>
+<select class="w-full h-11 pl-9 pr-9 rounded-lg bg-white border border-outline-variant/80 text-on-surface font-body-md text-body-md focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all shadow-xs appearance-none cursor-pointer">
+<option value="all">Toutes les régions</option>
+<option value="analamanga">Analamanga</option>
+<option value="atsinanana">Atsinanana</option>
+<option value="diana">Diana</option>
+<option value="boeny">Boeny</option>
+<option value="vatovavy">Vatovavy</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-secondary text-[20px] pointer-events-none">expand_more</span>
+</div>
+<!-- Secondary Quick Reset / Refresh Action -->
+<button class="h-11 w-11 flex-shrink-0 flex items-center justify-center rounded-lg bg-white border border-outline-variant/80 text-secondary hover:text-on-surface hover:bg-surface-container-low transition-colors shadow-xs" title="Réinitialiser filtres" type="button">
+<span class="material-symbols-outlined text-[20px]">refresh</span>
+</button>
+</div>
+<!-- Table Container -->
+<div class="overflow-x-auto w-full">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant/60">
+<th class="py-3 px-4 font-label-md text-label-md text-secondary uppercase tracking-wider" scope="col">Code</th>
+<th class="py-3 px-4 font-label-md text-label-md text-secondary uppercase tracking-wider" scope="col">Libellé</th>
+<th class="py-3 px-4 font-label-md text-label-md text-secondary uppercase tracking-wider" scope="col">Type</th>
+<th class="py-3 px-4 font-label-md text-label-md text-secondary uppercase tracking-wider" scope="col">Région</th>
+<th class="py-3 px-4 font-label-md text-label-md text-secondary uppercase tracking-wider" scope="col">État</th>
+<th class="py-3 px-4 font-label-md text-label-md text-secondary uppercase tracking-wider text-right" scope="col">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/40 font-body-md text-body-md">
+<!-- Row 1: SRB-ANA -->
+<tr class="hover:bg-surface-container-low/50 transition-colors group">
+<td class="py-3.5 px-4 font-label-lg text-label-lg font-semibold text-primary">
+                  SRB-ANA
+                </td>
+<td class="py-3.5 px-4 font-body-md text-body-md text-on-surface font-medium">
+                  SRB – Analamanga
+                </td>
+<td class="py-3.5 px-4 text-on-surface-variant font-label-md text-label-md">
+<span class="px-2 py-0.5 rounded bg-surface-container font-mono text-secondary">SRB</span>
+</td>
+<td class="py-3.5 px-4 text-secondary font-body-md text-body-md">
+                  Analamanga
+                </td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1.5 h-6 px-2.5 rounded text-label-sm font-label-sm bg-emerald-50 text-[#1E7B4F] border border-[#1E7B4F]/20 font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-[#1E7B4F]"></span>
+                    Actif
+                  </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="w-8 h-8 rounded-lg flex items-center justify-center text-secondary hover:text-primary hover:bg-surface-container-high transition-colors" title="Modifier la structure" type="button">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button class="w-8 h-8 rounded-lg flex items-center justify-center text-secondary hover:text-error hover:bg-error-container/30 transition-colors" title="Désactiver" type="button">
+<span class="material-symbols-outlined text-[18px]">power_settings_new</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2: SRSP-ANA -->
+<tr class="hover:bg-surface-container-low/50 transition-colors group">
+<td class="py-3.5 px-4 font-label-lg text-label-lg font-semibold text-primary">
+                  SRSP-ANA
+                </td>
+<td class="py-3.5 px-4 font-body-md text-body-md text-on-surface font-medium">
+                  SRSP – Analamanga
+                </td>
+<td class="py-3.5 px-4 text-on-surface-variant font-label-md text-label-md">
+<span class="px-2 py-0.5 rounded bg-surface-container font-mono text-secondary">SRSP</span>
+</td>
+<td class="py-3.5 px-4 text-secondary font-body-md text-body-md">
+                  Analamanga
+                </td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1.5 h-6 px-2.5 rounded text-label-sm font-label-sm bg-emerald-50 text-[#1E7B4F] border border-[#1E7B4F]/20 font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-[#1E7B4F]"></span>
+                    Actif
+                  </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="w-8 h-8 rounded-lg flex items-center justify-center text-secondary hover:text-primary hover:bg-surface-container-high transition-colors" title="Modifier la structure" type="button">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button class="w-8 h-8 rounded-lg flex items-center justify-center text-secondary hover:text-error hover:bg-error-container/30 transition-colors" title="Désactiver" type="button">
+<span class="material-symbols-outlined text-[18px]">power_settings_new</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3: CIRBF-ANA -->
+<tr class="hover:bg-surface-container-low/50 transition-colors group">
+<td class="py-3.5 px-4 font-label-lg text-label-lg font-semibold text-primary">
+                  CIRBF-ANA
+                </td>
+<td class="py-3.5 px-4 font-body-md text-body-md text-on-surface font-medium">
+                  CIRBF – Analamanga
+                </td>
+<td class="py-3.5 px-4 text-on-surface-variant font-label-md text-label-md">
+<span class="px-2 py-0.5 rounded bg-surface-container font-mono text-secondary">CIRBF</span>
+</td>
+<td class="py-3.5 px-4 text-secondary font-body-md text-body-md">
+                  Analamanga
+                </td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1.5 h-6 px-2.5 rounded text-label-sm font-label-sm bg-emerald-50 text-[#1E7B4F] border border-[#1E7B4F]/20 font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-[#1E7B4F]"></span>
+                    Actif
+                  </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="w-8 h-8 rounded-lg flex items-center justify-center text-secondary hover:text-primary hover:bg-surface-container-high transition-colors" title="Modifier la structure" type="button">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button class="w-8 h-8 rounded-lg flex items-center justify-center text-secondary hover:text-error hover:bg-error-container/30 transition-colors" title="Désactiver" type="button">
+<span class="material-symbols-outlined text-[18px]">power_settings_new</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 4: SRB-ATS -->
+<tr class="hover:bg-surface-container-low/50 transition-colors group">
+<td class="py-3.5 px-4 font-label-lg text-label-lg font-semibold text-primary">
+                  SRB-ATS
+                </td>
+<td class="py-3.5 px-4 font-body-md text-body-md text-on-surface font-medium">
+                  SRB – Atsinanana
+                </td>
+<td class="py-3.5 px-4 text-on-surface-variant font-label-md text-label-md">
+<span class="px-2 py-0.5 rounded bg-surface-container font-mono text-secondary">SRB</span>
+</td>
+<td class="py-3.5 px-4 text-secondary font-body-md text-body-md">
+                  Atsinanana
+                </td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1.5 h-6 px-2.5 rounded text-label-sm font-label-sm bg-emerald-50 text-[#1E7B4F] border border-[#1E7B4F]/20 font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-[#1E7B4F]"></span>
+                    Actif
+                  </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="w-8 h-8 rounded-lg flex items-center justify-center text-secondary hover:text-primary hover:bg-surface-container-high transition-colors" title="Modifier la structure" type="button">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button class="w-8 h-8 rounded-lg flex items-center justify-center text-secondary hover:text-error hover:bg-error-container/30 transition-colors" title="Désactiver" type="button">
+<span class="material-symbols-outlined text-[18px]">power_settings_new</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 5: SRPE-ATS -->
+<tr class="hover:bg-surface-container-low/50 transition-colors group">
+<td class="py-3.5 px-4 font-label-lg text-label-lg font-semibold text-primary">
+                  SRPE-ATS
+                </td>
+<td class="py-3.5 px-4 font-body-md text-body-md text-on-surface font-medium">
+                  SRPE – Atsinanana
+                </td>
+<td class="py-3.5 px-4 text-on-surface-variant font-label-md text-label-md">
+<span class="px-2 py-0.5 rounded bg-surface-container font-mono text-secondary">SRPE</span>
+</td>
+<td class="py-3.5 px-4 text-secondary font-body-md text-body-md">
+                  Atsinanana
+                </td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1.5 h-6 px-2.5 rounded text-label-sm font-label-sm bg-emerald-50 text-[#1E7B4F] border border-[#1E7B4F]/20 font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-[#1E7B4F]"></span>
+                    Actif
+                  </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="w-8 h-8 rounded-lg flex items-center justify-center text-secondary hover:text-primary hover:bg-surface-container-high transition-colors" title="Modifier la structure" type="button">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button class="w-8 h-8 rounded-lg flex items-center justify-center text-secondary hover:text-error hover:bg-error-container/30 transition-colors" title="Désactiver" type="button">
+<span class="material-symbols-outlined text-[18px]">power_settings_new</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 6: SRB-DIA (Inactive) -->
+<tr class="bg-surface-container-low/30 hover:bg-surface-container-low transition-colors group opacity-85">
+<td class="py-3.5 px-4 font-label-lg text-label-lg font-semibold text-secondary">
+                  SRB-DIA
+                </td>
+<td class="py-3.5 px-4 font-body-md text-body-md text-secondary font-medium">
+                  SRB – Diana
+                </td>
+<td class="py-3.5 px-4 text-secondary font-label-md text-label-md">
+<span class="px-2 py-0.5 rounded bg-surface-container text-secondary font-mono">SRB</span>
+</td>
+<td class="py-3.5 px-4 text-secondary font-body-md text-body-md">
+                  Diana
+                </td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1.5 h-6 px-2.5 rounded text-label-sm font-label-sm bg-surface-container-highest text-secondary border border-outline-variant font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                    Inactif
+                  </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="w-8 h-8 rounded-lg flex items-center justify-center text-secondary hover:text-primary hover:bg-surface-container-high transition-colors" title="Modifier la structure" type="button">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button class="w-8 h-8 rounded-lg flex items-center justify-center text-tertiary hover:bg-tertiary-container/20 transition-colors" title="Activer" type="button">
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination Footer -->
+<div class="p-4 bg-white border-t border-outline-variant/60 flex flex-col sm:flex-row items-center justify-between gap-4">
+<div class="flex items-center gap-2">
+<span class="font-body-sm text-body-sm text-secondary">Affichage :</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold">Page 1 sur 8</span>
+<span class="text-secondary/50 font-body-sm text-body-sm">·</span>
+<span class="font-body-sm text-body-sm text-secondary">Total : 46 structures</span>
+</div>
+<div class="flex items-center gap-4">
+<!-- Row Counter Selector -->
+<div class="flex items-center gap-2">
+<label class="font-body-sm text-body-sm text-secondary" for="page-size">Lignes :</label>
+<div class="relative">
+<select class="h-8 pl-2.5 pr-7 rounded bg-surface-container-low border border-outline-variant text-on-surface font-label-sm text-label-sm focus:border-primary focus:outline-none appearance-none cursor-pointer" id="page-size">
+<option selected="">6 par page</option>
+<option>12 par page</option>
+<option>24 par page</option>
+<option>48 par page</option>
+</select>
+<span class="material-symbols-outlined absolute right-1.5 top-1/2 -translate-y-1/2 text-secondary text-[16px] pointer-events-none">expand_more</span>
+</div>
+</div>
+<!-- Page Navigation Controls -->
+<div class="flex items-center gap-1 border-l border-outline-variant/60 pl-3">
+<button class="w-8 h-8 rounded flex items-center justify-center text-secondary/40 cursor-not-allowed" disabled="" type="button">
+<span class="material-symbols-outlined text-[18px]">first_page</span>
+</button>
+<button class="w-8 h-8 rounded flex items-center justify-center text-secondary/40 cursor-not-allowed" disabled="" type="button">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<button class="w-8 h-8 rounded bg-primary text-on-primary font-label-sm text-label-sm font-semibold flex items-center justify-center shadow-xs" type="button">
+                1
+              </button>
+<button class="w-8 h-8 rounded hover:bg-surface-container-low text-secondary font-label-sm text-label-sm flex items-center justify-center" type="button">
+                2
+              </button>
+<button class="w-8 h-8 rounded hover:bg-surface-container-low text-secondary font-label-sm text-label-sm flex items-center justify-center" type="button">
+                3
+              </button>
+<span class="px-1 text-secondary font-body-sm text-body-sm">...</span>
+<button class="w-8 h-8 rounded hover:bg-surface-container-low text-secondary font-label-sm text-label-sm flex items-center justify-center" type="button">
+                8
+              </button>
+<button class="w-8 h-8 rounded hover:bg-surface-container-low text-secondary flex items-center justify-center" type="button">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+<button class="w-8 h-8 rounded hover:bg-surface-container-low text-secondary flex items-center justify-center" type="button">
+<span class="material-symbols-outlined text-[18px]">last_page</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Institutional Informational Note -->
+<div class="mt-4 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-surface-container-low/70 border border-outline-variant/50">
+<span class="material-symbols-outlined text-[20px] text-primary flex-shrink-0" style="font-variation-settings: 'FILL' 1;">info</span>
+<p class="font-body-sm text-body-sm text-secondary">
+          Une valeur désactivée n'apparaît plus dans les listes de choix, mais reste visible dans l'historique et les journaux de consolidation.
+        </p>
+</div>
+</div>
+</div>
+</div>
+<script>
+  // Simple micro-interaction for reference list selection
+  document.addEventListener('DOMContentLoaded', () => {
+    const listButtons = document.querySelectorAll('#reference-list-nav button');
+    listButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Handle visual state toggle demo
+        listButtons.forEach(b => {
+          b.classList.remove('bg-surface-container-high', 'text-primary', 'font-semibold', 'shadow-xs');
+          b.classList.add('text-secondary');
+          const count = b.querySelector('span:last-child');
+          if (count) {
+            count.classList.remove('bg-primary-container', 'text-on-primary', 'font-semibold');
+            count.classList.add('bg-surface-container', 'text-secondary');
+          }
+        });
+        
+        btn.classList.remove('text-secondary');
+        btn.classList.add('bg-surface-container-high', 'text-primary', 'font-semibold', 'shadow-xs');
+        const activeCount = btn.querySelector('span:last-child');
+        if (activeCount) {
+          activeCount.classList.remove('bg-surface-container', 'text-secondary');
+          activeCount.classList.add('bg-primary-container', 'text-on-primary', 'font-semibold');
+        }
+      });
+    });
+  });
+</script></main></div></body></html>
