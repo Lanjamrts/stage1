@@ -29,6 +29,14 @@ cd backend && npm run seed
 Le seed est idempotent : il purge et recrée régions, structures, utilisateurs, périodes,
 référentiels, modules et saisies. **Après un re-seed, il faut se reconnecter.**
 
+Archivage (script système, sans bouton d'interface) :
+
+```bash
+cd backend && npm run archive
+```
+
+Passe en statut `archivee` les rapports `exportee` dont la période est terminée.
+
 ## Démarrage
 
 Terminal 1 — API (port 4000) :

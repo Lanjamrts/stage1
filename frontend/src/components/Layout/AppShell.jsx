@@ -35,8 +35,10 @@ export default function AppShell({ children }) {
     fetchUser();
   }, []);
 
-  // Détecter l'expiration de la session : timeout d'inactivité de 30 minutes
+  // Détecter l'expiration de la session : délai d'inactivité renvoyé par /auth/me
+  // (SESSION_TIMEOUT_MINUTES, 30 par défaut), avertissement 5 minutes avant.
   useEffect(() => {
+    const minutes = (user && user.sessionTimeoutMinutes) || 30;
     let timeoutId;
     const resetTimer = () => {
       if (showExpiryModalRef.current) return; // ne pas reprogrammer pendant l'avertissement
@@ -44,7 +46,7 @@ export default function AppShell({ children }) {
       timeoutId = setTimeout(() => {
         setShowExpiryModal(true);
         setTimeLeft(60);
-      }, 25 * 60 * 1000); // 25 minutes (avant les 30 min)
+      }, Math.max(minutes - 5, 1) * 60 * 1000);
     };
     const events = ['click', 'keydown', 'scroll'];
     events.forEach((e) => document.addEventListener(e, resetTimer, { passive: true }));
@@ -53,7 +55,7 @@ export default function AppShell({ children }) {
       events.forEach((e) => document.removeEventListener(e, resetTimer));
       if (timeoutId) clearTimeout(timeoutId);
     };
-  }, []);
+  }, [user]);
 
   // Confirmer = prolonger la session (expiration glissante)
   const handleModalConfirm = async () => {

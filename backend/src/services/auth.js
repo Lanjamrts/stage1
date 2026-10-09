@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET || 'change-me-in-production-sigbd-2026';
-const SESSION_TIMEOUT_MINUTES = parseInt(process.env.SESSION_TIMEOUT_MINUTES || '30', 10);
+export const SESSION_TIMEOUT_MINUTES = parseInt(process.env.SESSION_TIMEOUT_MINUTES || '30', 10);
 const MAX_FAILED_ATTEMPTS = 5;
 const LOCKOUT_DURATION_MINUTES = 30;
 
@@ -32,6 +32,18 @@ export function generateToken(user) {
     },
     JWT_SECRET
   );
+}
+
+// Pose le cookie de session httpOnly (durée = délai d'inactivité, configurable
+// dans .env via SESSION_TIMEOUT_MINUTES). Utilisé par login, refresh et le
+// glissement de session à chaque requête authentifiée.
+export function setSessionCookie(res, user) {
+  res.cookie('token', generateToken(user), {
+    httpOnly: true,
+    sameSite: 'strict',
+    maxAge: SESSION_TIMEOUT_MINUTES * 60 * 1000,
+    secure: process.env.NODE_ENV === 'production',
+  });
 }
 
 // Vérification du token (middleware d'authentification)

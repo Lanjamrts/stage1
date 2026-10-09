@@ -1,6 +1,7 @@
 "use strict";
 import jwt from 'jsonwebtoken';
 import UtilisateurModel from '../models/Utilisateur.js';
+import { setSessionCookie } from '../services/auth.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -39,6 +40,10 @@ export function requireAuth(options = {}) {
     if (utilisateur.lockedUntil && utilisateur.lockedUntil > Date.now()) {
       return res.status(403).json({ message: 'Votre compte est temporairement verrouillé', code: 'ACCOUNT_LOCKED' });
     }
+
+    // Expiration glissante (SPEC §5) : chaque requête authentifiée prolonge le
+    // cookie et le JWT de SESSION_TIMEOUT_MINUTES (délai d'inactivité .env).
+    setSessionCookie(res, utilisateur);
 
     req.user = utilisateur;
     next();
