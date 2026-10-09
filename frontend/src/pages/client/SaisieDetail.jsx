@@ -36,6 +36,7 @@ export default function SaisieDetail() {
   const [savedAt, setSavedAt] = useState(null);
   const [saveError, setSaveError] = useState(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [submitErrorCount, setSubmitErrorCount] = useState(0);
   const [busy, setBusy] = useState(false);
   const dirtyRef = useRef(false);
   const savingRef = useRef(false);
@@ -78,6 +79,7 @@ export default function SaisieDetail() {
       }
       dirtyRef.current = false;
       setSavedAt(null);
+      setSubmitErrorCount(0);
     } catch (err) {
       setLoadError(err.message);
     } finally {
@@ -155,6 +157,7 @@ export default function SaisieDetail() {
       });
       if (Object.keys(clientErrors).length > 0) {
         setErrors(clientErrors);
+        setSubmitErrorCount(Object.keys(clientErrors).length);
         addToast('Le formulaire contient des erreurs.', 'error');
         setConfirmOpen(false);
         return;
@@ -167,6 +170,7 @@ export default function SaisieDetail() {
     } catch (err) {
       if (err.status === 400 && err.data && err.data.errors) {
         setErrors(err.data.errors);
+        setSubmitErrorCount(Object.keys(err.data.errors).length);
         addToast('Le formulaire contient des erreurs.', 'error');
       } else {
         addToast(err.message, 'error');
@@ -212,24 +216,28 @@ export default function SaisieDetail() {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <Link to="/mes-saisies" className="text-sm text-[#1F5FA8] hover:underline">
-            ← Mes saisies
+            Retour à mes saisies
           </Link>
           <h1 className="text-[24px] font-semibold text-[#0B2A4A] mt-1">
             {saisie.moduleCode} — {saisie.moduleLabel}
           </h1>
           <p className="text-sm text-[#5B6778] mt-1">
-            {periodLabel} · Version {saisie.moduleVersion} · Créée le{' '}
+            {periodLabel}
+            {saisie.structureLabel ? ` · ${saisie.structureLabel}` : ''}
+          </p>
+          <p className="text-xs text-[#8A94A6] mt-0.5">
+            Version {saisie.moduleVersion} · Créée le{' '}
             {formatDateTime(saisie.dates && saisie.dates.created)}
           </p>
         </div>
         <div className="flex items-center gap-3">
           <StatusBadge status={saisie.status} />
-          {canEdit && (
+          {canEdit && saisie.status === 'brouillon' && (
             <button
               onClick={() => setConfirmOpen(true)}
               className="h-[40px] px-5 rounded-lg bg-[#1F5FA8] hover:bg-[#174C87] text-white text-sm font-semibold"
             >
-              {saisie.status === 'rejetee' ? 'Soumettre' : 'Soumettre'}
+              Soumettre
             </button>
           )}
         </div>
@@ -240,10 +248,13 @@ export default function SaisieDetail() {
         <div className="rounded-lg border border-[#F6C7C3] bg-[#FEF3F2] px-4 py-4">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="text-sm font-semibold text-[#B42318]">
-                Saisie rejetée{rejet.actor ? ` par ${rejet.actor}` : ''}
+              <p className="text-sm font-semibold text-[#B42318]">Rapport rejeté</p>
+              <p className="text-sm text-[#1A2433] mt-1 font-semibold">Motif du rejet</p>
+              <p className="text-sm text-[#1A2433]">{rejet.motif}</p>
+              <p className="text-xs text-[#5B6778] mt-1">
+                Rejeté par {rejet.actor || 'administrateur régional'} (administrateur régional) le{' '}
+                {formatDateTime(rejet.date)}
               </p>
-              <p className="text-sm text-[#1A2433] mt-1">Motif : {rejet.motif}</p>
             </div>
             {canEdit && (
               <button
@@ -259,7 +270,29 @@ export default function SaisieDetail() {
 
       {!canEdit && (
         <div className="rounded-lg border border-[#E3E8EF] bg-[#F5F7FA] px-4 py-3 text-sm text-[#5B6778]">
-          Cette saisie est en lecture seule (statut « {saisie.statusLabel} »).
+          {saisie.status === 'soumise' && saisie.dates && saisie.dates.submitted ? (
+            <>
+              <p>
+                Ce rapport a été soumis le {formatDateTime(saisie.dates.submitted)}. Il est en
+                attente de validation par l'administrateur régional.
+              </p>
+              <p className="mt-1 text-[#8A94A6]">
+                Mode consultation en lecture seule — aucune modification n'est permise.
+              </p>
+            </>
+          ) : (
+            <p>Cette saisie est en lecture seule. Elle ne peut plus être modifiée.</p>
+          )}
+        </div>
+      )}
+
+      {submitErrorCount > 0 && (
+        <div className="rounded-lg border border-[#F6C7C3] bg-[#FEF3F2] px-4 py-3 text-sm text-[#B42318]">
+          <p className="font-semibold">Le rapport ne peut pas être soumis.</p>
+          <p>
+            Corrigez {submitErrorCount} champ{submitErrorCount > 1 ? 's' : ''} signalé
+            {submitErrorCount > 1 ? 's' : ''} en rouge.
+          </p>
         </div>
       )}
 
@@ -268,13 +301,15 @@ export default function SaisieDetail() {
         <div className="lg:col-span-2 space-y-4">
           <div className="bg-white rounded-xl border border-[#E3E8EF] shadow-sm p-6">
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-[16px] font-semibold text-[#0B2A4A]">Formulaire</h2>
+              <h2 className="text-[16px] font-semibold text-[#0B2A4A]">
+                {canEdit ? 'Formulaire' : 'Contenu du rapport'}
+              </h2>
               {canEdit && (
                 <span className="text-xs text-[#5B6778]">
                   {saveError ? (
                     <span className="text-[#B42318] font-semibold">{saveError}</span>
                   ) : savedAt ? (
-                    <>Enregistré à {formatTime(savedAt)}</>
+                    <>Brouillon enregistré à {formatTime(savedAt)}</>
                   ) : (
                     'Enregistrement automatique'
                   )}
@@ -334,7 +369,12 @@ export default function SaisieDetail() {
 
         {/* Historique des étapes */}
         <div className="bg-white rounded-xl border border-[#E3E8EF] shadow-sm p-6 h-fit">
-          <h2 className="text-[16px] font-semibold text-[#0B2A4A] mb-4">Historique des étapes</h2>
+          <div className="flex items-center gap-2 mb-4">
+            <h2 className="text-[16px] font-semibold text-[#0B2A4A]">Historique des étapes</h2>
+            <span className="inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full bg-[#EBF3FC] text-[12px] font-semibold text-[#1F5FA8]">
+              {steps.length}
+            </span>
+          </div>
           <ol className="space-y-4">
             {steps.map((step, i) => {
               const style = STEP_STYLES[step.decision] || STEP_STYLES.creee;
@@ -365,13 +405,13 @@ export default function SaisieDetail() {
 
       <ConfirmModal
         isOpen={confirmOpen}
-        title="Soumettre cette saisie ?"
+        title={saisie.status === 'rejetee' ? 'Soumettre à nouveau ce rapport ?' : 'Soumettre ce rapport ?'}
         message={
           saisie.status === 'rejetee'
-            ? 'La saisie corrigée sera renvoyée au service de validation régional. Elle ne pourra plus être modifiée tant qu’elle n’a pas été réexaminée.'
-            : 'Une fois soumise, la saisie ne pourra plus être modifiée. Elle sera transmise au service de validation régional.'
+            ? 'Votre rapport corrigé sera de nouveau transmis à administrateur régional pour validation.'
+            : 'Une fois soumis, vous ne pourrez plus le modifier, sauf s’il est rejeté par l’administrateur régional.'
         }
-        confirmLabel="Soumettre"
+        confirmLabel="Confirmer la soumission"
         busy={busy}
         onCancel={() => setConfirmOpen(false)}
         onConfirm={submit}

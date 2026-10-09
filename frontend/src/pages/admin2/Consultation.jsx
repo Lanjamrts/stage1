@@ -126,15 +126,22 @@ export default function Consultation() {
           <option value="exportee">Exportée</option>
           <option value="archivee">Archivée</option>
         </select>
-        {(filters.module || filters.periode || filters.statut) && (
-          <button
-            onClick={() => setFilters({ module: '', periode: '', statut: '' })}
-            className="h-[40px] px-4 rounded-lg border border-[#E3E8EF] text-sm font-medium hover:bg-[#F5F7FA]"
-          >
-            Réinitialiser
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={() => setFilters({ module: '', periode: '', statut: '' })}
+          className="h-[40px] px-4 rounded-lg border border-[#E3E8EF] text-sm font-medium hover:bg-[#F5F7FA] inline-flex items-center gap-2"
+        >
+          <span aria-hidden="true">↺</span> Réinitialiser les filtres
+        </button>
       </div>
+
+      {!loading && !error && (
+        <p className="text-sm text-[#5B6778]">
+          <span className="font-semibold text-[#0B2A4A]">{rows.length}</span>{' '}
+          {rows.length > 1 ? 'enregistrements trouvés' : 'enregistrement trouvé'} pour ces
+          critères
+        </p>
+      )}
 
       {error && (
         <div className="rounded-lg border border-[#F6C7C3] bg-[#FEF3F2] px-4 py-3 text-sm text-[#B42318]">

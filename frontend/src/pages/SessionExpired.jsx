@@ -9,9 +9,14 @@ export default function SessionExpired() {
         </div>
         <h1 className="text-[24px] font-semibold text-[#0B2A4A] mb-2">Votre session a expiré</h1>
         <p className="text-[15px] text-[#5B6778] leading-relaxed">
-          Pour votre sécurité, votre session a été fermée après une période d'inactivité.
-          Veuillez vous reconnecter pour continuer.
+          Pour votre sécurité, vous avez été déconnecté après une période d'inactivité.
         </p>
+        <div className="mt-5 flex items-start gap-2 bg-[#EBF7EE] border border-[#1E7B4F]/30 rounded-lg p-3 text-[13px] text-[#1E7B4F] text-left">
+          <svg className="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+          <span>Les données que vous avez enregistrées en brouillon sont conservées.</span>
+        </div>
         <a
           href="/login"
           className="inline-flex items-center justify-center mt-6 h-[44px] px-6 bg-[#1F5FA8] hover:bg-[#174C87] text-white text-[15px] font-semibold rounded-lg transition-colors"

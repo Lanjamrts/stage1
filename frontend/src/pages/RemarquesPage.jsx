@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { api, formatDateTime } from '../api.js';
 import { useToast } from '../components/Common/Toast/Toast.jsx';
 import useMe from '../lib/useMe.js';
+import { ROLE_MENUS, ROLE_LABELS } from '../menus.js';
 
 const STATE_BADGE = {
   nouvelle: { cls: 'bg-[#EBF3FC] border-[#B8D2EF] text-[#1F5FA8]', label: 'Nouvelle' },
@@ -15,6 +16,13 @@ const STATE_OPTIONS = [
   ['traitee', 'Traitée'],
 ];
 
+const shortDate = (d) =>
+  d
+    ? `${new Date(d).toLocaleDateString('fr-FR')} à ${new Date(d)
+        .toTimeString()
+        .slice(0, 5)}`
+    : '—';
+
 // Boîte de réception des remarques (SPEC §4, developpeur) : toutes les
 // remarques reçues avec état Nouvelle / En cours / Traitée, modifiable.
 function RemarquesInbox() {
@@ -23,6 +31,9 @@ function RemarquesInbox() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [busyId, setBusyId] = useState(null);
+  const [stateTab, setStateTab] = useState('');
+  const [q, setQ] = useState('');
+  const [roleFilter, setRoleFilter] = useState('');
 
   const load = async () => {
     try {
@@ -53,13 +64,104 @@ function RemarquesInbox() {
     }
   };
 
+  const counts = useMemo(
+    () => ({
+      all: items.length,
+      nouvelle: items.filter((r) => r.state === 'nouvelle').length,
+      en_cours: items.filter((r) => r.state === 'en_cours').length,
+      traitee: items.filter((r) => r.state === 'traitee').length,
+    }),
+    [items]
+  );
+
+  const needle = q.trim().toLowerCase();
+  const visible = items.filter(
+    (r) =>
+      (!stateTab || r.state === stateTab) &&
+      (!roleFilter || r.authorRole === roleFilter) &&
+      (!needle ||
+        [r.context, r.text, r.author]
+          .filter(Boolean)
+          .some((v) => String(v).toLowerCase().includes(needle)))
+  );
+
+  const TABS = [
+    { key: '', label: 'Toutes' },
+    { key: 'nouvelle', label: 'Nouvelles' },
+    { key: 'en_cours', label: 'En cours' },
+    { key: 'traitee', label: 'Traitées' },
+  ];
+
+  const hasFilters = !!(stateTab || roleFilter || needle);
+
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-[24px] font-semibold text-[#0B2A4A]">Remarques</h1>
+        <h1 className="text-[24px] font-semibold text-[#0B2A4A] flex items-center gap-3">
+          Remarques reçues
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full border border-[#D7C4F0] bg-[#F3ECFB] text-xs font-semibold text-[#6B3FA0]">
+            Cellule Informatique
+          </span>
+        </h1>
         <p className="text-sm text-[#5B6778] mt-1">
-          Boîte de réception des remarques de l'équipe (état Nouvelle / En cours / Traitée).
+          Remarques transmises par les administrateurs. Consultez-les et indiquez où en est leur
+          traitement.
         </p>
+      </div>
+
+      {/* Onglets d'état avec compteurs */}
+      <div className="flex flex-wrap gap-2 border-b border-[#E3E8EF]">
+        {TABS.map((t) => (
+          <button
+            key={t.key}
+            onClick={() => setStateTab(t.key)}
+            className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px ${
+              stateTab === t.key
+                ? 'border-[#1F5FA8] text-[#1F5FA8]'
+                : 'border-transparent text-[#5B6778] hover:text-[#0B2A4A]'
+            }`}
+          >
+            {t.label}
+            <span
+              className={`inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full text-[12px] font-semibold ${
+                stateTab === t.key ? 'bg-[#EBF3FC] text-[#1F5FA8]' : 'bg-[#F5F7FA] text-[#5B6778]'
+              }`}
+            >
+              {t.key ? counts[t.key] : counts.all}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {/* Filtres */}
+      <div className="flex flex-wrap gap-3 items-center">
+        <input
+          type="search"
+          className="h-[40px] px-3 rounded-lg border border-[#D6DCE5] bg-white text-sm min-w-[240px]"
+          placeholder="Rechercher (auteur, page, texte...)"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+        />
+        <select
+          className="h-[40px] px-3 rounded-lg border border-[#D6DCE5] bg-white text-sm min-w-[170px]"
+          value={roleFilter}
+          onChange={(e) => setRoleFilter(e.target.value)}
+        >
+          <option value="">Tous les profils</option>
+          <option value="admin1">Admin 1</option>
+          <option value="admin2">Admin 2</option>
+        </select>
+        <button
+          type="button"
+          onClick={() => {
+            setStateTab('');
+            setQ('');
+            setRoleFilter('');
+          }}
+          className="h-[40px] px-4 rounded-lg border border-[#E3E8EF] text-sm font-medium hover:bg-[#F5F7FA] inline-flex items-center gap-2"
+        >
+          <span aria-hidden="true">↺</span> Réinitialiser les filtres
+        </button>
       </div>
 
       <div className="bg-white rounded-xl border border-[#E3E8EF] shadow-sm overflow-hidden">
@@ -68,28 +170,29 @@ function RemarquesInbox() {
         )}
         {loading ? (
           <p className="px-5 py-6 text-sm text-[#5B6778]">Chargement...</p>
-        ) : items.length === 0 ? (
-          <p className="px-5 py-8 text-center text-sm text-[#5B6778]">Aucune remarque reçue.</p>
+        ) : visible.length === 0 ? (
+          <div className="px-5 py-10 text-center">
+            <p className="text-sm text-[#5B6778]">Aucune remarque pour ces filtres.</p>
+            <p className="text-xs text-[#8A94A6] mt-1">
+              Modifiez ou réinitialisez les filtres pour afficher d'autres remarques.
+            </p>
+          </div>
         ) : (
           <ul className="divide-y divide-[#E3E8EF]">
-            {items.map((r) => {
+            {visible.map((r) => {
               const badge = STATE_BADGE[r.state] || STATE_BADGE.nouvelle;
               return (
                 <li key={r.id} className="px-5 py-4">
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold text-[#0B2A4A]">
-                        {r.context}
-                        {r.author && (
-                          <span className="ml-2 text-xs font-normal text-[#5B6778]">
-                            de {r.author}
-                          </span>
-                        )}
+                      <p className="text-xs text-[#5B6778]">
+                        {shortDate(r.createdAt)} · {r.author || '—'}{' '}
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full border border-[#E3E8EF] bg-[#F5F7FA] text-[11px] font-semibold text-[#5B6778] ml-1">
+                          {r.authorRole ? ROLE_LABELS[r.authorRole] || r.authorRole : '—'}
+                        </span>
                       </p>
+                      <p className="text-sm font-semibold text-[#0B2A4A] mt-1">{r.context}</p>
                       <p className="text-sm text-[#1A2433] mt-1 whitespace-pre-wrap">{r.text}</p>
-                      <p className="text-xs text-[#5B6778] mt-1.5">
-                        Reçue le {formatDateTime(r.createdAt)}
-                      </p>
                     </div>
                     <div className="flex items-center gap-3 shrink-0">
                       <span
@@ -102,6 +205,7 @@ function RemarquesInbox() {
                         value={r.state}
                         disabled={busyId === r.id}
                         onChange={(e) => changeEtat(r.id, e.target.value)}
+                        aria-label="État du traitement"
                       >
                         {STATE_OPTIONS.map(([v, l]) => (
                           <option key={v} value={v}>
@@ -115,6 +219,12 @@ function RemarquesInbox() {
               );
             })}
           </ul>
+        )}
+        {!loading && visible.length > 0 && (
+          <div className="px-5 py-3 border-t border-[#E3E8EF] text-xs text-[#5B6778]">
+            {hasFilters ? 'Filtres actifs · ' : ''}
+            Affichage de 1 à {visible.length} sur {items.length} entrées
+          </div>
         )}
       </div>
     </div>
@@ -157,9 +267,12 @@ export default function RemarquesPage() {
     return <RemarquesInbox />;
   }
 
+  // Pages de « Page concernée » = libellés du menu du rôle connecté (zip).
+  const pageOptions = (ROLE_MENUS[me && me.role] || []).map((m) => m.label);
+
   const submit = async () => {
     if (!context.trim() || !text.trim()) {
-      addToast('Le contexte et le message sont obligatoires.', 'error');
+      addToast('Ce champ est obligatoire.', 'error');
       return;
     }
     setBusy(true);
@@ -187,30 +300,43 @@ export default function RemarquesPage() {
       <div>
         <h1 className="text-[24px] font-semibold text-[#0B2A4A]">Remarques</h1>
         <p className="text-sm text-[#5B6778] mt-1">
-          Envoyez une remarque à l'équipe technique et suivez son état.
+          Signalez un problème ou une difficulté à l'équipe technique de l'application.
         </p>
       </div>
 
       {/* Envoi */}
-      <div className="bg-white rounded-xl border border-[#E3E8EF] shadow-sm p-6">
-        <h2 className="text-[16px] font-semibold text-[#0B2A4A] mb-4">Nouvelle remarque</h2>
+      <div className="bg-white rounded-xl border border-[#E3E8EF] shadow-card p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <span aria-hidden="true">✏️</span>
+          <h2 className="text-[16px] font-semibold text-[#0B2A4A]">Nouvelle remarque</h2>
+          <span className="ml-auto text-xs text-[#5B6778]">
+            {me ? `${me.structureLabel || ''} · ${ROLE_LABELS[me.role] || ''}` : ''}
+          </span>
+        </div>
         <div className="space-y-4">
           <div>
             <label className="block text-[13px] font-semibold text-[#0B2A4A] mb-1.5">
-              Contexte <span className="text-[#B42318]">*</span>
+              Page concernée <span className="text-[#B42318]">*</span>
             </label>
-            <input
-              type="text"
+            <select
               className={inputCls}
               value={context}
-              maxLength={200}
-              placeholder="Ex. : Module RA — Octobre 2026"
               onChange={(e) => setContext(e.target.value)}
-            />
+            >
+              <option value="">-- Sélectionner --</option>
+              {pageOptions.map((p) => (
+                <option key={p} value={p}>
+                  {p}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-[#8A94A6] mt-1">
+              Indiquez la page où se situe le problème.
+            </p>
           </div>
           <div>
             <label className="block text-[13px] font-semibold text-[#0B2A4A] mb-1.5">
-              Message <span className="text-[#B42318]">*</span>
+              Votre remarque <span className="text-[#B42318]">*</span>
             </label>
             <textarea
               className="w-full min-h-[100px] px-3 py-2 rounded-lg border border-[#D6DCE5] bg-white text-[15px] focus:outline-none focus:ring-2 focus:ring-[#1F5FA8]/30"
@@ -220,6 +346,9 @@ export default function RemarquesPage() {
               onChange={(e) => setText(e.target.value)}
             />
             <p className="text-xs text-[#5B6778] mt-1 text-right">{text.length} / 2000</p>
+          </div>
+          <div className="rounded-lg border border-[#B8D2EF] bg-[#EBF3FC] px-4 py-3 text-xs text-[#1F5FA8]">
+            Transmis directement à la cellule informatique DGBF.
           </div>
           <div className="flex justify-end">
             <button
@@ -235,8 +364,12 @@ export default function RemarquesPage() {
 
       {/* Liste */}
       <div className="bg-white rounded-xl border border-[#E3E8EF] shadow-sm overflow-hidden">
-        <div className="px-5 py-4 border-b border-[#E3E8EF]">
-          <h2 className="text-[16px] font-semibold text-[#0B2A4A]">Mes remarques</h2>
+        <div className="px-5 py-4 border-b border-[#E3E8EF] flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-[16px] font-semibold text-[#0B2A4A]">Mes remarques envoyées</h2>
+          <span className="text-sm text-[#5B6778]">
+            <span className="font-semibold text-[#0B2A4A]">{items.length}</span>{' '}
+            {items.length > 1 ? 'enregistrements' : 'enregistrement'}
+          </span>
         </div>
         {error && (
           <div className="px-5 py-3 text-sm text-[#B42318] bg-[#FEF3F2]">{error}</div>
@@ -254,17 +387,15 @@ export default function RemarquesPage() {
               return (
                 <li key={r.id} className="px-5 py-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className="text-sm font-semibold text-[#0B2A4A]">{r.context}</p>
+                    <p className="text-xs text-[#5B6778]">{shortDate(r.createdAt)}</p>
                     <span
                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full border text-xs font-semibold ${badge.cls}`}
                     >
                       {badge.label}
                     </span>
                   </div>
+                  <p className="text-sm font-semibold text-[#0B2A4A] mt-1">{r.context}</p>
                   <p className="text-sm text-[#1A2433] mt-1 whitespace-pre-wrap">{r.text}</p>
-                  <p className="text-xs text-[#5B6778] mt-1.5">
-                    Envoyée le {formatDateTime(r.createdAt)}
-                  </p>
                 </li>
               );
             })}

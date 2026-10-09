@@ -9,8 +9,11 @@ export default function AccessDenied() {
         </div>
         <h1 className="text-[24px] font-semibold text-[#0B2A4A] mb-2">Accès refusé</h1>
         <p className="text-[15px] text-[#5B6778] leading-relaxed">
-          Vous n'avez pas les droits nécessaires pour consulter cette page.
-          Si vous pensez qu'il s'agit d'une erreur, contactez votre administrateur.
+          Vous n'avez pas l'autorisation d'accéder à cette page.
+        </p>
+        <p className="text-[15px] text-[#5B6778] leading-relaxed mt-2">
+          Cette page n'est pas disponible pour votre profil. Si vous pensez qu'il s'agit d'une
+          erreur, contactez votre administrateur.
         </p>
         <a
           href="/"

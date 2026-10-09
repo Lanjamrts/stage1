@@ -32,6 +32,7 @@ function serialize(r) {
     author: o.authorId && typeof o.authorId === 'object'
       ? `${o.authorId.prenom} ${o.authorId.nom}`
       : null,
+    authorRole: o.authorId && typeof o.authorId === 'object' ? o.authorId.role : null,
     createdAt: o.createdAt,
     updatedAt: o.updatedAt,
   };

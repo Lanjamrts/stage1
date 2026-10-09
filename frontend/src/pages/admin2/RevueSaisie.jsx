@@ -29,9 +29,11 @@ function RejectModal({ isOpen, busy, onCancel, onConfirm }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
       <div className="absolute inset-0 bg-[#0B2A4A]/40" onClick={busy ? undefined : onCancel} />
       <div className="relative w-full max-w-[480px] bg-white rounded-xl border border-[#E3E8EF] shadow-card p-6">
-        <h2 className="text-[18px] font-semibold text-[#0B2A4A] mb-2">Rejeter la saisie</h2>
+        <h2 className="text-[18px] font-semibold text-[#0B2A4A] mb-2 flex items-center gap-2">
+          <span aria-hidden="true">⚠</span> Rejeter ce rapport ?
+        </h2>
         <p className="text-sm text-[#5B6778] mb-4">
-          Le motif est obligatoire : il sera affiché au client pour corriger la saisie.
+          Indiquez le motif du rejet. Il sera visible du service qui a saisi le rapport.
         </p>
         <label className="block text-[13px] font-semibold text-[#0B2A4A] mb-1.5">
           Motif du rejet <span className="text-[#B42318]">*</span>
@@ -112,7 +114,7 @@ export default function RevueSaisie() {
     try {
       if (action === 'valider') {
         await api(`/saisies/${id}/valider`, { method: 'POST' });
-        addToast('Saisie validée avec succès.', 'success');
+        addToast('Validation enregistrée.', 'success');
       } else if (action === 'exporter') {
         await api(`/saisies/${id}/exporter`, { method: 'POST' });
         addToast('Saisie exportée vers la base centrale.', 'success');
@@ -153,56 +155,54 @@ export default function RevueSaisie() {
     ? `Événement du ${formatDate(saisie.eventDate)}`
     : '—';
   const lastRejet = [...(saisie.validations || [])].reverse().find((v) => v.decision === 'rejetee');
+  const lastValide = [...(saisie.validations || [])].reverse().find((v) => v.decision === 'validee');
+  const region = (saisie.structureLabel || '').split(' – ').slice(-1)[0] || '—';
 
   return (
     <div className="space-y-6">
       {/* En-tête */}
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <Link to="/donnees-saisies" className="text-sm text-[#1F5FA8] hover:underline">
-            ← Données saisies
+          <Link to="/donnees-saisies" className="text-sm text-[#1F5FA8] hover:underline inline-flex items-center gap-1">
+            <span aria-hidden="true">←</span> Retour aux données saisies
           </Link>
           <h1 className="text-[24px] font-semibold text-[#0B2A4A] mt-1">
             {saisie.moduleCode} — {saisie.moduleLabel}
           </h1>
           <p className="text-sm text-[#5B6778] mt-1">
-            {saisie.structureLabel || '—'} · {periodLabel} · Soumise par {saisie.authorLabel || '—'}{' '}
-            le {formatDateTime(saisie.dates && saisie.dates.submitted)}
+            {periodLabel}
+            {saisie.structureLabel ? ` · ${saisie.structureLabel}` : ''}
           </p>
         </div>
         <div className="flex items-center gap-3">
           <StatusBadge status={saisie.status} />
-          {saisie.status === 'soumise' && (
-            <>
-              <button
-                onClick={() => setConfirm('valider')}
-                className="h-[40px] px-5 rounded-lg bg-[#1E7B4F] hover:bg-[#186641] text-white text-sm font-semibold"
-              >
-                Valider
-              </button>
-              <button
-                onClick={() => setRejectOpen(true)}
-                className="h-[40px] px-5 rounded-lg bg-[#B42318] hover:bg-[#9B1E14] text-white text-sm font-semibold"
-              >
-                Rejeter
-              </button>
-            </>
-          )}
-          {saisie.status === 'validee' && (
-            <button
-              onClick={() => setConfirm('exporter')}
-              className="h-[40px] px-5 rounded-lg bg-[#1F5FA8] hover:bg-[#174C87] text-white text-sm font-semibold"
-            >
-              Exporter vers la base
-            </button>
-          )}
         </div>
       </div>
 
       {/* Bandeaux d'état */}
+      {saisie.status === 'soumise' && (
+        <div className="rounded-lg border border-[#B8D2EF] bg-[#EBF3FC] px-4 py-3 text-sm text-[#1F5FA8]">
+          Ce rapport est en lecture seule. Vous pouvez le valider ou le rejeter.
+        </div>
+      )}
+      {saisie.status === 'validee' && lastValide && (
+        <div className="rounded-lg border border-[#B7E3C8] bg-[#EBF7EE] px-4 py-3 text-sm text-[#1E7B4F]">
+          <p className="font-semibold">Rapport validé.</p>
+          <p>
+            Validé le {formatDateTime(lastValide.date)}. Il peut maintenant être exporté vers la
+            base.
+          </p>
+        </div>
+      )}
       {saisie.status === 'rejetee' && lastRejet && (
         <div className="rounded-lg border border-[#F6C7C3] bg-[#FEF3F2] px-4 py-3 text-sm text-[#B42318]">
-          Rejetée{lastRejet.actor ? ` par ${lastRejet.actor}` : ''} : {lastRejet.motif}
+          <p className="font-semibold">Rapport rejeté.</p>
+          <p className="font-semibold mt-1">Motif du rejet</p>
+          <p>{lastRejet.motif}</p>
+          <p className="text-xs mt-1 text-[#5B6778]">
+            Rejeté par {lastRejet.actor || 'administrateur régional'} le{' '}
+            {formatDateTime(lastRejet.date)}
+          </p>
         </div>
       )}
       {saisie.status === 'exportee' && (
@@ -215,20 +215,33 @@ export default function RevueSaisie() {
           Cette saisie est archivée (lecture seule).
         </div>
       )}
-      {saisie.status === 'soumise' && (
-        <div className="rounded-lg border border-[#B8D2EF] bg-[#EBF3FC] px-4 py-3 text-sm text-[#1F5FA8]">
-          Saisie soumise : examinez le contenu puis validez ou rejetez avec un motif.
-        </div>
-      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Contenu en lecture seule */}
         <div className="lg:col-span-2">
           <div className="bg-white rounded-xl border border-[#E3E8EF] shadow-sm p-6">
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-[16px] font-semibold text-[#0B2A4A]">Contenu de la saisie</h2>
+              <h2 className="text-[16px] font-semibold text-[#0B2A4A]">Contenu du rapport</h2>
               <span className="text-xs text-[#5B6778]">Lecture seule</span>
             </div>
+            <dl className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5 rounded-lg border border-[#E3E8EF] bg-[#F5F7FA] px-4 py-3 text-sm">
+              <div>
+                <dt className="text-[12px] font-semibold text-[#5B6778]">Région</dt>
+                <dd className="text-[#1A2433] font-medium">{region}</dd>
+              </div>
+              <div>
+                <dt className="text-[12px] font-semibold text-[#5B6778]">Structure</dt>
+                <dd className="text-[#1A2433] font-medium">{saisie.structureLabel || '—'}</dd>
+              </div>
+              <div>
+                <dt className="text-[12px] font-semibold text-[#5B6778]">Rédacteur</dt>
+                <dd className="text-[#1A2433] font-medium">{saisie.authorLabel || '—'}</dd>
+              </div>
+              <div>
+                <dt className="text-[12px] font-semibold text-[#5B6778]">Période</dt>
+                <dd className="text-[#1A2433] font-medium">{periodLabel}</dd>
+              </div>
+            </dl>
             <DynamicForm
               fields={(saisie.module && saisie.module.fields) || []}
               values={saisie.values || {}}
@@ -244,9 +257,65 @@ export default function RevueSaisie() {
           </div>
         </div>
 
+        <div className="space-y-6">
+        {/* Décision */}
+        <div className="bg-white rounded-xl border border-[#E3E8EF] shadow-sm p-6 h-fit">
+          <h2 className="text-[16px] font-semibold text-[#0B2A4A] mb-4">Décision</h2>
+          <p className="text-[13px] font-semibold text-[#5B6778]">
+            {saisie.status === 'soumise' ? 'Statut actuel' : 'Statut'}
+          </p>
+          <div className="mt-1 mb-4">
+            <StatusBadge status={saisie.status} />
+          </div>
+          {saisie.status === 'soumise' && saisie.dates && saisie.dates.submitted && (
+            <p className="text-sm text-[#5B6778] mb-4">
+              Soumise par {saisie.authorLabel || '—'} le{' '}
+              {formatDateTime(saisie.dates.submitted)}
+            </p>
+          )}
+          {saisie.status === 'validee' && lastValide && (
+            <p className="text-sm text-[#5B6778] mb-4">
+              Validé par {lastValide.actor || '—'} le {formatDateTime(lastValide.date)}
+            </p>
+          )}
+          {saisie.status === 'soumise' && (
+            <div className="space-y-3">
+              <button
+                onClick={() => setConfirm('valider')}
+                className="w-full h-[40px] rounded-lg bg-[#1E7B4F] hover:bg-[#186641] text-white text-sm font-semibold inline-flex items-center justify-center gap-2"
+              >
+                <span aria-hidden="true">✓</span> Valider
+              </button>
+              <button
+                onClick={() => setRejectOpen(true)}
+                className="w-full h-[40px] rounded-lg bg-[#B42318] hover:bg-[#9B1E14] text-white text-sm font-semibold inline-flex items-center justify-center gap-2"
+              >
+                <span aria-hidden="true">✕</span> Rejeter
+              </button>
+              <p className="text-xs text-[#5B6778]">
+                En cas de rejet, un motif est obligatoire. Il sera visible du service qui a saisi
+                le rapport.
+              </p>
+            </div>
+          )}
+          {saisie.status === 'validee' && (
+            <button
+              onClick={() => setConfirm('exporter')}
+              className="w-full h-[40px] rounded-lg bg-[#1F5FA8] hover:bg-[#174C87] text-white text-sm font-semibold inline-flex items-center justify-center gap-2"
+            >
+              <span aria-hidden="true">⬆</span> Exporter vers la base
+            </button>
+          )}
+        </div>
+
         {/* Historique */}
         <div className="bg-white rounded-xl border border-[#E3E8EF] shadow-sm p-6 h-fit">
-          <h2 className="text-[16px] font-semibold text-[#0B2A4A] mb-4">Historique des étapes</h2>
+          <div className="flex items-center gap-2 mb-4">
+            <h2 className="text-[16px] font-semibold text-[#0B2A4A]">Historique des étapes</h2>
+            <span className="inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full bg-[#EBF3FC] text-[12px] font-semibold text-[#1F5FA8]">
+              {steps.length}
+            </span>
+          </div>
           <ol className="space-y-4">
             {steps.map((step, i) => {
               const style = STEP_STYLES[step.decision] || STEP_STYLES.creee;
@@ -271,13 +340,14 @@ export default function RevueSaisie() {
             })}
           </ol>
         </div>
+        </div>
       </div>
 
       <ConfirmModal
         isOpen={confirm === 'valider'}
-        title="Valider cette saisie ?"
-        message="La saisie passera au statut « Validée » et pourra ensuite être exportée vers la base centrale."
-        confirmLabel="Valider"
+        title="Valider ce rapport ?"
+        message="Le rapport sera marqué comme validé. Vous pourrez ensuite l'exporter vers la base."
+        confirmLabel="Confirmer la validation"
         busy={busy}
         onCancel={() => setConfirm(null)}
         onConfirm={() => runAction('valider')}
@@ -300,7 +370,7 @@ export default function RevueSaisie() {
             setBusy(true);
             try {
               await api(`/saisies/${id}/rejeter`, { method: 'POST', body: { motif } });
-              addToast('Saisie rejetée.', 'success');
+              addToast('Rejet enregistré.', 'success');
               setRejectOpen(false);
               await load();
             } catch (err) {

@@ -55,7 +55,7 @@ export default function DynamicForm({
             disabled={disabled}
             onChange={(e) => setValue(f.key, e.target.value)}
           >
-            <option value="">— Choisir —</option>
+            <option value="">-- Sélectionner --</option>
             {opts.map((o) => (
               <option key={o} value={o}>
                 {o}
@@ -229,7 +229,7 @@ export default function DynamicForm({
                             disabled={disabled}
                             onChange={(e) => setRow(i, s.key, e.target.value)}
                           >
-                            <option value="">— Choisir —</option>
+                            <option value="">-- Sélectionner --</option>
                             {(s.options || []).map((o) => (
                               <option key={o} value={o}>
                                 {o}

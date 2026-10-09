@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { api } from '../../api.js';
+import { api, formatDate, formatTime } from '../../api.js';
 
 // Tableau de bord Admin 1 (SPEC §4) : taux par région, retards,
 // taux de rejet, structures en retard. Aucun bouton d'action.
@@ -11,6 +11,7 @@ export default function Admin1Dashboard({ readOnly = false }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({ module: '', periode: '' });
+  const [updatedAt, setUpdatedAt] = useState(null);
 
   useEffect(() => {
     api('/modules').then(setModules).catch(() => setModules([]));
@@ -29,6 +30,7 @@ export default function Admin1Dashboard({ readOnly = false }) {
         if (!cancelled) {
           setData(d);
           setError(null);
+          setUpdatedAt(new Date().toISOString());
         }
       })
       .catch((err) => {
@@ -45,16 +47,35 @@ export default function Admin1Dashboard({ readOnly = false }) {
   const setFilter = (key, value) => setFilters((f) => ({ ...f, [key]: value }));
 
   const totals = data && data.totals;
+  const rejetCount = totals
+    ? Math.round((totals.tauxRejet / 100) * (totals.soumises || 0))
+    : 0;
   const cards = totals
     ? [
-        { label: 'Taux de soumission', value: `${totals.tauxSoumission} %`, color: 'text-[#1F5FA8]' },
         {
-          label: 'Soumises reçues',
-          value: `${totals.soumises} / ${totals.attendues}`,
+          label: 'Taux de soumission',
+          value: `${totals.tauxSoumission} %`,
+          sub: `${totals.soumises} soumissions reçues sur ${totals.attendues} attendues`,
+          color: 'text-[#1F5FA8]',
+        },
+        {
+          label: 'Soumissions reçues',
+          value: `${totals.soumises}`,
+          sub: `sur les ${totals.attendues} attendues`,
           color: 'text-[#0B2A4A]',
         },
-        { label: 'En retard', value: totals.enRetard, color: 'text-[#B7791F]' },
-        { label: 'Taux de rejet', value: `${totals.tauxRejet} %`, color: 'text-[#B42318]' },
+        {
+          label: 'En retard',
+          value: totals.enRetard,
+          sub: 'échéance dépassée, rien reçu',
+          color: 'text-[#B7791F]',
+        },
+        {
+          label: 'Taux de rejet',
+          value: `${totals.tauxRejet} %`,
+          sub: `${rejetCount} rejetée${rejetCount > 1 ? 's' : ''} sur ${totals.soumises} soumises`,
+          color: 'text-[#B42318]',
+        },
       ]
     : [];
 
@@ -69,9 +90,12 @@ export default function Admin1Dashboard({ readOnly = false }) {
             </span>
           )}
         </h1>
-        <p className="text-sm text-[#5B6778] mt-1">
-          Taux de soumission, retards et taux de rejet par région.
-        </p>
+        <p className="text-sm text-[#5B6778] mt-1">Suivi des soumissions par région.</p>
+        {updatedAt && (
+          <p className="text-xs text-[#8A94A6] mt-0.5">
+            Mise à jour le {formatDate(updatedAt)} à {formatTime(updatedAt)}
+          </p>
+        )}
       </div>
 
       {/* Filtres */}
@@ -105,7 +129,7 @@ export default function Admin1Dashboard({ readOnly = false }) {
             onClick={() => setFilters({ module: '', periode: '' })}
             className="h-[40px] px-4 rounded-lg border border-[#E3E8EF] text-sm font-medium hover:bg-[#F5F7FA]"
           >
-            Réinitialiser
+            <span aria-hidden="true">↺</span> Réinitialiser les filtres
           </button>
         )}
       </div>
@@ -129,6 +153,7 @@ export default function Admin1Dashboard({ readOnly = false }) {
               >
                 <p className="text-[13px] font-semibold text-[#5B6778]">{c.label}</p>
                 <p className={`text-[28px] font-semibold mt-1 ${c.color}`}>{c.value}</p>
+                <p className="text-xs text-[#8A94A6] mt-1">{c.sub}</p>
               </div>
             ))}
           </div>
@@ -136,14 +161,16 @@ export default function Admin1Dashboard({ readOnly = false }) {
           {/* Taux par région */}
           <div className="bg-white rounded-xl border border-[#E3E8EF] shadow-sm overflow-hidden">
             <div className="px-5 py-4 border-b border-[#E3E8EF]">
-              <h2 className="text-[16px] font-semibold text-[#0B2A4A]">Taux par région</h2>
+              <h2 className="text-[16px] font-semibold text-[#0B2A4A]">Détail par région</h2>
+              <p className="text-xs text-[#5B6778] mt-1">
+                Taux de soumission et de rejet, avec les structures en retard.
+              </p>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-[#F5F7FA] text-left">
                     <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Région</th>
-                    <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Structures</th>
                     <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Attendues</th>
                     <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Soumises</th>
                     <th className="px-5 py-3 font-semibold text-[#0B2A4A]">En retard</th>
@@ -164,7 +191,6 @@ export default function Admin1Dashboard({ readOnly = false }) {
                   {data.regions.map((r) => (
                     <tr key={r.region} className="border-t border-[#E3E8EF]">
                       <td className="px-5 py-3 text-[#1A2433] font-medium">{r.region}</td>
-                      <td className="px-5 py-3 text-[#5B6778]">{r.structures}</td>
                       <td className="px-5 py-3 text-[#1A2433]">{r.attendues}</td>
                       <td className="px-5 py-3 text-[#1A2433]">{r.soumises}</td>
                       <td className="px-5 py-3">
@@ -191,6 +217,9 @@ export default function Admin1Dashboard({ readOnly = false }) {
           <div className="bg-white rounded-xl border border-[#E3E8EF] shadow-sm overflow-hidden">
             <div className="px-5 py-4 border-b border-[#E3E8EF]">
               <h2 className="text-[16px] font-semibold text-[#0B2A4A]">Structures en retard</h2>
+              <p className="text-xs text-[#5B6778] mt-1">
+                Structures n'ayant pas transmis leurs données à l'échéance fixée.
+              </p>
             </div>
             {data.structuresEnRetard.length === 0 ? (
               <p className="px-5 py-8 text-center text-sm text-[#5B6778]">
@@ -202,25 +231,46 @@ export default function Admin1Dashboard({ readOnly = false }) {
                   <tr className="bg-[#F5F7FA] text-left">
                     <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Structure</th>
                     <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Région</th>
-                    <th className="px-5 py-3 font-semibold text-[#0B2A4A]">
-                      Saisies en retard
-                    </th>
+                    <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Module</th>
+                    <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Échéance</th>
+                    <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Retard</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {data.structuresEnRetard.map((s) => (
-                    <tr key={s.structure} className="border-t border-[#E3E8EF]">
-                      <td className="px-5 py-3 text-[#1A2433]">{s.structure}</td>
-                      <td className="px-5 py-3 text-[#5B6778]">{s.region || '—'}</td>
-                      <td className="px-5 py-3 font-semibold text-[#B7791F]">{s.nb}</td>
-                    </tr>
-                  ))}
+                  {data.structuresEnRetard.flatMap((s) =>
+                    (s.items && s.items.length > 0
+                      ? s.items
+                      : [{ module: '—', echeance: null, retardJours: null }]
+                    ).map((item, idx) => (
+                      <tr
+                        key={`${s.structure}-${idx}`}
+                        className="border-t border-[#E3E8EF]"
+                      >
+                        <td className="px-5 py-3 text-[#1A2433]">{s.structure}</td>
+                        <td className="px-5 py-3 text-[#5B6778]">{s.region || '—'}</td>
+                        <td className="px-5 py-3 text-[#1A2433]">{item.module}</td>
+                        <td className="px-5 py-3 text-[#5B6778]">
+                          {item.echeance
+                            ? new Date(item.echeance).toLocaleDateString('fr-FR')
+                            : '—'}
+                        </td>
+                        <td className="px-5 py-3 font-semibold text-[#B7791F]">
+                          {item.retardJours != null ? `${item.retardJours} jour${item.retardJours > 1 ? 's' : ''}` : s.nb}
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             )}
           </div>
         </>
       )}
+
+      <div className="rounded-lg border border-[#B8D2EF] bg-[#EBF3FC] px-4 py-3 text-sm text-[#1F5FA8]">
+        Ce tableau de bord compte les soumissions par statut. Le contenu d'un rapport n'est
+        consultable qu'après son export vers la base.
+      </div>
     </div>
   );
 }

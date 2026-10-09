@@ -63,10 +63,12 @@ export async function listAudit(req, res) {
 
   const rows = await JournalAudit.find(filter).sort({ createdAt: -1 }).limit(500).lean();
 
-  // Libellé de l'utilisateur (ObjectId ou IM brut sinon).
-  const allUsers = await Utilisateur.find({}).select('im nom prenom').lean();
-  const labelById = new Map(allUsers.map((u) => [String(u._id), `${u.prenom} ${u.nom} (${u.im})`]));
-  const labelByIm = new Map(allUsers.map((u) => [u.im, `${u.prenom} ${u.nom} (${u.im})`]));
+  // Libellé de l'utilisateur (ObjectId ou IM brut sinon) + profil.
+  const allUsers = await Utilisateur.find({}).select('im nom prenom role').lean();
+  const labelById = new Map(allUsers.map((u) => [String(u._id), `${u.prenom} ${u.nom}`]));
+  const labelByIm = new Map(allUsers.map((u) => [u.im, `${u.prenom} ${u.nom}`]));
+  const roleById = new Map(allUsers.map((u) => [String(u._id), u.role]));
+  const roleByIm = new Map(allUsers.map((u) => [u.im, u.role]));
 
   return res.status(200).json(
     rows.map((r) => ({
@@ -74,7 +76,11 @@ export async function listAudit(req, res) {
       date: r.createdAt,
       action: r.action,
       userId: r.userId,
-      userLabel: labelById.get(r.userId) || labelByIm.get(r.userId) || r.userId,
+      userLabel:
+        labelById.get(r.userId) ||
+        labelByIm.get(r.userId) ||
+        (r.userId ? `Inconnu (IM ${r.userId})` : '–'),
+      userRole: roleById.get(r.userId) || roleByIm.get(r.userId) || null,
       object: r.object,
       ip: r.ip,
     }))

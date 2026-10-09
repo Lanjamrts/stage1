@@ -116,12 +116,12 @@ export default function Utilisateurs() {
         const res = await api('/users', { method: 'POST', body: form });
         setDrawer(null);
         setPasswordModal({
-          title: 'Utilisateur créé',
+          mode: 'create',
+          name: `${form.prenom} ${form.nom}`,
+          im: form.im,
           password: res.provisionalPassword,
-          intro:
-            'Utilisateur créé. Voici le mot de passe provisoire — il ne sera plus jamais affiché :',
         });
-        addToast('Utilisateur créé.', 'success');
+        addToast('Compte créé.', 'success');
       } else {
         const { im, ...profile } = form;
         await api(`/users/${drawer.user.id}/profil`, { method: 'PATCH', body: profile });
@@ -149,10 +149,10 @@ export default function Utilisateurs() {
         const res = await api(`/users/${confirm.user.id}/reinitialiser-mdp`, { method: 'POST' });
         setConfirm(null);
         setPasswordModal({
-          title: 'Mot de passe réinitialisé',
+          mode: 'reset',
+          name: `${confirm.user.prenom} ${confirm.user.nom}`,
+          im: confirm.user.im,
           password: res.provisionalPassword,
-          intro:
-            'Nouveau mot de passe provisoire — il ne sera plus jamais affiché :',
         });
         addToast('Mot de passe réinitialisé.', 'success');
       }
@@ -172,7 +172,7 @@ export default function Utilisateurs() {
         <div>
           <h1 className="text-[24px] font-semibold text-[#0B2A4A]">Utilisateurs</h1>
           <p className="text-sm text-[#5B6778] mt-1">
-            Créer, modifier, désactiver des comptes et réinitialiser les mots de passe.
+            Gérez les comptes des agents autorisés à utiliser SIGBD.
           </p>
         </div>
         <button
@@ -182,6 +182,15 @@ export default function Utilisateurs() {
           Ajouter un utilisateur
         </button>
       </div>
+      <div className="flex flex-wrap items-center gap-3 text-sm text-[#5B6778]">
+        <span>
+          <span className="font-semibold text-[#0B2A4A]">{users.length}</span>{' '}
+          {users.length > 1 ? 'utilisateurs' : 'utilisateur'}
+        </span>
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-[#E3E8EF] bg-[#F5F7FA] px-2.5 py-0.5 text-xs font-semibold text-[#5B6778]">
+          Base mise à jour en temps réel
+        </span>
+      </div>
 
       {/* Filtres */}
       <div className="flex flex-wrap gap-3">
@@ -190,7 +199,7 @@ export default function Utilisateurs() {
           value={filters.role}
           onChange={(e) => setFilter('role', e.target.value)}
         >
-          <option value="">Tous les rôles</option>
+          <option value="">Tous les profils</option>
           {ROLES.map((r) => (
             <option key={r} value={r}>
               {ROLE_LABELS[r]}
@@ -209,7 +218,7 @@ export default function Utilisateurs() {
         <input
           type="search"
           className="h-[40px] px-3 rounded-lg border border-[#D6DCE5] bg-white text-sm min-w-[220px]"
-          placeholder="Rechercher (IM, nom, prénom)"
+          placeholder="Rechercher par nom, IM, direction..."
           value={filters.q}
           onChange={(e) => setFilter('q', e.target.value)}
         />
@@ -218,7 +227,7 @@ export default function Utilisateurs() {
             onClick={() => applyFilters({ role: '', status: '', q: '' })}
             className="h-[40px] px-4 rounded-lg border border-[#E3E8EF] text-sm font-medium hover:bg-[#F5F7FA]"
           >
-            Réinitialiser
+            <span aria-hidden="true">↺</span> Réinitialiser les filtres
           </button>
         )}
       </div>
@@ -238,7 +247,9 @@ export default function Utilisateurs() {
                 <th className="px-5 py-3 font-semibold text-[#0B2A4A]">IM</th>
                 <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Nom</th>
                 <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Prénom</th>
-                <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Rôle</th>
+                <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Direction</th>
+                <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Service</th>
+                <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Profil</th>
                 <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Structure</th>
                 <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Statut</th>
                 <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Actions</th>
@@ -247,14 +258,14 @@ export default function Utilisateurs() {
             <tbody>
               {loading && (
                 <tr>
-                  <td colSpan={7} className="px-5 py-8 text-center text-[#5B6778]">
+                  <td colSpan={9} className="px-5 py-8 text-center text-[#5B6778]">
                     Chargement...
                   </td>
                 </tr>
               )}
               {!loading && users.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-5 py-10 text-center text-[#5B6778]">
+                  <td colSpan={9} className="px-5 py-10 text-center text-[#5B6778]">
                     Aucun utilisateur ne correspond à ces filtres.
                   </td>
                 </tr>
@@ -265,6 +276,8 @@ export default function Utilisateurs() {
                     <td className="px-5 py-3 font-mono text-[#0B2A4A]">{u.im}</td>
                     <td className="px-5 py-3 text-[#1A2433]">{u.nom}</td>
                     <td className="px-5 py-3 text-[#1A2433]">{u.prenom}</td>
+                    <td className="px-5 py-3 text-[#5B6778]">{u.direction || '—'}</td>
+                    <td className="px-5 py-3 text-[#5B6778]">{u.service || '—'}</td>
                     <td className="px-5 py-3">
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full border text-xs font-semibold ${
@@ -292,7 +305,7 @@ export default function Utilisateurs() {
                           onClick={() => openEdit(u)}
                           className="h-[30px] px-3 rounded-lg border border-[#D6DCE5] text-xs font-semibold text-[#1F5FA8] hover:bg-[#EBF3FC]"
                         >
-                          Modifier
+                          Modifier le profil
                         </button>
                         {u.status === 'actif' && (
                           <button
@@ -439,7 +452,7 @@ export default function Utilisateurs() {
                 value={form.structureId}
                 onChange={(e) => setField('structureId', e.target.value)}
               >
-                <option value="">— Choisir une structure —</option>
+                <option value="">-- Sélectionner --</option>
                 {structures.map((s) => (
                   <option key={s.id} value={s.id}>
                     {s.label}
@@ -463,9 +476,9 @@ export default function Utilisateurs() {
         message={
           confirm &&
           confirm.type === 'desactiver' &&
-          `${confirm.user.prenom} ${confirm.user.nom} (${confirm.user.im}) ne pourra plus se connecter.`
+          `${confirm.user.prenom} ${confirm.user.nom} (IM ${confirm.user.im}) ne pourra plus se connecter à SIGBD. Ses saisies et son historique sont conservés.`
         }
-        confirmLabel="Désactiver"
+        confirmLabel="Désactiver le compte"
         danger
         busy={busy}
         onConfirm={runConfirm}
@@ -490,15 +503,42 @@ export default function Utilisateurs() {
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
           <div className="absolute inset-0 bg-[#0B2A4A]/40" />
           <div className="relative w-full max-w-[440px] bg-white rounded-xl border border-[#E3E8EF] shadow-card p-6">
-            <h2 className="text-[18px] font-semibold text-[#0B2A4A] mb-2">
-              {passwordModal.title}
-            </h2>
-            <p className="text-[15px] text-[#5B6778] leading-relaxed">{passwordModal.intro}</p>
-            <p className="mt-4 px-4 py-3 rounded-lg border border-[#B8D2EF] bg-[#EBF3FC] text-center font-mono text-[20px] font-semibold text-[#0B2A4A] select-all">
-              {passwordModal.password}
+            <div className="flex items-center gap-2 mb-3 text-[#1E7B4F]">
+              <span aria-hidden="true">✓</span>
+              <h2 className="text-[18px] font-semibold text-[#0B2A4A]">
+                {passwordModal.mode === 'create' ? 'Compte créé' : 'Mot de passe réinitialisé'}
+              </h2>
+            </div>
+            <p className="text-[15px] text-[#5B6778] leading-relaxed">
+              {passwordModal.mode === 'create' ? (
+                <>
+                  Le compte de <span className="font-semibold text-[#0B2A4A]">{passwordModal.name}</span>{' '}
+                  (IM {passwordModal.im}) est prêt.
+                </>
+              ) : (
+                <>
+                  Nouveau mot de passe provisoire pour{' '}
+                  <span className="font-semibold text-[#0B2A4A]">{passwordModal.name}</span> (IM{' '}
+                  {passwordModal.im}).
+                </>
+              )}
             </p>
+            <p className="mt-4 text-[13px] font-semibold text-[#0B2A4A]">Mot de passe provisoire</p>
+            <div className="mt-1 flex items-center gap-2">
+              <p className="flex-1 px-4 py-3 rounded-lg border border-[#B8D2EF] bg-[#EBF3FC] text-center font-mono text-[20px] font-semibold text-[#0B2A4A] select-all">
+                {passwordModal.password}
+              </p>
+              <button
+                type="button"
+                onClick={() => navigator.clipboard && navigator.clipboard.writeText(passwordModal.password)}
+                className="h-[44px] px-3 rounded-lg border border-[#D6DCE5] text-sm font-semibold text-[#1F5FA8] hover:bg-[#F5F7FA]"
+              >
+                Copier
+              </button>
+            </div>
             <p className="mt-3 text-xs text-[#B7791F]">
-              Notez-le maintenant : il ne sera plus jamais affiché.
+              Ce mot de passe ne sera plus affiché. Remettez-le à l'agent en main propre ou par un
+              canal sûr. Il devra le remplacer à sa première connexion.
             </p>
             <div className="flex justify-end mt-6">
               <button
@@ -506,7 +546,7 @@ export default function Utilisateurs() {
                 onClick={() => setPasswordModal(null)}
                 className="h-[40px] px-5 rounded-lg bg-[#1F5FA8] hover:bg-[#174C87] text-white text-sm font-semibold"
               >
-                J'ai noté le mot de passe
+                Terminer
               </button>
             </div>
           </div>

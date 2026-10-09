@@ -8,19 +8,7 @@ const periodCell = (s) => {
   return '—';
 };
 
-// Libellés lisibles des types de structure (cases « types »).
-const TYPE_LABELS = {
-  SRB: 'SRB',
-  SRSP: 'SRSP',
-  SRPE: 'SRPE',
-  CIRBF: 'CIRBF',
-  DRBF: 'DRBF',
-  SSEBF: 'SSEBF',
-  DGBF: 'DGBF',
-  CELLULE_INFO: 'Cellule informatique',
-};
-
-// « Collecte et téléchargement » (SPEC §4) : cases régions et types ->
+// « Collecte et téléchargement » (SPEC §4) : cases régions et modules ->
 // résultats -> téléchargement ; onglet « Historique des soumissions ».
 // Aucun bouton valider / rejeter.
 export default function CollectePage() {
@@ -31,29 +19,28 @@ export default function CollectePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [regions, setRegions] = useState([]); // noms cochés
-  const [types, setTypes] = useState([]); // codes cochés
+  const [selectedModules, setSelectedModules] = useState([]); // ids cochés
+  const [allModules, setAllModules] = useState([]);
 
   const allRegions = useMemo(
     () => [...new Set(items.map((i) => i.region).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'fr')),
     [items]
   );
-  const allTypes = useMemo(
-    () => [...new Set(items.map((i) => i.type))].sort((a, b) => a.localeCompare(b)),
-    [items]
-  );
-
   useEffect(() => {
     api('/referentiels/structures?full=1')
       .then((d) => setItems(d.items || []))
       .catch(() => setItems([]));
+    api('/modules')
+      .then((m) => setAllModules(m || []))
+      .catch(() => setAllModules([]));
   }, []);
 
   const qs = useMemo(() => {
     const p = new URLSearchParams();
     if (regions.length) p.set('regions', regions.join(','));
-    if (types.length) p.set('types', types.join(','));
+    if (selectedModules.length) p.set('modules', selectedModules.join(','));
     return p.toString();
-  }, [regions, types]);
+  }, [regions, selectedModules]);
 
   useEffect(() => {
     let cancelled = false;
@@ -84,17 +71,25 @@ export default function CollectePage() {
   const exportHref = (format) => {
     const p = new URLSearchParams({ format });
     if (regions.length) p.set('regions', regions.join(','));
-    if (types.length) p.set('types', types.join(','));
+    if (selectedModules.length) p.set('modules', selectedModules.join(','));
     return `/api/collecte/export?${p.toString()}`;
   };
 
-  const hasFilters = regions.length > 0 || types.length > 0;
+  const hasFilters = regions.length > 0 || selectedModules.length > 0;
+  const regionOf = (s) => (s.structureLabel || '').split(' – ').slice(-1)[0] || '—';
   const boxCls =
     'bg-white rounded-xl border border-[#E3E8EF] shadow-sm p-5';
   const labelCls = 'flex items-center gap-2 text-sm text-[#1A2433] py-1 cursor-pointer';
 
   const renderResults = (list, colSpan) => (
     <div className="overflow-x-auto">
+      <div className="px-5 py-4 border-b border-[#E3E8EF] flex items-center justify-between gap-3">
+        <h2 className="text-[16px] font-semibold text-[#0B2A4A]">Données exportées</h2>
+        <p className="text-sm text-[#5B6778]">
+          <span className="font-semibold text-[#0B2A4A]">{list.length}</span>{' '}
+          {list.length > 1 ? 'enregistrements' : 'enregistrement'}
+        </p>
+      </div>
       <table className="w-full text-sm">
         <thead>
           <tr className="bg-[#F5F7FA] text-left">
@@ -144,30 +139,38 @@ export default function CollectePage() {
 
   const renderHistorique = () => (
     <div className="overflow-x-auto">
+      <div className="px-5 py-4 border-b border-[#E3E8EF] flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="text-[16px] font-semibold text-[#0B2A4A]">Historique des soumissions</h2>
+          <p className="text-xs text-[#5B6778] mt-0.5">Affichage complet</p>
+        </div>
+        <p className="text-sm text-[#5B6778]">
+          <span className="font-semibold text-[#0B2A4A]">{historique.length}</span>{' '}
+          {historique.length > 1 ? 'soumissions' : 'soumission'}
+        </p>
+      </div>
       <table className="w-full text-sm">
         <thead>
           <tr className="bg-[#F5F7FA] text-left">
+            <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Date de soumission</th>
+            <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Région</th>
             <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Structure</th>
             <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Module</th>
-            <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Période / Événement</th>
-            <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Auteur</th>
+            <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Période</th>
             <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Statut</th>
-            <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Créée le</th>
-            <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Soumise le</th>
-            <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Mise à jour</th>
           </tr>
         </thead>
         <tbody>
           {loading && (
             <tr>
-              <td colSpan={8} className="px-5 py-8 text-center text-[#5B6778]">
+              <td colSpan={6} className="px-5 py-8 text-center text-[#5B6778]">
                 Chargement...
               </td>
             </tr>
           )}
           {!loading && historique.length === 0 && (
             <tr>
-              <td colSpan={8} className="px-5 py-10 text-center text-[#5B6778]">
+              <td colSpan={6} className="px-5 py-10 text-center text-[#5B6778]">
                 Aucune saisie ne correspond à ces filtres.
               </td>
             </tr>
@@ -175,23 +178,28 @@ export default function CollectePage() {
           {!loading &&
             historique.map((s) => (
               <tr key={s.id} className="border-t border-[#E3E8EF]">
+                <td className="px-5 py-3 text-[#5B6778]">
+                  {s.dates && s.dates.submitted
+                    ? new Date(s.dates.submitted).toLocaleDateString('fr-FR')
+                    : '—'}
+                </td>
+                <td className="px-5 py-3 text-[#5B6778]">{regionOf(s)}</td>
                 <td className="px-5 py-3 text-[#1A2433]">{s.structureLabel || '—'}</td>
                 <td className="px-5 py-3">
                   <span className="font-semibold text-[#0B2A4A]">{s.moduleCode}</span>{' '}
                   <span className="text-[#1A2433]">{s.moduleLabel}</span>
                 </td>
                 <td className="px-5 py-3 text-[#5B6778]">{periodCell(s)}</td>
-                <td className="px-5 py-3 text-[#5B6778]">{s.authorLabel || '—'}</td>
                 <td className="px-5 py-3">
                   <StatusBadge status={s.status} />
                 </td>
-                <td className="px-5 py-3 text-[#5B6778]">{formatDateTime(s.createdAt)}</td>
-                <td className="px-5 py-3 text-[#5B6778]">{formatDateTime(s.dates && s.dates.submitted)}</td>
-                <td className="px-5 py-3 text-[#5B6778]">{formatDateTime(s.updatedAt)}</td>
               </tr>
             ))}
         </tbody>
       </table>
+      <p className="px-5 py-3 text-xs text-[#5B6778] border-t border-[#E3E8EF]">
+        Le contenu d'un rapport n'est consultable qu'après son export vers la base.
+      </p>
     </div>
   );
 
@@ -203,7 +211,7 @@ export default function CollectePage() {
             Collecte et téléchargement
           </h1>
           <p className="text-sm text-[#5B6778] mt-1">
-            Filtrez par région et par type de structure, puis téléchargez les résultats.
+            Filtrez par région et par module, puis téléchargez les résultats.
           </p>
         </div>
         {tab === 'resultats' && (
@@ -244,7 +252,7 @@ export default function CollectePage() {
         ))}
       </div>
 
-      {/* Cases régions et types */}
+      {/* Cases régions et modules */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className={boxCls}>
           <div className="flex items-center justify-between mb-2">
@@ -278,26 +286,32 @@ export default function CollectePage() {
 
         <div className={boxCls}>
           <div className="flex items-center justify-between mb-2">
-            <h2 className="text-[15px] font-semibold text-[#0B2A4A]">Types de structure</h2>
+            <h2 className="text-[15px] font-semibold text-[#0B2A4A]">Modules</h2>
             <div className="flex gap-3 text-xs font-semibold">
-              <button onClick={() => setTypes(allTypes)} className="text-[#1F5FA8] hover:underline">
+              <button
+                onClick={() => setSelectedModules(allModules.map((m) => m.id))}
+                className="text-[#1F5FA8] hover:underline"
+              >
                 Tout cocher
               </button>
-              <button onClick={() => setTypes([])} className="text-[#5B6778] hover:underline">
+              <button
+                onClick={() => setSelectedModules([])}
+                className="text-[#5B6778] hover:underline"
+              >
                 Tout décocher
               </button>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-x-4">
-            {allTypes.map((t) => (
-              <label key={t} className={labelCls}>
+            {allModules.map((m) => (
+              <label key={m.id} className={labelCls}>
                 <input
                   type="checkbox"
                   className="accent-[#1F5FA8]"
-                  checked={types.includes(t)}
-                  onChange={() => toggle(types, setTypes, t)}
+                  checked={selectedModules.includes(m.id)}
+                  onChange={() => toggle(selectedModules, setSelectedModules, m.id)}
                 />
-                {TYPE_LABELS[t] || t}
+                {m.label}
               </label>
             ))}
           </div>
@@ -305,19 +319,29 @@ export default function CollectePage() {
       </div>
 
       {hasFilters && (
-        <div className="flex items-center gap-3">
-          <p className="text-xs text-[#5B6778]">
-            {regions.length} région{regions.length > 1 ? 's' : ''} et {types.length} type
-            {types.length > 1 ? 's' : ''} sélectionné{types.length > 1 ? 's' : ''}.
-          </p>
+        <div className="flex flex-wrap items-center gap-3 text-xs text-[#5B6778]">
+          {regions.length > 0 && (
+            <span className="rounded-full border border-[#E3E8EF] bg-[#F5F7FA] px-3 py-1">
+              Régions : {regions.join(', ')}
+            </span>
+          )}
+          {selectedModules.length > 0 && (
+            <span className="rounded-full border border-[#E3E8EF] bg-[#F5F7FA] px-3 py-1">
+              Modules :{' '}
+              {allModules
+                .filter((m) => selectedModules.includes(m.id))
+                .map((m) => m.label)
+                .join(', ')}
+            </span>
+          )}
           <button
             onClick={() => {
               setRegions([]);
-              setTypes([]);
+              setSelectedModules([]);
             }}
-            className="h-[32px] px-3 rounded-lg border border-[#E3E8EF] text-xs font-medium hover:bg-[#F5F7FA]"
+            className="h-[32px] px-3 rounded-lg border border-[#E3E8EF] text-xs font-medium hover:bg-[#F5F7FA] inline-flex items-center gap-1.5"
           >
-            Tout réinitialiser
+            <span aria-hidden="true">↺</span> Réinitialiser les filtres
           </button>
         </div>
       )}

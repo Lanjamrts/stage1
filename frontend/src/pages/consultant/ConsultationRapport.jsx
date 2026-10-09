@@ -78,30 +78,42 @@ export default function ConsultationRapport() {
 
   if (!saisie) return null;
 
+  const region = (saisie.structureLabel || '').split(' – ').slice(-1)[0] || '';
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
+          <p className="text-sm text-[#5B6778] mb-1">
+            <button
+              onClick={() => navigate('/consultation-donnees')}
+              className="text-[#1F5FA8] hover:underline"
+            >
+              Consultation des données
+            </button>{' '}
+            / {saisie.moduleLabel} / {periodLabel(saisie)} – {saisie.structureLabel || '—'}
+          </p>
           <button
             onClick={() => navigate('/consultation-donnees')}
-            className="text-sm font-semibold text-[#1F5FA8] hover:underline mb-2"
+            className="text-sm font-semibold text-[#1F5FA8] hover:underline mb-2 inline-flex items-center gap-1"
           >
-            ← Retour à la consultation
+            <span aria-hidden="true">←</span> Retour à la liste
           </button>
           <h1 className="text-[24px] font-semibold text-[#0B2A4A] flex items-center gap-3">
-            {saisie.moduleCode} — {saisie.moduleLabel}
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full border border-[#D7C4F0] bg-[#F3ECFB] text-xs font-semibold text-[#6B3FA0]">
-              Lecture seule
-            </span>
+            {saisie.moduleLabel}
           </h1>
           <p className="text-sm text-[#5B6778] mt-1">
-            {saisie.structureLabel || '—'} · {periodLabel(saisie)} · Soumise par{' '}
-            {saisie.authorLabel || '—'} le {formatDateTime(saisie.dates && saisie.dates.submitted)}
+            {periodLabel(saisie)} · {saisie.structureLabel || '—'} ·{' '}
+            {region || '—'} ·{' '}
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full border border-[#E3E8EF] bg-[#F5F7FA] text-xs font-semibold text-[#5B6778] ml-1 align-middle">
+              {saisie.statusLabel || saisie.status}
+            </span>
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <StatusBadge status={saisie.status} />
-        </div>
+      </div>
+
+      <div className="rounded-lg border border-[#B8D2EF] bg-[#EBF3FC] px-4 py-3 text-sm text-[#1F5FA8]">
+        Ce rapport est en lecture seule.
       </div>
 
       {/* Historique des étapes */}
@@ -125,6 +137,24 @@ export default function ConsultationRapport() {
       {/* Contenu du rapport (moteur de gabarits, lecture seule) */}
       <div className="bg-white rounded-xl border border-[#E3E8EF] shadow-sm p-6">
         <h2 className="text-[15px] font-semibold text-[#0B2A4A] mb-4">Contenu du rapport</h2>
+        <dl className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5 rounded-lg border border-[#E3E8EF] bg-[#F5F7FA] px-4 py-3 text-sm">
+          <div>
+            <dt className="text-[12px] font-semibold text-[#5B6778]">Région</dt>
+            <dd className="text-[#1A2433] font-medium">{region || '—'}</dd>
+          </div>
+          <div>
+            <dt className="text-[12px] font-semibold text-[#5B6778]">Structure émettrice</dt>
+            <dd className="text-[#1A2433] font-medium">{saisie.structureLabel || '—'}</dd>
+          </div>
+          <div>
+            <dt className="text-[12px] font-semibold text-[#5B6778]">Module budgétaire</dt>
+            <dd className="text-[#1A2433] font-medium">{saisie.moduleLabel}</dd>
+          </div>
+          <div>
+            <dt className="text-[12px] font-semibold text-[#5B6778]">Période de référence</dt>
+            <dd className="text-[#1A2433] font-medium">{periodLabel(saisie)}</dd>
+          </div>
+        </dl>
         <DynamicForm
           fields={(saisie.module && saisie.module.fields) || []}
           values={saisie.values || {}}

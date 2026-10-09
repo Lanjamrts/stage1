@@ -17,7 +17,7 @@ export const MODULES_GROUP_1 = [
     fields: [
       {
         key: 'activites',
-        label: 'Activités',
+        label: 'Activités réalisées',
         type: 'table',
         required: true,
         fields: [
@@ -28,15 +28,15 @@ export const MODULES_GROUP_1 = [
       },
       {
         key: 'indicateurs',
-        label: 'Indicateurs',
+        label: 'Indicateurs de performance',
         type: 'table',
         fields: [
           field('indicateur', 'Indicateur', 'text', { required: true }),
           field('valeur', 'Valeur', 'decimal', { required: true, min: 0 }),
         ],
       },
-      field('difficultes', 'Difficultés', 'textarea', { maxLength: 2000 }),
-      field('perspectives', 'Perspectives', 'textarea', { maxLength: 2000 }),
+      field('difficultes', 'Difficultés rencontrées et solutions', 'textarea', { maxLength: 2000 }),
+      field('perspectives', 'Perspectives et besoins', 'textarea', { maxLength: 2000 }),
     ],
   },
   {
@@ -48,7 +48,7 @@ export const MODULES_GROUP_1 = [
     fields: [
       {
         key: 'effectif',
-        label: 'Effectif',
+        label: 'Effectif par catégorie, grade et sexe',
         type: 'table',
         required: true,
         fields: [
@@ -63,14 +63,14 @@ export const MODULES_GROUP_1 = [
       },
       {
         key: 'mouvements',
-        label: 'Mouvements',
+        label: 'Mouvements de personnel',
         type: 'table',
         fields: [
           field('type', 'Type', 'select', { required: true, options: ['Arrivée', 'Départ', 'Affectation'] }),
           field('nombre', 'Nombre', 'integer', { required: true, min: 1 }),
         ],
       },
-      field('besoins', 'Besoins', 'textarea', { maxLength: 2000 }),
+      field('besoins', 'Besoins en personnel et en formation', 'textarea', { maxLength: 2000 }),
     ],
   },
   {

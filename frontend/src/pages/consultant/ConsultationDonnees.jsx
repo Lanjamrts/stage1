@@ -19,7 +19,7 @@ export default function ConsultationDonnees() {
   const [periodes, setPeriodes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [filters, setFilters] = useState({ module: '', periode: '' });
+  const [filters, setFilters] = useState({ module: '', periode: '', region: '', statut: '' });
 
   useEffect(() => {
     api('/modules').then(setModules).catch(() => setModules([]));
@@ -53,6 +53,17 @@ export default function ConsultationDonnees() {
 
   const setFilter = (key, value) => setFilters((f) => ({ ...f, [key]: value }));
 
+  const regionOf = (s) => (s.structureLabel || '').split(' – ').slice(-1)[0] || '';
+  const allRegions = [...new Set(rows.map(regionOf).filter(Boolean))].sort((a, b) =>
+    a.localeCompare(b, 'fr')
+  );
+  // Région et statut : filtrés côté navigateur (l'API expose module + période).
+  const visibleRows = rows.filter(
+    (s) =>
+      (!filters.region || regionOf(s) === filters.region) &&
+      (!filters.statut || s.status === filters.statut)
+  );
+
   return (
     <div className="space-y-6">
       <div>
@@ -63,13 +74,24 @@ export default function ConsultationDonnees() {
           </span>
         </h1>
         <p className="text-sm text-[#5B6778] mt-1">
-          Rapports exportés et archivés, toutes régions. Cliquez sur une ligne pour ouvrir le
-          rapport.
+          Consultez les données validées et enregistrées dans la base, pour toutes les régions.
         </p>
       </div>
 
       {/* Filtres */}
       <div className="flex flex-wrap gap-3">
+        <select
+          className="h-[40px] px-3 rounded-lg border border-[#D6DCE5] bg-white text-sm min-w-[180px]"
+          value={filters.region}
+          onChange={(e) => setFilter('region', e.target.value)}
+        >
+          <option value="">Toutes les régions</option>
+          {allRegions.map((r) => (
+            <option key={r} value={r}>
+              {r}
+            </option>
+          ))}
+        </select>
         <select
           className="h-[40px] px-3 rounded-lg border border-[#D6DCE5] bg-white text-sm min-w-[220px]"
           value={filters.module}
@@ -94,15 +116,32 @@ export default function ConsultationDonnees() {
             </option>
           ))}
         </select>
-        {(filters.module || filters.periode) && (
-          <button
-            onClick={() => setFilters({ module: '', periode: '' })}
-            className="h-[40px] px-4 rounded-lg border border-[#E3E8EF] text-sm font-medium hover:bg-[#F5F7FA]"
-          >
-            Réinitialiser
-          </button>
-        )}
+        <select
+          className="h-[40px] px-3 rounded-lg border border-[#D6DCE5] bg-white text-sm min-w-[150px]"
+          value={filters.statut}
+          onChange={(e) => setFilter('statut', e.target.value)}
+        >
+          <option value="">Tous les statuts</option>
+          <option value="exportee">Exportée</option>
+          <option value="archivee">Archivée</option>
+        </select>
+        <button
+          type="button"
+          onClick={() => setFilters({ module: '', periode: '', region: '', statut: '' })}
+          className="h-[40px] px-4 rounded-lg border border-[#E3E8EF] text-sm font-medium hover:bg-[#F5F7FA] inline-flex items-center gap-2"
+        >
+          <span aria-hidden="true">↺</span> Réinitialiser les filtres
+        </button>
       </div>
+
+      {!loading && !error && (
+        <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-[#5B6778]">
+          <p>
+            <span className="font-semibold text-[#0B2A4A]">{visibleRows.length}</span>{' '}
+            {visibleRows.length > 1 ? 'enregistrements' : 'enregistrement'} • Base consolidée DGBF
+          </p>
+        </div>
+      )}
 
       {error && (
         <div className="rounded-lg border border-[#F6C7C3] bg-[#FEF3F2] px-4 py-3 text-sm text-[#B42318]">
@@ -115,35 +154,38 @@ export default function ConsultationDonnees() {
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-[#F5F7FA] text-left">
+                <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Région</th>
                 <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Structure</th>
                 <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Module</th>
-                <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Période / Événement</th>
+                <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Période</th>
+                <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Date d'export</th>
                 <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Statut</th>
-                <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Exportée le</th>
+                <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Action</th>
               </tr>
             </thead>
             <tbody>
               {loading && (
                 <tr>
-                  <td colSpan={5} className="px-5 py-8 text-center text-[#5B6778]">
+                  <td colSpan={7} className="px-5 py-8 text-center text-[#5B6778]">
                     Chargement...
                   </td>
                 </tr>
               )}
-              {!loading && rows.length === 0 && (
+              {!loading && visibleRows.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-5 py-10 text-center text-[#5B6778]">
+                  <td colSpan={7} className="px-5 py-10 text-center text-[#5B6778]">
                     Aucun rapport disponible.
                   </td>
                 </tr>
               )}
               {!loading &&
-                rows.map((s) => (
+                visibleRows.map((s) => (
                   <tr
                     key={s.id}
                     onClick={() => navigate(`/consultation-donnees/${s.id}`)}
                     className="border-t border-[#E3E8EF] cursor-pointer hover:bg-[#F5F7FA]"
                   >
+                    <td className="px-5 py-3 text-[#5B6778]">{regionOf(s) || '—'}</td>
                     <td className="px-5 py-3 text-[#1A2433]">{s.structureLabel || '—'}</td>
                     <td className="px-5 py-3">
                       <span className="font-semibold text-[#0B2A4A]">{s.moduleCode}</span>{' '}
@@ -156,11 +198,25 @@ export default function ConsultationDonnees() {
                     <td className="px-5 py-3 text-[#5B6778]">
                       {formatDateTime(s.dates && s.dates.exported)}
                     </td>
+                    <td className="px-5 py-3">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/consultation-donnees/${s.id}`);
+                        }}
+                        className="h-[30px] px-3 rounded-lg border border-[#D6DCE5] text-xs font-semibold text-[#1F5FA8] hover:bg-[#EBF3FC]"
+                      >
+                        Consulter
+                      </button>
+                    </td>
                   </tr>
                 ))}
             </tbody>
           </table>
         </div>
+        <p className="px-5 py-3 border-t border-[#E3E8EF] text-xs text-[#5B6778]">
+          Seules les données validées et enregistrées dans la base sont consultables.
+        </p>
       </div>
     </div>
   );

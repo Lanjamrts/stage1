@@ -19,14 +19,18 @@ export default function MesSaisies() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [saisies, setSaisies] = useState([]);
   const [modules, setModules] = useState([]);
+  const [periodes, setPeriodes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const statut = searchParams.get('statut') || '';
   const moduleId = searchParams.get('module') || '';
+  const periodeId = searchParams.get('periode') || '';
+  const hasFilters = !!(statut || moduleId || periodeId);
 
   useEffect(() => {
     api('/modules').then(setModules).catch(() => setModules([]));
+    api('/periodes').then(setPeriodes).catch(() => setPeriodes([]));
   }, []);
 
   useEffect(() => {
@@ -35,6 +39,7 @@ export default function MesSaisies() {
     const query = new URLSearchParams();
     if (statut) query.set('status', statut);
     if (moduleId) query.set('module', moduleId);
+    if (periodeId) query.set('periode', periodeId);
     const qs = query.toString();
     api(`/saisies${qs ? `?${qs}` : ''}`)
       .then((data) => {
@@ -52,7 +57,7 @@ export default function MesSaisies() {
     return () => {
       cancelled = true;
     };
-  }, [statut, moduleId]);
+  }, [statut, moduleId, periodeId]);
 
   const setParam = (key, value) => {
     const next = new URLSearchParams(searchParams);
@@ -69,32 +74,39 @@ export default function MesSaisies() {
     return '—';
   };
 
+  const actionLabel = (status) => {
+    if (status === 'brouillon') return 'Continuer';
+    if (status === 'rejetee') return 'Corriger';
+    return 'Consulter';
+  };
+
+  const filterSelect =
+    'h-[40px] px-3 rounded-lg border border-[#D6DCE5] bg-white text-sm min-w-[180px]';
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-[24px] font-semibold text-[#0B2A4A]">Mes saisies</h1>
-        <p className="text-sm text-[#5B6778] mt-1">
-          Toutes les saisies de votre structure, quel que soit leur statut.
-        </p>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="text-[12px] font-semibold uppercase tracking-wider text-[#5B6778]">
+            Répertoire des déclarations
+          </p>
+          <h1 className="text-[24px] font-semibold text-[#0B2A4A] mt-0.5">Mes saisies</h1>
+          <p className="text-sm text-[#5B6778] mt-1">
+            Retrouvez toutes vos saisies et leur état d'avancement.
+          </p>
+        </div>
+        <span className="inline-flex items-center rounded-full bg-[#EBF3FC] border border-[#B8D2EF] px-3 py-1 text-[13px] font-semibold text-[#1F5FA8]">
+          {saisies.length} saisie{saisies.length > 1 ? 's' : ''} enregistrée{saisies.length > 1 ? 's' : ''}
+        </span>
       </div>
 
-      {/* Filtres */}
+      {/* Filtres (ordre zip : Module, Période, Statut) */}
       <div className="flex flex-wrap gap-3">
         <select
-          className="h-[40px] px-3 rounded-lg border border-[#D6DCE5] bg-white text-sm min-w-[180px]"
-          value={statut}
-          onChange={(e) => setParam('statut', e.target.value)}
-        >
-          {STATUS_OPTIONS.map(([v, l]) => (
-            <option key={v} value={v}>
-              {l}
-            </option>
-          ))}
-        </select>
-        <select
-          className="h-[40px] px-3 rounded-lg border border-[#D6DCE5] bg-white text-sm min-w-[220px]"
+          className={filterSelect + ' min-w-[220px]'}
           value={moduleId}
           onChange={(e) => setParam('module', e.target.value)}
+          aria-label="Module"
         >
           <option value="">Tous les modules</option>
           {modules.map((m) => (
@@ -103,12 +115,37 @@ export default function MesSaisies() {
             </option>
           ))}
         </select>
-        {(statut || moduleId) && (
+        <select
+          className={filterSelect}
+          value={periodeId}
+          onChange={(e) => setParam('periode', e.target.value)}
+          aria-label="Période"
+        >
+          <option value="">Toutes les périodes</option>
+          {periodes.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.label}
+            </option>
+          ))}
+        </select>
+        <select
+          className={filterSelect}
+          value={statut}
+          onChange={(e) => setParam('statut', e.target.value)}
+          aria-label="Statut du dossier"
+        >
+          {STATUS_OPTIONS.map(([v, l]) => (
+            <option key={v} value={v}>
+              {l}
+            </option>
+          ))}
+        </select>
+        {hasFilters && (
           <button
             onClick={() => setSearchParams({})}
             className="h-[40px] px-4 rounded-lg border border-[#E3E8EF] text-sm font-medium hover:bg-[#F5F7FA]"
           >
-            Réinitialiser
+            Réinitialiser les filtres
           </button>
         )}
       </div>
@@ -126,35 +163,53 @@ export default function MesSaisies() {
             <thead>
               <tr className="bg-[#F5F7FA] text-left">
                 <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Module</th>
-                <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Période / Événement</th>
+                <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Période</th>
                 <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Statut</th>
-                <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Dernière mise à jour</th>
+                <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Date de soumission</th>
+                <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Dernière modification</th>
                 <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Action</th>
               </tr>
             </thead>
             <tbody>
               {loading && (
                 <tr>
-                  <td colSpan={5} className="px-5 py-8 text-center text-[#5B6778]">
+                  <td colSpan={6} className="px-5 py-8 text-center text-[#5B6778]">
                     Chargement...
                   </td>
                 </tr>
               )}
               {!loading && saisies.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-5 py-10 text-center">
-                    <p className="text-[#5B6778] text-[15px]">
-                      Aucune saisie pour le moment.
-                    </p>
-                    <p className="text-[#8A94A6] text-sm mt-1">
-                      Créez une saisie depuis le tableau de bord.
-                    </p>
-                    <button
-                      onClick={() => navigate('/')}
-                      className="mt-4 h-[40px] px-5 rounded-lg bg-[#1F5FA8] hover:bg-[#174C87] text-white text-sm font-semibold"
-                    >
-                      Aller au tableau de bord
-                    </button>
+                  <td colSpan={6} className="px-5 py-10 text-center">
+                    {hasFilters ? (
+                      <>
+                        <p className="text-[#5B6778] text-[15px]">Aucun résultat pour ces filtres.</p>
+                        <p className="text-[#8A94A6] text-sm mt-1">
+                          Modifiez ou réinitialisez les filtres pour afficher vos saisies.
+                        </p>
+                        <button
+                          onClick={() => setSearchParams({})}
+                          className="mt-4 h-[40px] px-5 rounded-lg border border-[#E3E8EF] text-sm font-semibold hover:bg-[#F5F7FA]"
+                        >
+                          Réinitialiser les filtres
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-[#5B6778] text-[15px]">
+                          Vous n'avez encore aucune saisie
+                        </p>
+                        <p className="text-[#8A94A6] text-sm mt-1">
+                          Vos saisies apparaîtront ici dès que vous aurez commencé un module.
+                        </p>
+                        <button
+                          onClick={() => navigate('/')}
+                          className="mt-4 h-[40px] px-5 rounded-lg bg-[#1F5FA8] hover:bg-[#174C87] text-white text-sm font-semibold"
+                        >
+                          Aller au tableau de bord
+                        </button>
+                      </>
+                    )}
                   </td>
                 </tr>
               )}
@@ -169,13 +224,16 @@ export default function MesSaisies() {
                     <td className="px-5 py-3">
                       <StatusBadge status={s.status} />
                     </td>
+                    <td className="px-5 py-3 text-[#5B6778]">
+                      {s.dates && s.dates.submitted ? formatDateTime(s.dates.submitted) : '—'}
+                    </td>
                     <td className="px-5 py-3 text-[#5B6778]">{formatDateTime(s.updatedAt)}</td>
                     <td className="px-5 py-3">
                       <button
                         onClick={() => navigate(`/mes-saisies/${s.id}`)}
                         className="h-[32px] px-3 rounded-lg border border-[#D6DCE5] text-[13px] font-semibold text-[#1A2433] hover:bg-[#F5F7FA]"
                       >
-                        {s.status === 'brouillon' || s.status === 'rejetee' ? 'Ouvrir' : 'Consulter'}
+                        {actionLabel(s.status)}
                       </button>
                     </td>
                   </tr>
@@ -184,6 +242,11 @@ export default function MesSaisies() {
           </table>
         </div>
       </div>
+
+      <p className="text-[12px] text-[#8A94A6]">
+        Règle de conformité et intégrité administrative — un rapport soumis est en lecture seule
+        jusqu'à la décision de l'administrateur régional.
+      </p>
     </div>
   );
 }

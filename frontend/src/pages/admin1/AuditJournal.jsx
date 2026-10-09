@@ -36,6 +36,7 @@ export default function AuditJournal() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({ action: '', role: '', from: '', to: '' });
+  const [q, setQ] = useState('');
 
   useEffect(() => {
     let cancelled = false;
@@ -66,18 +67,43 @@ export default function AuditJournal() {
 
   const setFilter = (key, value) => setFilters((f) => ({ ...f, [key]: value }));
   const actionLabel = (a) => ACTION_LABELS[a] || a;
+  const needle = q.trim().toLowerCase();
+  const visibleRows = needle
+    ? rows.filter((r) =>
+        [r.userLabel, actionLabel(r.action), r.object]
+          .filter(Boolean)
+          .some((v) => String(v).toLowerCase().includes(needle))
+      )
+    : rows;
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-[24px] font-semibold text-[#0B2A4A]">Journal d'audit</h1>
+        <h1 className="text-[24px] font-semibold text-[#0B2A4A] flex items-center gap-3">
+          Journal d'audit
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border border-[#E3E8EF] bg-[#F5F7FA] text-xs font-semibold text-[#5B6778]">
+            <span aria-hidden="true">🔒</span> Lecture seule
+          </span>
+        </h1>
         <p className="text-sm text-[#5B6778] mt-1">
-          Historique des actions sensibles (lecture seule).
+          Historique automatique des connexions et des actions sensibles. Les lignes ne peuvent être
+          ni modifiées ni supprimées.
         </p>
+      </div>
+
+      <div className="rounded-lg border border-[#B8D2EF] bg-[#EBF3FC] px-4 py-3 text-sm text-[#1F5FA8]">
+        Les données du journal sont conservées pendant 12 mois minimum.
       </div>
 
       {/* Filtres */}
       <div className="flex flex-wrap gap-3">
+        <input
+          type="search"
+          className="h-[40px] px-3 rounded-lg border border-[#D6DCE5] bg-white text-sm min-w-[220px]"
+          placeholder="Recherche libre (utilisateur, objet...)"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+        />
         <select
           className="h-[40px] px-3 rounded-lg border border-[#D6DCE5] bg-white text-sm min-w-[230px]"
           value={filters.action}
@@ -95,7 +121,7 @@ export default function AuditJournal() {
           value={filters.role}
           onChange={(e) => setFilter('role', e.target.value)}
         >
-          <option value="">Tous les rôles</option>
+          <option value="">Tous les profils</option>
           {ROLES.map((r) => (
             <option key={r} value={r}>
               {ROLE_LABELS[r]}
@@ -125,7 +151,7 @@ export default function AuditJournal() {
             onClick={() => setFilters({ action: '', role: '', from: '', to: '' })}
             className="h-[40px] px-4 rounded-lg border border-[#E3E8EF] text-sm font-medium hover:bg-[#F5F7FA]"
           >
-            Réinitialiser
+            <span aria-hidden="true">↺</span> Réinitialiser les filtres
           </button>
         )}
       </div>
@@ -136,40 +162,56 @@ export default function AuditJournal() {
         </div>
       )}
 
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-[#5B6778]">
+          <span className="font-semibold text-[#0B2A4A]">{visibleRows.length}</span>{' '}
+          {visibleRows.length > 1 ? 'événements' : 'événement'}
+        </p>
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-[#E3E8EF] bg-[#F5F7FA] px-2.5 py-0.5 text-xs font-semibold text-[#5B6778]">
+          Journal immuable certifié DGBF
+        </span>
+      </div>
+
       <div className="bg-white rounded-xl border border-[#E3E8EF] shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-[#F5F7FA] text-left">
-                <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Date</th>
+                <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Date et heure</th>
                 <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Utilisateur</th>
+                <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Profil</th>
                 <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Action</th>
                 <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Objet</th>
-                <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Adresse IP</th>
+                <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Adresse</th>
               </tr>
             </thead>
             <tbody>
               {loading && (
                 <tr>
-                  <td colSpan={5} className="px-5 py-8 text-center text-[#5B6778]">
+                  <td colSpan={6} className="px-5 py-8 text-center text-[#5B6778]">
                     Chargement...
                   </td>
                 </tr>
               )}
-              {!loading && rows.length === 0 && (
+              {!loading && visibleRows.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-5 py-10 text-center text-[#5B6778]">
+                  <td colSpan={6} className="px-5 py-10 text-center text-[#5B6778]">
                     Aucune entrée ne correspond à ces filtres.
                   </td>
                 </tr>
               )}
               {!loading &&
-                rows.map((r) => (
+                visibleRows.map((r) => (
                   <tr key={r.id} className="border-t border-[#E3E8EF]">
                     <td className="px-5 py-3 text-[#5B6778] whitespace-nowrap">
                       {formatDateTime(r.date)}
                     </td>
                     <td className="px-5 py-3 text-[#1A2433]">{r.userLabel}</td>
+                    <td className="px-5 py-3">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full border border-[#E3E8EF] bg-[#F5F7FA] text-xs font-semibold text-[#5B6778]">
+                        {r.userRole ? ROLE_LABELS[r.userRole] || r.userRole : '–'}
+                      </span>
+                    </td>
                     <td className="px-5 py-3 font-medium text-[#0B2A4A]">
                       {actionLabel(r.action)}
                     </td>

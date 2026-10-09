@@ -96,8 +96,18 @@ export async function getDashboard(req, res) {
             structure: s.label,
             region,
             nb: 0,
+            items: [],
           };
           entry.nb += 1;
+          const retardJours = Math.max(
+            1,
+            Math.ceil((now - new Date(p.deadline)) / (24 * 60 * 60 * 1000))
+          );
+          entry.items.push({
+            module: m.label,
+            echeance: p.deadline,
+            retardJours,
+          });
           lateByStructure.set(String(s._id), entry);
         }
       }
@@ -142,9 +152,14 @@ export async function getDashboard(req, res) {
       };
     });
 
-  const structuresEnRetard = [...lateByStructure.values()].sort(
-    (a, b) => b.nb - a.nb || a.structure.localeCompare(b.structure, 'fr')
-  );
+  const structuresEnRetard = [...lateByStructure.values()]
+    .sort((a, b) => b.nb - a.nb || a.structure.localeCompare(b.structure, 'fr'))
+    .map((e) => ({
+      structure: e.structure,
+      region: e.region,
+      nb: e.nb,
+      items: e.items.sort((a, b) => b.retardJours - a.retardJours),
+    }));
 
   return res.status(200).json({
     module: moduleId || null,

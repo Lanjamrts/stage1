@@ -28,8 +28,10 @@ export default function ExpiryWarningModal({ isOpen, onConfirm, onExpire, onCanc
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
-    return `${m}:${s < 10 ? '0' + s : s}`;
+    return `${m < 10 ? '0' + m : m}:${s < 10 ? '0' + s : s}`;
   };
+
+  const progress = timeLeft > 0 ? Math.max(0, Math.min(100, (count / timeLeft) * 100)) : 0;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
@@ -43,20 +45,31 @@ export default function ExpiryWarningModal({ isOpen, onConfirm, onExpire, onCanc
           <div className="flex-1">
             <h2 className="text-[16px] font-semibold text-[#0B2A4A]">Votre session va expirer</h2>
             <p className="text-[14px] text-[#5B6778] mt-1">
-              Votre session expirera dans <span className="font-semibold text-[#B7791F]">{formatTime(count)}</span>. Veuillez confirmer pour rester connecté.
+              Sans activité de votre part, vous serez déconnecté dans{' '}
+              <span className="font-semibold text-[#B7791F] text-[18px]">{formatTime(count)}</span>
+              .
+            </p>
+            <div className="mt-3 h-1.5 w-full rounded-full bg-[#E3E8EF] overflow-hidden">
+              <div
+                className="h-full bg-[#B7791F] transition-all duration-1000 ease-linear"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+            <p className="text-[13px] text-[#5B6778] mt-3">
+              Vos brouillons enregistrés ne seront pas perdus.
             </p>
             <div className="mt-4 flex justify-end gap-2">
+              <button
+                onClick={onConfirm}
+                className="h-9 px-4 rounded-lg bg-[#1F5FA8] text-white font-medium text-xs hover:bg-[#174C87]"
+              >
+                Rester connecté
+              </button>
               <button
                 onClick={onCancel}
                 className="h-9 px-4 rounded-lg bg-white border border-[#E3E8EF] text-[#1A2433] font-medium text-xs hover:bg-[#F5F7FA]"
               >
                 Se déconnecter
-              </button>
-              <button
-                onClick={onConfirm}
-                className="h-9 px-4 rounded-lg bg-[#1F5FA8] text-white font-medium text-xs hover:bg-[#174C87]"
-              >
-                Confirmer et rester
               </button>
             </div>
           </div>

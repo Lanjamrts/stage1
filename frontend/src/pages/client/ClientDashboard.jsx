@@ -4,26 +4,35 @@ import { api, formatDate } from '../../api.js';
 import StatusBadge from '../../components/Common/StatusBadge.jsx';
 import NouvelleSaisieModal from '../../components/Form/NouvelleSaisieModal.jsx';
 
+const PERIODICITY_LABELS = {
+  monthly: 'Mensuelle',
+  quarterly: 'Trimestrielle',
+  event: 'Événement',
+};
+
 // Tableau de bord Client (SPEC §4) : alertes, 4 compteurs, tableau des modules.
 export default function ClientDashboard() {
   const navigate = useNavigate();
   const [modules, setModules] = useState([]);
   const [periodes, setPeriodes] = useState([]);
   const [saisies, setSaisies] = useState([]);
+  const [me, setMe] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [modalModule, setModalModule] = useState(null);
 
   const load = async () => {
     try {
-      const [m, p, s] = await Promise.all([
+      const [m, p, s, u] = await Promise.all([
         api('/modules'),
         api('/periodes'),
         api('/saisies'),
+        fetch('/api/auth/me', { credentials: 'include' }).then((r) => (r.ok ? r.json() : null)),
       ]);
       setModules(m);
       setPeriodes(p);
       setSaisies(s);
+      setMe(u);
       setError(null);
     } catch (err) {
       setError(err.message);
@@ -67,9 +76,16 @@ export default function ClientDashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [modules, saisies, periodes]);
 
-  // 4 compteurs
+  const lateOf = (r) => {
+    if (!r.periode || r.saisie) return null;
+    const days = Math.floor((today - new Date(r.periode.deadline)) / 86400000);
+    return days > 0 ? days : null;
+  };
+
+  // 4 compteurs (zip : En retard, Brouillons, Soumises, Rejetées)
+  const lateCount = rows.filter((r) => lateOf(r)).length;
   const counters = [
-    { label: 'Total saisies', value: saisies.length, color: 'text-[#0B2A4A]' },
+    { label: 'En retard', value: lateCount, color: 'text-[#B7791F]' },
     { label: 'Brouillons', value: saisies.filter((s) => s.status === 'brouillon').length, color: 'text-[#5B6778]' },
     { label: 'Soumises', value: saisies.filter((s) => s.status === 'soumise').length, color: 'text-[#1F5FA8]' },
     { label: 'Rejetées', value: saisies.filter((s) => s.status === 'rejetee').length, color: 'text-[#B42318]' },
@@ -77,9 +93,19 @@ export default function ClientDashboard() {
 
   // Alertes
   const rejetees = saisies.filter((s) => s.status === 'rejetee');
-  const missing = rows.filter(
-    (r) => !r.isEvent && !r.saisie && r.periode && new Date(r.periode.deadline) < today
-  );
+  const rejeteeDetail = rejetees
+    .slice(0, 3)
+    .map((s) => {
+      const mod = modules.find((m) => m.id === s.moduleId);
+      const per = periodes.find((p) => p.id === s.periodeId);
+      return `${mod ? mod.label : s.moduleCode}${per ? ` – ${per.label}` : ''}`;
+    })
+    .join(' · ');
+  const missing = rows.filter((r) => !r.isEvent && !r.saisie && r.periode && new Date(r.periode.deadline) < today);
+  const missingDetail = missing
+    .slice(0, 4)
+    .map((r) => `${r.module.label} – ${r.periode.label}`)
+    .join(' · ');
   const upcoming = rows.filter(
     (r) =>
       !r.isEvent &&
@@ -95,12 +121,25 @@ export default function ClientDashboard() {
     return <div className="text-[#5B6778]">Chargement...</div>;
   }
 
+  const actionFor = (r) => {
+    if (r.saisie) {
+      if (r.saisie.status === 'brouillon') return { label: 'Continuer', primary: false };
+      if (r.saisie.status === 'rejetee') return { label: 'Corriger', primary: false };
+      return { label: 'Consulter', primary: false };
+    }
+    if (r.isEvent) return { label: 'Nouvelle saisie', primary: true };
+    return { label: 'Saisir', primary: true };
+  };
+
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-[24px] font-semibold text-[#0B2A4A]">Tableau de bord</h1>
+        <h1 className="text-[24px] font-semibold text-[#0B2A4A]">
+          {me ? `Bonjour, ${me.prenom} ${me.nom}` : 'Tableau de bord'}
+        </h1>
         <p className="text-sm text-[#5B6778] mt-1">
-          Suivi de vos saisies par module et par période.
+          {me && me.structureLabel ? `${me.structureLabel}` : ''}
+          {me && me.structureLabel ? ' · ' : ''}Suivi de vos saisies par module et par période.
         </p>
       </div>
 
@@ -110,26 +149,41 @@ export default function ClientDashboard() {
         </div>
       )}
 
+      {saisies.length === 0 && !error && (
+        <div className="rounded-lg border border-[#B8D2EF] bg-[#EBF3FC] px-4 py-3">
+          <p className="text-sm font-semibold text-[#1F5FA8]">Bienvenue sur SIGBD.</p>
+          <p className="text-sm text-[#5B6778] mt-0.5">
+            Vous n'avez encore aucune saisie. Choisissez un module ci-dessous pour commencer.
+          </p>
+        </div>
+      )}
+
       {/* Alertes */}
       <div className="space-y-2">
         {rejetees.length > 0 && (
-          <div className="flex items-center justify-between rounded-lg border border-[#F6C7C3] bg-[#FEF3F2] px-4 py-3">
-            <p className="text-sm text-[#B42318] font-medium">
-              {rejetees.length} saisie{rejetees.length > 1 ? 's ont été rejetées' : ' a été rejetée'} et
-              doit{rejetees.length > 1 ? 'ent' : ''} être corrigée{rejetees.length > 1 ? 's' : ''}.
+          <div className="rounded-lg border border-[#F6C7C3] bg-[#FEF3F2] px-4 py-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-[#B42318] font-medium">
+                {rejetees.length === 1
+                  ? 'Un rapport a été rejeté.'
+                  : `${rejetees.length} rapports ont été rejetés.`}
+              </p>
+              <button
+                onClick={() => navigate('/mes-saisies?statut=rejetee')}
+                className="text-sm font-semibold text-[#B42318] underline whitespace-nowrap ml-4"
+              >
+                Corriger
+              </button>
+            </div>
+            <p className="text-sm text-[#B42318]/90 mt-0.5">
+              {rejeteeDetail}. Consultez le motif et corrigez votre saisie.
             </p>
-            <button
-              onClick={() => navigate('/mes-saisies?statut=rejetee')}
-              className="text-sm font-semibold text-[#B42318] underline whitespace-nowrap ml-4"
-            >
-              Corriger
-            </button>
           </div>
         )}
         {missing.length > 0 && (
           <div className="rounded-lg border border-[#F8D7A4] bg-[#FEF6E7] px-4 py-3 text-sm text-[#B7791F] font-medium">
-            {missing.length} échéance{missing.length > 1 ? 's sont' : ' est'} dépassée
-            {missing.length > 1 ? 's' : ''} sans saisie : {missing.map((r) => r.module.code).join(', ')}.
+            {missing.length} rapport{missing.length > 1 ? 's sont' : ' est'} en retard.{' '}
+            <span className="font-normal">{missingDetail}.</span>
           </div>
         )}
         {upcoming.length > 0 && (
@@ -158,17 +212,20 @@ export default function ClientDashboard() {
       {/* Tableau des modules */}
       <div className="bg-white rounded-xl border border-[#E3E8EF] shadow-sm overflow-hidden">
         <div className="px-5 py-4 border-b border-[#E3E8EF]">
-          <h2 className="text-[16px] font-semibold text-[#0B2A4A]">Modules de saisie</h2>
+          <h2 className="text-[16px] font-semibold text-[#0B2A4A]">Mes modules</h2>
+          <p className="text-sm text-[#5B6778] mt-0.5">
+            Choisissez le module que vous souhaitez renseigner.
+          </p>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-[#F5F7FA] text-left">
                 <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Module</th>
-                <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Période</th>
-                <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Échéance</th>
+                <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Périodicité</th>
+                <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Période et échéance</th>
                 <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Statut</th>
-                <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Actions</th>
+                <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -179,45 +236,60 @@ export default function ClientDashboard() {
                   </td>
                 </tr>
               )}
-              {rows.map((r) => (
-                <tr key={r.module.id} className="border-t border-[#E3E8EF]">
-                  <td className="px-5 py-3">
-                    <span className="font-semibold text-[#0B2A4A]">{r.module.code}</span>{' '}
-                    <span className="text-[#1A2433]">{r.module.label}</span>
-                  </td>
-                  <td className="px-5 py-3 text-[#5B6778]">
-                    {r.isEvent ? 'Événement' : r.periode ? r.periode.label : '—'}
-                  </td>
-                  <td className="px-5 py-3 text-[#5B6778]">
-                    {r.isEvent || !r.periode ? '—' : formatDate(r.periode.deadline)}
-                  </td>
-                  <td className="px-5 py-3">
-                    {r.saisie ? <StatusBadge status={r.saisie.status} /> : <span className="text-[#8A94A6]">Aucune saisie</span>}
-                  </td>
-                  <td className="px-5 py-3">
-                    <div className="flex items-center gap-2">
-                      {r.saisie && (
-                        <button
-                          onClick={() => openSaisie(r.saisie.id)}
-                          className="h-[32px] px-3 rounded-lg border border-[#D6DCE5] text-[13px] font-semibold text-[#1A2433] hover:bg-[#F5F7FA]"
-                        >
-                          {r.saisie.status === 'brouillon' || r.saisie.status === 'rejetee'
-                            ? 'Reprendre'
-                            : 'Consulter'}
-                        </button>
+              {rows.map((r) => {
+                const late = lateOf(r);
+                const action = actionFor(r);
+                return (
+                  <tr key={r.module.id} className="border-t border-[#E3E8EF]">
+                    <td className="px-5 py-3">
+                      <span className="font-semibold text-[#0B2A4A]">{r.module.code}</span>{' '}
+                      <span className="text-[#1A2433]">{r.module.label}</span>
+                    </td>
+                    <td className="px-5 py-3 text-[#5B6778]">
+                      {r.isEvent
+                        ? PERIODICITY_LABELS.event
+                        : PERIODICITY_LABELS[r.module.periodicity] || '—'}
+                    </td>
+                    <td className="px-5 py-3 text-[#5B6778]">
+                      {r.isEvent || !r.periode ? (
+                        '—'
+                      ) : (
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span>
+                            {r.periode.label} · échéance {formatDate(r.periode.deadline)}
+                          </span>
+                          {late && (
+                            <span className="inline-flex items-center rounded-full bg-[#FEF6E7] border border-[#F8D7A4] px-2 py-0.5 text-[11px] font-semibold text-[#B7791F]">
+                              En retard de {late} jour{late > 1 ? 's' : ''}
+                            </span>
+                          )}
+                        </div>
                       )}
-                      {(!r.isEvent && !r.saisie) || r.isEvent ? (
-                        <button
-                          onClick={() => setModalModule(r.module)}
-                          className="h-[32px] px-3 rounded-lg bg-[#1F5FA8] hover:bg-[#174C87] text-white text-[13px] font-semibold"
-                        >
-                          Nouvelle saisie
-                        </button>
-                      ) : null}
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="px-5 py-3">
+                      {r.saisie ? (
+                        <StatusBadge status={r.saisie.status} />
+                      ) : (
+                        <span className="text-[#8A94A6]">Aucune saisie</span>
+                      )}
+                    </td>
+                    <td className="px-5 py-3">
+                      <button
+                        onClick={() =>
+                          r.saisie ? openSaisie(r.saisie.id) : setModalModule(r.module)
+                        }
+                        className={`h-[32px] px-3 rounded-lg text-[13px] font-semibold ${
+                          action.primary
+                            ? 'bg-[#1F5FA8] hover:bg-[#174C87] text-white'
+                            : 'border border-[#D6DCE5] text-[#1A2433] hover:bg-[#F5F7FA]'
+                        }`}
+                      >
+                        {action.label}
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

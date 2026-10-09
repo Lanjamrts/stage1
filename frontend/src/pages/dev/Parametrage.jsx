@@ -6,6 +6,22 @@ import { useToast } from '../../components/Common/Toast/Toast.jsx';
 const PERIODICITY_LABELS = { monthly: 'Mensuelle', quarterly: 'Trimestrielle' };
 const KIND_LABELS = { periodic: 'Périodique', event: 'Événement' };
 
+// Libellés de déclencheur par module (zip a_liste_des_modules).
+const TRIGGER_BY_CODE = {
+  RA: 'Mensuelle ou trimestrielle',
+  CRGP: 'Par réunion',
+  ASS: 'Par intervention',
+  FOR: 'Par session',
+  NOS: 'À chaque changement',
+  NPR: 'À chaque changement',
+  NCA: 'À chaque changement',
+  RAV: 'À chaque création',
+  TSE: 'À chaque demande',
+};
+
+const periodLabel = (m) =>
+  TRIGGER_BY_CODE[m.code] || PERIODICITY_LABELS[m.periodicity] || m.periodicity;
+
 // Listes de référence affichées (SPEC §4) : Régions, Structures, Directions,
 // Services, Grades, Périodes, EPN, STD. Seules Directions/Services/Grades/EPN/STD
 // sont modifiables (POST|PUT|PATCH /referentiels — Régions, Structures et
@@ -229,26 +245,35 @@ export default function Parametrage() {
       <div>
         <h1 className="text-[24px] font-semibold text-[#0B2A4A]">Paramétrage</h1>
         <p className="text-sm text-[#5B6778] mt-1">
-          Gabarits de saisie (versions) et listes de référence.
+          Définissez les canevas, les listes de référence et les règles de contrôle.
         </p>
       </div>
 
       {/* Onglets */}
       <div className="flex flex-wrap gap-2 border-b border-[#E3E8EF]">
         {[
-          { key: 'gabarits', label: 'Gabarits' },
+          { key: 'gabarits', label: 'Canevas des modules', count: modules.length },
           { key: 'listes', label: 'Listes de référence' },
         ].map((t) => (
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
-            className={`px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px ${
+            className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px ${
               tab === t.key
                 ? 'border-[#1F5FA8] text-[#1F5FA8]'
                 : 'border-transparent text-[#5B6778] hover:text-[#0B2A4A]'
             }`}
           >
             {t.label}
+            {t.count != null && (
+              <span
+                className={`inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full text-[12px] font-semibold ${
+                  tab === t.key ? 'bg-[#EBF3FC] text-[#1F5FA8]' : 'bg-[#F5F7FA] text-[#5B6778]'
+                }`}
+              >
+                {t.count}
+              </span>
+            )}
           </button>
         ))}
       </div>
@@ -260,18 +285,19 @@ export default function Parametrage() {
       )}
 
       {tab === 'gabarits' && (
+        <>
         <div className="bg-white rounded-xl border border-[#E3E8EF] shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-[#F5F7FA] text-left">
                   <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Code</th>
-                  <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Libellé</th>
+                  <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Module</th>
                   <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Périodicité</th>
-                  <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Type</th>
+                  <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Champs</th>
                   <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Version</th>
-                  <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Statut</th>
-                  <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Actions</th>
+                  <th className="px-5 py-3 font-semibold text-[#0B2A4A]">État</th>
+                  <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -287,11 +313,11 @@ export default function Parametrage() {
                     <tr key={m.id} className="border-t border-[#E3E8EF]">
                       <td className="px-5 py-3 font-semibold text-[#0B2A4A]">{m.code}</td>
                       <td className="px-5 py-3 text-[#1A2433]">{m.label}</td>
-                      <td className="px-5 py-3 text-[#5B6778]">
-                        {PERIODICITY_LABELS[m.periodicity] || m.periodicity}
+                      <td className="px-5 py-3 text-[#5B6778]">{periodLabel(m)}</td>
+                      <td className="px-5 py-3 text-[#1A2433]">
+                        {(m.fields || []).length}
                       </td>
-                      <td className="px-5 py-3 text-[#5B6778]">{KIND_LABELS[m.kind] || m.kind}</td>
-                      <td className="px-5 py-3 text-[#1A2433]">v{m.version}</td>
+                      <td className="px-5 py-3 text-[#1A2433]">Version {m.version}</td>
                       <td className="px-5 py-3">
                         <span
                           className={`inline-flex items-center px-2.5 py-0.5 rounded-full border text-xs font-semibold ${
@@ -309,7 +335,7 @@ export default function Parametrage() {
                             onClick={() => navigate(`/parametrage/${m.id}`)}
                             className="h-[30px] px-3 rounded-lg border border-[#D6DCE5] text-xs font-semibold text-[#1F5FA8] hover:bg-[#EBF3FC]"
                           >
-                            Éditer
+                            Configurer
                           </button>
                           <button
                             onClick={() => toggleActive(m)}
@@ -324,7 +350,15 @@ export default function Parametrage() {
               </tbody>
             </table>
           </div>
+          <div className="px-5 py-3 border-t border-[#E3E8EF] text-xs text-[#5B6778]">
+            Affichage de 1 à {modules.length} sur {modules.length} modules enregistrés
+          </div>
         </div>
+        <div className="rounded-lg border border-[#B8D2EF] bg-[#EBF3FC] px-4 py-3 text-sm text-[#1F5FA8]">
+          Une modification de canevas crée une nouvelle version. Les saisies déjà enregistrées
+          gardent la version avec laquelle elles ont été créées.
+        </div>
+        </>
       )}
 
       {tab === 'listes' && (
