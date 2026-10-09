@@ -11,7 +11,18 @@ export default function AuthGuard({ children }) {
       try {
         const response = await fetch('/api/auth/me', { credentials: 'include' });
         if (!response.ok) {
-          // si 401/403, traiter comme non authentifié
+          // 403 PASSWORD_CHANGE_REQUIRED : mdp provisoire pas encore changé (SPEC §5)
+          let data = null;
+          try {
+            data = await response.json();
+          } catch (e) {
+            data = null;
+          }
+          if (response.status === 403 && data && data.code === 'PASSWORD_CHANGE_REQUIRED') {
+            setAuthState('passwordChangeRequired');
+            return;
+          }
+          // sinon, traiter comme non authentifié
           setAuthState('unauthenticated');
           return;
         }

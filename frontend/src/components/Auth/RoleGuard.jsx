@@ -15,6 +15,17 @@ export default function RoleGuard({ roles, children }) {
         const res = await fetch('/api/auth/me', { credentials: 'include' });
         if (cancelled) return;
         if (!res.ok) {
+          // 403 PASSWORD_CHANGE_REQUIRED : mdp provisoire pas encore changé (SPEC §5)
+          let data = null;
+          try {
+            data = await res.json();
+          } catch (e) {
+            data = null;
+          }
+          if (res.status === 403 && data && data.code === 'PASSWORD_CHANGE_REQUIRED') {
+            setState({ status: 'passwordChange' });
+            return;
+          }
           setState({ status: 'unauthenticated' });
           return;
         }

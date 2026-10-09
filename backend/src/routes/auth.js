@@ -23,21 +23,17 @@ const asyncHandler = (fn) => (req, res, next) => Promise.resolve(fn(req, res, ne
 // POST /api/auth/login
 router.post('/login', loginLimiter, asyncHandler(login));
 
-// Toutes les routes ci-dessous nécessitent une authentification.
-// allowPasswordChange : logout/me/change-password doivent rester accessibles
-// même si mustChangePassword est vrai (voir SPEC §5).
-router.use(requireAuth({ allowPasswordChange: true }));
+// SPEC §5 : jusqu'au changement, toute autre route que change-password et
+// logout renvoie 403 PASSWORD_CHANGE_REQUIRED (donc /me et /refresh sont
+// stricts ; logout et change-password restent accessibles).
+router.post('/logout', requireAuth({ allowPasswordChange: true }), asyncHandler(logout));
 
-// POST /api/auth/logout
-router.post('/logout', asyncHandler(logout));
-
-// POST /api/auth/me
-router.get('/me', asyncHandler(me));
+router.get('/me', requireAuth(), asyncHandler(me));
 
 // POST /api/auth/refresh : prolongation glissante de la session
-router.post('/refresh', asyncHandler(refresh));
+router.post('/refresh', requireAuth(), asyncHandler(refresh));
 
 // POST /api/auth/change-password
-router.post('/change-password', asyncHandler(changePassword));
+router.post('/change-password', requireAuth({ allowPasswordChange: true }), asyncHandler(changePassword));
 
 export default router;

@@ -75,7 +75,8 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json({ message: err.message || 'Erreur interne du serveur' });
 });
 
-// Démarrer le serveur
+// Démarrer le serveur (sauté en environnement de test : supertest importe
+// l'app et Mongo est connecté par le setup des tests)
 async function startServer() {
   try {
     const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/sigbd';
@@ -91,4 +92,8 @@ async function startServer() {
   }
 }
 
-startServer();
+if (process.env.NODE_ENV !== 'test') {
+  startServer();
+}
+
+export default app;
