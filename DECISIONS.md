@@ -11,6 +11,8 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 - [P2] Rate limiting désactivé si NODE_ENV=test (sinon la suite de tests RBAC serait bloquée par les limites).
 - [P2] « Différent du mot de passe provisoire » implémenté comme « nouveau ≠ actuel » (le serveur ne stocke jamais le mot de passe provisoire en clair).
 - [P2] requireAuth(options) : allowPasswordChange=true pour logout/me/change-password; toutes les autres routes /api passent par requireAuth strict (403 PASSWORD_CHANGE_REQUIRED).
+- [P2] Limite de connexion 20/5min par IP (et non 5) : le verrouillage de compte après 5 échecs doit rester observable par l'utilisateur avant le 429 IP.
+- [P2] Helpers de périmètre centralisés dans middleware/scope.js (structuresInScope, regionOfUser, statusesInScope) — utilisés par les routes des phases 3 à 5.
 - [P1] Tokens de design définis dans tailwind.config.js (couleurs, espacements, rayon, police Inter), conformes à DESIGN.md.
 - [P1] AppShell = Sidebar (emblème + SIGBD + menu du rôle + footer DGBF · SSEBF) + TopBar (64px blanche) + bandeau national 4px (rouge/gauche, vert/droite).
 - [P1] Seule une structure par région et par type (SRB, SRSP, SRPE, CIRBF) est créée pour les 3 régions Analamanga, Atsinanana, Diana (cohérent avec les utilisateurs du seed).

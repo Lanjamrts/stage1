@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { LANDING_BY_ROLE } from '../../menus.js';
 
 export default function LoginPage() {
   const [im, setIm] = useState('');
@@ -34,8 +35,8 @@ export default function LoginPage() {
         return;
       }
 
-      // Connexion réussie, rediriger vers la page d'accueil
-      navigate('/');
+      // Connexion réussie, rediriger vers la page d'accueil du rôle (SPEC §4)
+      navigate(LANDING_BY_ROLE[data.user.role] || '/');
     } catch (err) {
       setError('Une erreur est survenue lors de la tentative de connexion.');
     } finally {

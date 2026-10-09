@@ -53,6 +53,18 @@ export async function login(req, res) {
   return res.status(200).json({ message: 'Connexion réussie', user: { im: utilisateur.im, role: utilisateur.role } });
 }
 
+// Prolongation glissante de la session : re-génère le cookie (timeout d'inactivité)
+export async function refresh(req, res) {
+  const token = generateToken(req.user);
+  res.cookie('token', token, {
+    httpOnly: true,
+    sameSite: 'strict',
+    maxAge: 30 * 60 * 1000,
+    secure: process.env.NODE_ENV === 'production',
+  });
+  return res.status(200).json({ message: 'Session prolongée' });
+}
+
 export async function logout(req, res) {
   const utilisateur = req.user;
   const clientIP = req.ip || req.connection.remoteAddress;
@@ -67,12 +79,15 @@ export async function logout(req, res) {
 }
 
 export async function me(req, res) {
+  const StructureModel = (await import('../models/Structure.js')).default;
+  const structure = await StructureModel.findById(req.user.structureId).catch(() => null);
   return res.status(200).json({
     im: req.user.im,
     nom: req.user.nom,
     prenom: req.user.prenom,
     role: req.user.role,
     structureId: req.user.structureId,
+    structureLabel: structure ? structure.label : null,
     direction: req.user.direction,
     service: req.user.service,
     mustChangePassword: req.user.mustChangePassword,

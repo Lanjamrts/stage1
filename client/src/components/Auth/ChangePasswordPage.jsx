@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { LANDING_BY_ROLE } from '../../menus.js';
 
 export default function ChangePasswordPage() {
   const [current, setCurrent] = useState('');
@@ -55,8 +56,16 @@ export default function ChangePasswordPage() {
         return;
       }
       setSuccess('Mot de passe changé avec succès.');
-      // Attendre 1 seconde puis rediriger vers la page d'accueil
-      setTimeout(() => navigate('/'), 1000);
+      // Rediriger vers la page d'accueil du rôle (SPEC §4)
+      setTimeout(async () => {
+        try {
+          const res = await fetch('/api/auth/me', { credentials: 'include' });
+          const data = res.ok ? await res.json() : null;
+          navigate(data ? (LANDING_BY_ROLE[data.role] || '/') : '/login');
+        } catch (err) {
+          navigate('/');
+        }
+      }, 1000);
     } catch (err) {
       setError('Une erreur est survenue. Veuillez réessayer.');
     } finally {

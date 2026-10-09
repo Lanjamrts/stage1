@@ -1,8 +1,10 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 
-export default function ExpiryWarningModal({ isOpen, onConfirm, onCancel, timeLeft }) {
+export default function ExpiryWarningModal({ isOpen, onConfirm, onExpire, onCancel, timeLeft }) {
   const [count, setCount] = useState(timeLeft);
+  const onExpireRef = React.useRef(onExpire);
+  React.useEffect(() => { onExpireRef.current = onExpire; }, [onExpire]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -11,14 +13,15 @@ export default function ExpiryWarningModal({ isOpen, onConfirm, onCancel, timeLe
       setCount((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          onConfirm && onConfirm();
+          // Compte à rebours terminé : la session expire
+          onExpireRef.current && onExpireRef.current();
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
     return () => clearInterval(timer);
-  }, [isOpen, timeLeft, onConfirm]);
+  }, [isOpen, timeLeft]);
 
   if (!isOpen) return null;
 

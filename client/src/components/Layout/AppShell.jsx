@@ -1,15 +1,21 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useToast } from '../Common/Toast/Toast.jsx';
 import ExpiryWarningModal from '../Common/Modal/ExpiryWarningModal.jsx';
+import { ROLE_MENUS, ROLE_LABELS } from '../../menus.js';
 
 export default function AppShell({ children }) {
   const [user, setUser] = useState(null);
   const [showExpiryModal, setShowExpiryModal] = useState(false);
   const [timeLeft, setTimeLeft] = useState(60);
+  const showExpiryModalRef = useRef(false);
   const navigate = useNavigate();
   const { addToast } = useToast();
+
+  useEffect(() => {
+    showExpiryModalRef.current = showExpiryModal;
+  }, [showExpiryModal]);
 
   // Récupérer les données utilisateur depuis /api/auth/me
   useEffect(() => {
@@ -33,6 +39,7 @@ export default function AppShell({ children }) {
   useEffect(() => {
     let timeoutId;
     const resetTimer = () => {
+      if (showExpiryModalRef.current) return; // ne pas reprogrammer pendant l'avertissement
       if (timeoutId) clearTimeout(timeoutId);
       timeoutId = setTimeout(() => {
         setShowExpiryModal(true);
@@ -48,10 +55,24 @@ export default function AppShell({ children }) {
     };
   }, []);
 
+  // Confirmer = prolonger la session (expiration glissante)
   const handleModalConfirm = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+      const res = await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' });
+      if (res.ok) {
+        setShowExpiryModal(false);
+        addToast('Session prolongée.', 'success');
+        window.location.reload();
+        return;
+      }
     } catch (err) {}
+    // La session n'a pas pu être prolongée : elle a expiré
+    setShowExpiryModal(false);
+    navigate('/session-expiree');
+  };
+
+  // Compte à rebours terminé : la session expire
+  const handleModalExpire = async () => {
     setShowExpiryModal(false);
     navigate('/session-expiree');
   };
@@ -65,29 +86,8 @@ export default function AppShell({ children }) {
     navigate('/login');
   };
 
-  const menuItems = [
-    { label: 'Tableau de bord', path: '/', icon: '📊' },
-    { label: 'Mes saisies', path: '/mes-saisies', icon: '📝' },
-    { label: 'Données saisies', path: '/donnees-saisies', icon: '📂' },
-    { label: 'Consultation et téléchargement', path: '/consultation', icon: '🔍' },
-    { label: 'Remarques', path: '/remarques', icon: '💬' },
-    { label: 'Collecte et téléchargement', path: '/collecte', icon: '📈' },
-    { label: 'Journal d\'audit', path: '/audit', icon: '📋' },
-    { label: 'Utilisateurs', path: '/utilisateurs', icon: '👥' },
-    { label: 'Paramétrage', path: '/parametrage', icon: '⚙️' },
-    { label: 'Consultation des données', path: '/consultation-donnees', icon: '📊' },
-  ];
-
-  // Filtrer les menus en fonction du rôle (simplifié)
-  const filteredMenuItems = menuItems.filter((item) => {
-    if (!user) return false;
-    if (user.role === 'client' && ['Tableau de bord', 'Mes saisies'].includes(item.label)) return true;
-    if (user.role === 'admin2' && ['Données saisies', 'Consultation et téléchargement', 'Remarques'].includes(item.label)) return true;
-    if (user.role === 'admin1' && ['Tableau de bord', 'Utilisateurs', 'Collecte et téléchargement', 'Journal d\'audit', 'Remarques'].includes(item.label)) return true;
-    if (user.role === 'developpeur' && ['Paramétrage', 'Remarques', 'Journal d\'audit'].includes(item.label)) return true;
-    if (user.role === 'consultant' && ['Tableau de bord', 'Consultation des données'].includes(item.label)) return true;
-    return false;
-  });
+  // Menu du rôle : libellés et ordre exacts de la SPEC §4
+  const menuItems = ROLE_MENUS[user?.role] || [];
 
   return (
     <div className="min-h-screen bg-[#F5F7FA] text-[#1A2433]">
@@ -100,12 +100,12 @@ export default function AppShell({ children }) {
       {/* TopBar */}
       <header className="fixed top-0 left-0 right-0 h-16 bg-white border-b border-[#E3E8EF] z-30 flex items-center justify-between px-6">
         <div className="text-sm text-[#5B6778]">
-          {user ? `${user.prenom} ${user.nom} · ${user.structureId}` : 'Non connecté'}
+          {user ? `${user.prenom} ${user.nom} · ${user.structureLabel || ''}` : 'Non connecté'}
         </div>
         <div className="flex items-center gap-3">
           {user && (
             <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-[#F5F7FA] text-[#5B6778] border border-[#E3E8EF]">
-              {user.role}
+              {ROLE_LABELS[user.role] || user.role}
             </span>
           )}
           <button
@@ -131,7 +131,7 @@ export default function AppShell({ children }) {
             <span className="font-semibold text-lg tracking-tight text-white">SIGBD</span>
           </div>
           <nav className="flex flex-col gap-1.5">
-            {filteredMenuItems.map((item) => (
+            {menuItems.map((item) => (
               <NavLink
                 key={item.path}
                 to={item.path}
@@ -164,6 +164,7 @@ export default function AppShell({ children }) {
       <ExpiryWarningModal
         isOpen={showExpiryModal}
         onConfirm={handleModalConfirm}
+        onExpire={handleModalExpire}
         onCancel={handleModalCancel}
         timeLeft={timeLeft}
       />
