@@ -3,6 +3,7 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
+import { loadConfig } from '../config.js';
 
 import RegionModel from '../models/Region.js';
 import StructureModel from '../models/Structure.js';
@@ -18,6 +19,7 @@ import { MODULES } from './modules.js';
 import { buildSaisies } from './saisies.js';
 
 dotenv.config();
+const config = loadConfig();
 
 const REGIONS = [
   { name: 'Alaotra-Mangoro', code: 'ALA' },
@@ -62,8 +64,12 @@ const PERIODES = [
 ];
 
 async function seed() {
-  const uri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/sigbd';
-  await mongoose.connect(uri);
+  if (config.NODE_ENV === 'production' && process.env.SEED_ALLOW_PRODUCTION !== 'true') {
+    console.error('Seed refusé en production. Définissez SEED_ALLOW_PRODUCTION=true pour forcer.');
+    process.exit(1);
+  }
+
+  await mongoose.connect(config.MONGODB_URI);
   console.log('Connecte a MongoDB');
 
   // Nettoyage (seed idempotent)
@@ -144,8 +150,13 @@ async function seed() {
   moduleDocs.forEach(m => { moduleIdByCode[m.code] = m._id; });
   console.log(`${MODULES.length} modules cres`);
 
-  // 7. Utilisateurs (mot de passe commun "Test@2026", hash bcrypt)
-  const passwordHash = await bcrypt.hash('Test@2026', 10);
+  // 7. Utilisateurs (mot de passe depuis SEED_DEMO_PASSWORD, défaut seulement hors production)
+  const demoPassword = process.env.SEED_DEMO_PASSWORD || (config.NODE_ENV === 'production' ? undefined : 'Test@2026');
+  if (!demoPassword) {
+    console.error('SEED_DEMO_PASSWORD est requis en production');
+    process.exit(1);
+  }
+  const passwordHash = await bcrypt.hash(demoPassword, 10);
   const utilisateurs = [
     { im: '104562', nom: 'Rakotoarivelo', prenom: 'Hery', direction: 'DRBF Analamanga', service: 'Service des rapports', role: 'client', structureId: structByCode['SRB-ANL'], status: 'actif', mustChangePassword: false },
     { im: '112470', nom: 'Randriamampionona', prenom: 'Jean', direction: 'DRBF Analamanga', service: 'Service des rapports', role: 'client', structureId: structByCode['SRSP-ANL'], status: 'actif', mustChangePassword: false },

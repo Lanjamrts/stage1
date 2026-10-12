@@ -2,10 +2,9 @@
 import jwt from 'jsonwebtoken';
 import UtilisateurModel from '../models/Utilisateur.js';
 import { setSessionCookie } from '../services/auth.js';
-import dotenv from 'dotenv';
+import { getConfig } from '../config.js';
 
-dotenv.config();
-const JWT_SECRET = process.env.JWT_SECRET || 'change-me-in-production-sigbd-2026';
+const { JWT_SECRET } = getConfig();
 
 // Middleware : vérifier le token depuis le cookie httpOnly 'token'
 // options.allowPasswordChange : autorise les routes logout/me/change-password

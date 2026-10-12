@@ -1,7 +1,7 @@
 # SIGBD — Système Informatisé de Gestion de la Base de Données
 
 Application web du Ministère de l'Économie et des Finances (Madagascar), Direction Générale
-du Budget et des Finances — Service Systèmes Électroniques de Budget et de Finances
+du Budget et des Finances — Service des Structures Excentriques du Budget et des Finances
 (DGBF / SSEBF).
 
 SIGBD centralise la collecte des 13 modules de rapports budgétaires (Rapport d'activités,
@@ -19,6 +19,36 @@ et leur consultation en lecture seule.
 cd backend  && npm install
 cd ../frontend && npm install
 ```
+
+## Configuration
+
+Copiez les fichiers d'exemple et adaptez les valeurs :
+
+```bash
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+```
+
+Variables backend (`.env`) :
+- `NODE_ENV` : `development` | `production` | `test` (défaut: `development`)
+- `MONGODB_URI` : URI de connexion MongoDB (défaut: `mongodb://127.0.0.1:27017/sigbd`)
+- `PORT` : Port du serveur API (défaut: `4000`)
+- `JWT_SECRET` : **Secret JWT (minimum 32 caractères, OBLIGATOIRE en production, ne jamais utiliser la valeur par défaut)**
+- `SESSION_TIMEOUT_MINUTES` : Délai d'inactivité glissant en minutes (défaut: `30`)
+- `CORS_ORIGIN` : Origine CORS autorisée (ex: `https://votre-domaine.com`)
+- `TRUST_PROXY` : Faire confiance aux en-têtes de proxy si derrière un reverse proxy (défaut: `false`)
+- `SEED_DEMO_PASSWORD` : Mot de passe pour les comptes de démo (défaut: `Test@2026` hors production)
+- `SEED_ALLOW_PRODUCTION` : Autoriser le seed en production (défaut: `false`, **dangereux**)
+
+Variables frontend (`.env`) :
+- `VITE_API_URL` : URL de l'API backend (défaut: `http://localhost:4000`)
+- `NODE_ENV` : `development` | `production`
+
+⚠️ **En production** :
+- `JWT_SECRET` doit être défini, faire ≥ 32 caractères, et ne pas être la valeur par défaut
+- Les comptes de démo (IM `104562`, `112470`, `115908`, `108231`, `120344`, `121775`, `123009`, `125430`, `098716`) **ne doivent jamais exister en production**
+- Utilisez `npm run create-admin` pour créer le premier admin1 avec un mot de passe provisoire généré aléatoirement
+- Le seed est refusé en production sauf si `SEED_ALLOW_PRODUCTION=true` (à éviter)
 
 ## Base de données (seed)
 

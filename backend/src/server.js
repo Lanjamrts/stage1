@@ -4,9 +4,8 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser';
 import mongoSanitize from 'express-mongo-sanitize';
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
+import { loadConfig } from './config.js';
 
 import authRoutes from './routes/auth.js';
 import moduleRoutes from './routes/modules.js';
@@ -23,6 +22,7 @@ import configRoutes from './routes/config.js';
 import { requireAuth } from './middleware/auth.js';
 
 dotenv.config();
+const config = loadConfig();
 
 // Ne pas faire planter le serveur sur une promesse rejetée non gérée
 process.on('unhandledRejection', (reason) => {
@@ -30,7 +30,7 @@ process.on('unhandledRejection', (reason) => {
 });
 
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = config.PORT;
 
 // Middlewares de base
 app.use(helmet());
@@ -41,7 +41,7 @@ app.use(mongoSanitize());
 // Rate limiting pour toutes les routes (désactivé en environnement de test)
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: process.env.NODE_ENV === 'test' ? 100000 : 100,
+  max: config.NODE_ENV === 'test' ? 100000 : 100,
   message: 'Trop de requêtes depuis cette IP, veuillez réessayer plus tard.',
 });
 app.use('/api/', generalLimiter);
@@ -79,9 +79,12 @@ app.use((err, req, res, next) => {
 // l'app et Mongo est connecté par le setup des tests)
 async function startServer() {
   try {
-    const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/sigbd';
-    await mongoose.connect(MONGODB_URI);
+    await mongoose.connect(config.MONGODB_URI);
     console.log('✅ MongoDB connecté');
+
+    if (config.TRUST_PROXY) {
+      app.set('trust proxy', true);
+    }
 
     app.listen(PORT, () => {
       console.log(`🚀 Serveur démarré sur le port ${PORT}`);
@@ -92,7 +95,7 @@ async function startServer() {
   }
 }
 
-if (process.env.NODE_ENV !== 'test') {
+if (config.NODE_ENV !== 'test') {
   startServer();
 }
 

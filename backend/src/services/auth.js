@@ -2,11 +2,10 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import UtilisateurModel from '../models/Utilisateur.js';
-import dotenv from 'dotenv';
+import { getConfig } from '../config.js';
 
-dotenv.config();
-const JWT_SECRET = process.env.JWT_SECRET || 'change-me-in-production-sigbd-2026';
-export const SESSION_TIMEOUT_MINUTES = parseInt(process.env.SESSION_TIMEOUT_MINUTES || '30', 10);
+const { JWT_SECRET, SESSION_TIMEOUT_MINUTES, NODE_ENV } = getConfig();
+export { SESSION_TIMEOUT_MINUTES };
 const MAX_FAILED_ATTEMPTS = 5;
 const LOCKOUT_DURATION_MINUTES = 30;
 
@@ -42,7 +41,7 @@ export function setSessionCookie(res, user) {
     httpOnly: true,
     sameSite: 'strict',
     maxAge: SESSION_TIMEOUT_MINUTES * 60 * 1000,
-    secure: process.env.NODE_ENV === 'production',
+    secure: NODE_ENV === 'production',
   });
 }
 

@@ -10,6 +10,7 @@
     "start": "node src/server.js",
     "seed": "node src/seed/run.js",
     "archive": "node src/scripts/archive.js",
+    "create-admin": "node src/scripts/create-admin.js",
     "test": "npm run seed:test && vitest run",
     "seed:test": "NODE_ENV=test MONGODB_URI=mongodb://127.0.0.1:27017/sigbd_test node src/seed/run.js"
   },
