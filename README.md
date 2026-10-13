@@ -37,6 +37,11 @@ Variables backend (`.env`) :
 - `SESSION_TIMEOUT_MINUTES` : Délai d'inactivité glissant en minutes (défaut: `30`)
 - `CORS_ORIGIN` : Origine CORS autorisée (ex: `https://votre-domaine.com`)
 - `TRUST_PROXY` : Faire confiance aux en-têtes de proxy si derrière un reverse proxy (défaut: `false`)
+- `JSON_BODY_LIMIT_KB` : Taille max du corps JSON en KB (défaut: `2048`, pour recensements et gabarits volumineux)
+- `RATE_LIMIT_WINDOW_MINUTES` : Fenêtre de rate limiting par utilisateur en minutes (défaut: `15`)
+- `RATE_LIMIT_USER_MAX` : Nombre max de requêtes par utilisateur par fenêtre (défaut: `1200`)
+- `LOGIN_RATE_LIMIT_WINDOW_MINUTES` : Fenêtre de rate limiting pour login en minutes (défaut: `5`)
+- `LOGIN_RATE_LIMIT_MAX` : Nombre max de tentatives de login par IP par fenêtre (défaut: `60`)
 - `SEED_DEMO_PASSWORD` : Mot de passe pour les comptes de démo (défaut: `Test@2026` hors production)
 - `SEED_ALLOW_PRODUCTION` : Autoriser le seed en production (défaut: `false`, **dangereux**)
 

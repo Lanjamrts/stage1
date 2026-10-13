@@ -25,7 +25,12 @@ export function requireAuth(options = {}) {
     }
 
     // Recharger l'utilisateur depuis la base pour vérifier le statut
-    const utilisateur = await UtilisateurModel.findById(decoded.id);
+    let utilisateur;
+    try {
+      utilisateur = await UtilisateurModel.findById(decoded.id);
+    } catch (error) {
+      return res.status(401).json({ message: 'Token invalide' });
+    }
     if (!utilisateur || utilisateur.status === 'desactive') {
       return res.status(403).json({ message: 'Ce compte est désactivé. Contactez votre administrateur.' });
     }
@@ -60,20 +65,6 @@ export function requireRole(roles) {
     }
     next();
   };
-}
-
-// Helper de périmètre : même structure (pour client)
-export async function sameStructure(req, res, next) {
-  // Pour une démo, supposer que req.user.structureId correspond à la structure de la ressource si elle est présente
-  // Pourrait être implémenté via une vérification de chemin ou un middleware réutilisable.
-  // Pour l'instant, permettre tout.
-  next();
-}
-
-// Helper de périmètre : même région (pour admin2)
-export async function sameRegion(req, res, next) {
-  // Pourrait vérifier si la structure de la requête appartient à la même région
-  next();
 }
 
 // Helper pour écrire les lignes d'audit

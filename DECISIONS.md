@@ -73,6 +73,21 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 - [P8] `npm run archive` (SPEC §2, exportee -> archivee) référencé dans package.json mais script absent : backend/src/scripts/archive.js créé — archive strictement les saisies exportee dont la période (periode.end) est passée ; les saisies d'événement (sans periodeId) ne sont pas archivées (« dont la période est terminée », lecture stricte) ; ni ligne d'audit ni entrée validations (absentes des listes fermées de la SPEC §2/§8).
 - [P8] Expiration glissante réellement glissante : le cookie et le JWT sont régénérés à chaque requête authentifiée (setSessionCookie), le cookie maxAge et la modale d'avertissement suivent SESSION_TIMEOUT_MINUTES du .env (renvoyé par /auth/me sous le nom sessionTimeoutMinutes, avertissement 5 min avant, compte à rebours 60 s) — auparavant maxAge et seuil 25 min étaient codés en dur et le serveur n'allongeait jamais la session.
 
+## Step 2 – Backend hardening
+
+- TRUST_PROXY parsing: remplacé z.coerce.boolean() par z.enum(['true','false','1','0']).transform(...) pour éviter que la chaîne "false" ne devienne true.
+- trust proxy mis à 1 (au lieu de true) : express-rate-limit v7 lève ERR_ERL_PERMISSIVE_TRUST_PROXY avec true, et true permet aux clients de spoof leur IP via X-Forwarded-For.
+- Body limit porté à 2048 KB (au lieu de 10 KB) : les recensements et gabarits dépassent 10 KB.
+- Rate limit déplacé après requireAuth et clé par user id (req.user._id) : les bureaux partagent une IP, le limiteur par IP pénaliserait tout le monde.
+- Login limit 60 requêtes / 5 min (au lieu de 20) : le verrouillage compte à 5 échecs reste observable avant le 429 IP.
+- Réponses 429 en JSON avec code RATE_LIMITED (au lieu de texte brut) : cohérence API.
+- Gestionnaire d'erreurs ne fuit plus les messages internes : 413 PAYLOAD_TOO_LARGE, 400 INVALID_JSON, 500 INTERNAL_ERROR génériques.
+- requireAuth renvoie 401 sur id malformé (try/catch sur findById) : un token forgé ne fait plus planter le serveur.
+- Code mort supprimé : sameStructure, sameRegion (inutilisés, next() seulement).
+- Role enum ajouté sur Utilisateur.role : ['client','admin2','admin1','developpeur','consultant'].
+- Fallback test corrigé : JWT_SECRET et MONGODB_URI ont des fallbacks dans loadConfig() quand NODE_ENV === 'test' (auparavant bloc inatteignable après zod parse).
+- Nouveau fichier de tests hardening.test.js (7 tests) : parseEnv, body limits, JSON errors, forged token, role enum.
+
 ## Step 1 – Logo
 
 - Corner transparency: original emblem-original.png (1254x1254) had transparent corners (verified via ImageMagick after installation; four corners returned srgba(0,0,0,0)). No flood-fill needed.
