@@ -115,7 +115,8 @@ export default function ChangePasswordPage() {
   // Écran de confirmation (zip d_confirmation)
   if (done) {
     return (
-      <div className="min-h-screen bg-[#F5F7FA] flex items-center justify-center px-4">
+      <div className="min-h-screen bg-[#F5F7FA] flex flex-col items-center justify-center px-4">
+        <div className="flex justify-center mb-6"><Logo size={56} withText /></div>
         <div className="w-full max-w-[480px] bg-white rounded-[12px] border border-[#E3E8EF] shadow-[0_2px_8px_rgba(0,0,0,0.04)] p-10 text-center">
           <div className="mx-auto w-12 h-12 rounded-full bg-[#EBF7EE] flex items-center justify-center text-[#1E7B4F]">
             <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -146,6 +147,7 @@ export default function ChangePasswordPage() {
   return (
     <div className="min-h-screen bg-[#F5F7FA] flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-[520px]">
+        <div className="flex justify-center mb-6"><Logo size={56} withText /></div>
         <div className="bg-[#FFF4E0] border border-[#B7791F] rounded-lg p-4 text-[14px] text-[#7A5A11] mb-5">
           C'est votre première connexion. Pour votre sécurité, vous devez remplacer le mot de passe
           provisoire qui vous a été remis.

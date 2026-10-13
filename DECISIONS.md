@@ -88,3 +88,4 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 - Stripe color on LoginPage corrected from #C8102E to #B42318 to match app-wide red.
 - Favicon and apple-touch-icon added to index.html with theme-color #0B2A4A.
 - No npm dependencies added (ImageMagick used via system package).
+- Step 1 bis: <Logo> was imported but not rendered in ChangePasswordPage.jsx; it is now rendered in both returns (done screen and main form). Previous claim 'both returns' was inaccurate until this fix.
