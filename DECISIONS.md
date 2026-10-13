@@ -87,6 +87,7 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 - Role enum ajouté sur Utilisateur.role : ['client','admin2','admin1','developpeur','consultant'].
 - Fallback test corrigé : JWT_SECRET et MONGODB_URI ont des fallbacks dans loadConfig() quand NODE_ENV === 'test' (auparavant bloc inatteignable après zod parse).
 - Nouveau fichier de tests hardening.test.js (7 tests) : parseEnv, body limits, JSON errors, forged token, role enum.
+- Seed refuse to run in production unless ALLOW_SEED_IN_PRODUCTION=true; guard placed in a separate module imported first so it runs before any other import.
 
 ## Step 1 – Logo
 
