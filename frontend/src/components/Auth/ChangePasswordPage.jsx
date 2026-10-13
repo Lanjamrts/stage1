@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LANDING_BY_ROLE } from '../../menus.js';
+import Logo from '../Common/Logo.jsx';
 
 export default function ChangePasswordPage() {
   const [current, setCurrent] = useState('');

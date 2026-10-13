@@ -72,3 +72,19 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 - [P8] Aucun élément des « non-objectifs » / « Défauts connus » de la SPEC n'a été repris (vérification grep sur le code : pas de relances, notifications, pièces jointes, lien « mot de passe oublié », suppression d'audit, menu consultant erroné…).
 - [P8] `npm run archive` (SPEC §2, exportee -> archivee) référencé dans package.json mais script absent : backend/src/scripts/archive.js créé — archive strictement les saisies exportee dont la période (periode.end) est passée ; les saisies d'événement (sans periodeId) ne sont pas archivées (« dont la période est terminée », lecture stricte) ; ni ligne d'audit ni entrée validations (absentes des listes fermées de la SPEC §2/§8).
 - [P8] Expiration glissante réellement glissante : le cookie et le JWT sont régénérés à chaque requête authentifiée (setSessionCookie), le cookie maxAge et la modale d'avertissement suivent SESSION_TIMEOUT_MINUTES du .env (renvoyé par /auth/me sous le nom sessionTimeoutMinutes, avertissement 5 min avant, compte à rebours 60 s) — auparavant maxAge et seuil 25 min étaient codés en dur et le serveur n'allongeait jamais la session.
+
+## Step 1 – Logo
+
+- Corner transparency: original emblem-original.png (1254x1254) had transparent corners (verified via ImageMagick after installation; four corners returned srgba(0,0,0,0)). No flood-fill needed.
+- Generated optimized PNGs via ImageMagick convert with -strip -define png:compression-level=9:
+  - emblem-128.png: 27,194 bytes (27 KB, target <40 KB)
+  - emblem-256.png: 92,290 bytes (92 KB, target <120 KB)
+  - favicon.png: 8,104 bytes (8 KB, target <12 KB)
+  - apple-touch-icon.png: 49,258 bytes (49 KB, target <60 KB)
+- Total shipped images weight: 180 KB (<250 KB target).
+- Master file kept in git at frontend/assets-src/emblem-original.png; shipped files in frontend/public/.
+- Fallback "MEF" badge (navy circle with gold ring, white "MEF" text) implemented in Logo.jsx for broken-image scenarios — ensures no broken image icon ever appears.
+- Logo component used on all five public/auth pages plus sidebar (AppShell): LoginPage, ChangePasswordPage (both returns), SessionExpired, AccessDenied, AppShell.
+- Stripe color on LoginPage corrected from #C8102E to #B42318 to match app-wide red.
+- Favicon and apple-touch-icon added to index.html with theme-color #0B2A4A.
+- No npm dependencies added (ImageMagick used via system package).

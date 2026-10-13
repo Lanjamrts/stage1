@@ -4,6 +4,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useToast } from '../Common/Toast/Toast.jsx';
 import ExpiryWarningModal from '../Common/Modal/ExpiryWarningModal.jsx';
 import { ROLE_MENUS, ROLE_LABELS } from '../../menus.js';
+import Logo from '../Common/Logo.jsx';
 
 export default function AppShell({ children }) {
   const [user, setUser] = useState(null);
@@ -129,8 +130,7 @@ export default function AppShell({ children }) {
       <aside className="fixed top-1 left-0 bottom-0 w-[240px] bg-[#0B2A4A] z-20 flex flex-col justify-between py-6 px-4 shadow-sm">
         <div>
           <div className="flex items-center gap-3 px-2 py-1 mb-6">
-            <img src="/emblem.png" alt="Ministère de l'Économie et des Finances" className="h-10 w-auto" />
-            <span className="font-semibold text-lg tracking-tight text-white">SIGBD</span>
+            <Logo size={40} withText variant="light" />
           </div>
           <nav className="flex flex-col gap-1.5">
             {menuItems.map((item) => (

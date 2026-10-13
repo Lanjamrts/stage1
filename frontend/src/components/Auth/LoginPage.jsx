@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LANDING_BY_ROLE } from '../../menus.js';
+import Logo from '../Common/Logo.jsx';
 
 export default function LoginPage() {
   const [im, setIm] = useState('');
@@ -73,7 +74,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-[#F5F7FA] flex flex-col">
       <div className="h-1 w-full flex">
-        <div className="flex-1 bg-[#C8102E]" />
+        <div className="flex-1 bg-[#B42318]" />
         <div className="flex-1 bg-[#1E7B4F]" />
       </div>
 
@@ -82,11 +83,12 @@ export default function LoginPage() {
           {/* Panneau institutionnel */}
           <div className="md:w-[46%] bg-[#0B2A4A] text-white p-10 flex flex-col justify-between">
             <div>
-              <div className="text-[13px] tracking-wide text-white/80">
-                Ministère de l'Économie et des Finances
-              </div>
-              <div className="text-[12px] tracking-widest uppercase text-white/60 mt-1">
-                DGBF · SSEBF
+              <div className="flex items-center gap-4">
+                <Logo size={64} />
+                <div>
+                  <div className="text-[13px] tracking-wide text-white/80">Ministère de l'Économie et des Finances</div>
+                  <div className="text-[12px] tracking-widest uppercase text-white/60 mt-1">DGBF · SSEBF</div>
+                </div>
               </div>
               <div className="mt-8 text-[32px] font-semibold tracking-tight">SIGBD</div>
               <div className="mt-1 text-[15px] text-white/90 leading-snug">
