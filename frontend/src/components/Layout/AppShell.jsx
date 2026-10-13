@@ -101,11 +101,14 @@ export default function AppShell({ children }) {
       </div>
 
       {/* TopBar */}
-      <header className="fixed top-0 left-0 right-0 h-16 bg-white border-b border-[#E3E8EF] z-30 flex items-center justify-between px-6">
-        <div className="text-sm text-[#5B6778]">
-          {user ? `${user.prenom} ${user.nom} · ${user.structureLabel || ''}` : 'Non connecté'}
+      <header className="fixed top-0 left-0 right-0 h-16 bg-white border-b border-[#E3E8EF] z-30 flex items-center justify-between gap-3 px-4 md:px-6">
+        <div className="flex min-w-0 items-center gap-3">
+          <Logo size={40} className="shrink-0" />
+          <div className="min-w-0 text-sm text-[#5B6778] truncate">
+            {user ? `${user.prenom} ${user.nom} · ${user.structureLabel || ''}` : 'Non connecté'}
+          </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex shrink-0 items-center gap-2 md:gap-3">
           {user && (
             <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-[#F5F7FA] text-[#5B6778] border border-[#E3E8EF]">
               {ROLE_LABELS[user.role] || user.role}
@@ -129,9 +132,7 @@ export default function AppShell({ children }) {
       {/* Sidebar */}
       <aside className="fixed top-1 left-0 bottom-0 w-[240px] bg-[#0B2A4A] z-20 flex flex-col justify-between py-6 px-4 shadow-sm">
         <div>
-          <div className="flex items-center gap-3 px-2 py-1 mb-6">
-            <Logo size={40} withText variant="light" />
-          </div>
+          <div className="mb-6 h-12" aria-hidden="true" />
           <nav className="flex flex-col gap-1.5">
             {menuItems.map((item) => (
               <NavLink
