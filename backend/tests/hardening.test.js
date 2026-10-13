@@ -103,8 +103,8 @@ describe('Durcissement backend — body limit & JSON errors', () => {
       .send('{"im": ');
     expect(res.status).toBe(400);
     expect(res.body.code).toBe('INVALID_JSON');
-    const bodyText = JSON.stringify(res.body);
-    expect(bodyText).not.toMatch(/Unexpected|JSON/i);
+    expect(res.body.message).toBe('Requête invalide.');
+    expect(res.body.message).not.toMatch(/Unexpected|JSON|position/i);
   });
 });
 
