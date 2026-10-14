@@ -1,8 +1,7 @@
 # SIGBD — Système Informatisé de Gestion de la Base de Données
 
 Application web du Ministère de l'Économie et des Finances (Madagascar), Direction Générale
-du Budget et des Finances — Service des Structures Excentriques du Budget et des Finances
-(DGBF / SSEBF).
+du Budget et des Finances — Service des Structures Excentriques du Budget et des Finances (SSEBF).
 
 SIGBD centralise la collecte des 13 modules de rapports budgétaires (Rapport d'activités,
 Ressources humaines, CRGP, …), leur validation régionale, leur export vers la base centrale
@@ -43,7 +42,7 @@ Variables backend (`.env`) :
 - `LOGIN_RATE_LIMIT_WINDOW_MINUTES` : Fenêtre de rate limiting pour login en minutes (défaut: `5`)
 - `LOGIN_RATE_LIMIT_MAX` : Nombre max de tentatives de login par IP par fenêtre (défaut: `60`)
 - `SEED_DEMO_PASSWORD` : Mot de passe pour les comptes de démo (défaut: `Test@2026` hors production)
-- `SEED_ALLOW_PRODUCTION` : Autoriser le seed en production (défaut: `false`, **dangereux**)
+- `SEED_ALLOW_PRODUCTION` : Autoriser le seed de **démonstration** en production (défaut: `false`, **dangereux**)
 
 Variables frontend (`.env`) :
 - `VITE_API_URL` : URL de l'API backend (défaut: `http://localhost:4000`)
@@ -53,16 +52,33 @@ Variables frontend (`.env`) :
 - `JWT_SECRET` doit être défini, faire ≥ 32 caractères, et ne pas être la valeur par défaut
 - Les comptes de démo (IM `104562`, `112470`, `115908`, `108231`, `120344`, `121775`, `123009`, `125430`, `098716`) **ne doivent jamais exister en production**
 - Utilisez `npm run create-admin` pour créer le premier admin1 avec un mot de passe provisoire généré aléatoirement
-- Le seed est refusé en production sauf si `SEED_ALLOW_PRODUCTION=true` (à éviter)
+- Le seed de **démonstration** est refusé en production sauf si `SEED_ALLOW_PRODUCTION=true` (à éviter)
 
 ## Base de données (seed)
 
 ```bash
-cd backend && npm run seed
+cd backend && npm run seed:ref
 ```
 
-Le seed est idempotent : il purge et recrée régions, structures, utilisateurs, périodes,
-référentiels, modules et saisies. **Après un re-seed, il faut se reconnecter.**
+Crée les profils et les 13 gabarits s'ils n'existent pas. Sûr en production. Ne supprime jamais rien.
+
+```bash
+cd backend && npm run seed:demo
+```
+(ou `npm run seed`) : données de démonstration. SUPPRIME les données (sauf le journal d'audit) après confirmation « OUI ». Options : `-- --yes` (sans confirmation), `-- --purge-audit` (supprime aussi le journal).
+
+```bash
+cd backend && npm run create-admin
+```
+Crée le premier administrateur (production).
+
+Après un seed:demo il faut se reconnecter.
+
+### Mise en service (production)
+
+1. `npm run seed:ref`
+2. `npm run create-admin`
+3. Les référentiels réels seront importés à l'étape suivante du projet.
 
 Archivage (script système, sans bouton d'interface) :
 

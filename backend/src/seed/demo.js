@@ -5,6 +5,7 @@ import './guard.js';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
+import readline from 'node:readline/promises';
 import { loadConfig } from '../config.js';
 
 import RegionModel from '../models/Region.js';
@@ -19,9 +20,14 @@ import SaisieModel from '../models/Saisie.js';
 import RemarqueModel from '../models/Remarque.js';
 import { MODULES } from './modules.js';
 import { buildSaisies } from './saisies.js';
+import { ensureProfils, ensureModules } from './common.js';
 
 dotenv.config();
 const config = loadConfig();
+
+const args = process.argv.slice(2);
+const YES = args.includes('--yes');
+const PURGE_AUDIT = args.includes('--purge-audit');
 
 const REGIONS = [
   { name: 'Alaotra-Mangoro', code: 'ALA' },
@@ -42,21 +48,21 @@ const REGIONAL_STRUCTURE_TYPES = ['SRB', 'SRSP', 'SRPE', 'CIRBF'];
 const REGIONS_WITH_STRUCTURES = ['Analamanga', 'Atsinanana', 'Diana'];
 
 const DIRECTIONS = [
-  'Direction des Régions Budget et des Finances',
+  'Direction des Regions Budget et des Finances',
   'Direction des Structures Excentriques',
-  'Direction Générale du Budget et des Finances',
+  'Direction Generale du Budget et des Finances',
 ];
 const SERVICES = ['Service des rapports', 'Service des ressources humaines', 'Service informatique'];
-const GRADES = ["Attaché d'administration", 'Secrétaire de bureau', "Agent d'exécution"];
+const GRADES = ["Attache d'administration", 'Secretaire de bureau', "Agent d'execution"];
 const EPNS = [
   'Centre de formation professionnelle d\'Analamanga',
   'Centre de formation professionnelle d\'Atsinanana',
   'Centre de formation professionnelle de Diana',
 ];
 const STDS = [
-  'Direction Régionale de l\'Éducation Nationale – Analamanga',
-  'Direction Régionale de l\'Éducation Nationale – Atsinanana',
-  'Direction Régionale de l\'Éducation Nationale – Diana',
+  'Direction Regionale de l\'Education Nationale – Analamanga',
+  'Direction Regionale de l\'Education Nationale – Atsinanana',
+  'Direction Regionale de l\'Education Nationale – Diana',
 ];
 
 const PERIODES = [
@@ -65,11 +71,26 @@ const PERIODES = [
   { label: 'Octobre 2026', start: new Date('2026-10-01'), end: new Date('2026-10-31'), deadline: new Date('2026-11-05'), periodicity: 'monthly' },
 ];
 
-async function seed() {
-  if (config.NODE_ENV === 'production' && process.env.SEED_ALLOW_PRODUCTION !== 'true') {
-    console.error('Seed refusé en production. Définissez SEED_ALLOW_PRODUCTION=true pour forcer.');
+async function confirmOrExit() {
+  if (YES || config.NODE_ENV === 'test') return;
+  const dbName = new URL(config.MONGODB_URI).pathname.replace('/', '') || '(inconnue)';
+  console.log(`ATTENTION : ce script SUPPRIME les donnees de la base "${dbName}" (regions, structures, utilisateurs, periodes, referentiels, modules, saisies, remarques) et recree des donnees de demonstration.`);
+  console.log(PURGE_AUDIT ? 'Le journal d\'audit sera AUSSI supprime (--purge-audit).' : 'Le journal d\'audit est conserve.');
+  if (!process.stdin.isTTY) {
+    console.error('Terminal non interactif : relancez avec --yes pour confirmer.');
     process.exit(1);
   }
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  const answer = await rl.question('Tapez OUI pour continuer : ');
+  rl.close();
+  if (answer.trim() !== 'OUI') {
+    console.log('Annule. Aucune donnee modifiee.');
+    process.exit(0);
+  }
+}
+
+async function seed() {
+  await confirmOrExit();
 
   await mongoose.connect(config.MONGODB_URI);
   console.log('Connecte a MongoDB');
@@ -82,23 +103,22 @@ async function seed() {
     UtilisateurModel.deleteMany({}),
     PeriodeModel.deleteMany({}),
     ReferentielModel.deleteMany({}),
-    JournalAuditModel.deleteMany({}),
     ModuleModel.deleteMany({}),
     SaisieModel.deleteMany({}),
     RemarqueModel.deleteMany({}),
   ]);
   console.log('Collections nettoyees');
 
-  // 1. Profils (les 5 roles)
-  const profils = [
-    { code: 'client', label: 'Client' },
-    { code: 'admin2', label: 'Administrateur regional (Admin 2)' },
-    { code: 'admin1', label: 'Administrateur central (Admin 1)' },
-    { code: 'developpeur', label: 'Developpeur' },
-    { code: 'consultant', label: 'Consultant' },
-  ];
-  await ProfilModel.insertMany(profils);
-  console.log(`${profils.length} profils crees`);
+  if (PURGE_AUDIT) {
+    await JournalAuditModel.deleteMany({});
+    console.log('Journal d\'audit supprime (--purge-audit)');
+  } else {
+    console.log('Journal d\'audit conserve');
+  }
+
+  // 1. Profils (les 5 roles) - utiliser ensureProfils pour reset et recreer
+  const profils = await ensureProfils();
+  console.log(`${profils.created + profils.existing} profils prets`);
 
   // 2. Regions (12)
   const regionDocs = await RegionModel.insertMany(REGIONS.map(r => ({ name: r.name })));
@@ -146,11 +166,12 @@ async function seed() {
   periodeDocs.forEach(p => { periodeIdByLabel[p.label] = p._id; });
   console.log(`${PERIODES.length} periodes creees`);
 
-  // 6. Modules (gabarits, fields structurés)
-  const moduleDocs = await ModuleModel.insertMany(MODULES.map(m => ({ ...m, version: 1, active: true })));
+  // 6. Modules (gabarits, fields structurés) - utiliser ensureModules pour reset et recreer
+  await ensureModules();
+  const moduleDocs = await ModuleModel.find({ code: { $in: MODULES.map((m) => m.code) } });
   const moduleIdByCode = {};
   moduleDocs.forEach(m => { moduleIdByCode[m.code] = m._id; });
-  console.log(`${MODULES.length} modules cres`);
+  console.log(`${MODULES.length} modules crees`);
 
   // 7. Utilisateurs (mot de passe depuis SEED_DEMO_PASSWORD, défaut seulement hors production)
   const demoPassword = process.env.SEED_DEMO_PASSWORD || (config.NODE_ENV === 'production' ? undefined : 'Test@2026');
