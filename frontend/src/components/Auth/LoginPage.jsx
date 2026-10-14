@@ -168,13 +168,14 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
-                    aria-label="Afficher ou masquer le mot de passe"
+                    aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-[#5B6778] hover:text-[#1A2433]"
                     disabled={blocked}
                   >
                     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                       <circle cx="12" cy="12" r="3"></circle>
+                      {showPassword && <path d="M3 3l18 18"></path>}
                     </svg>
                   </button>
                 </div>
