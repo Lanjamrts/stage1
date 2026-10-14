@@ -65,7 +65,7 @@ async function main() {
   // Récupérer la structure SSEBF
   const ssebfStructure = await StructureModel.findOne({ type: 'SSEBF' });
   if (!ssebfStructure) {
-    console.error('Structure SSEBF introuvable. Lancez le seed d\'abord.');
+    console.error('Structure SSEBF introuvable. Lancez d\'abord : npm run init:structures -- --apply');
     await mongoose.disconnect();
     process.exit(1);
   }

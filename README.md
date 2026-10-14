@@ -88,6 +88,20 @@ cd backend && npm run archive
 
 Passe en statut `archivee` les rapports `exportee` dont la période est terminée.
 
+## Initialiser une base réelle
+
+Pour initialiser une base de production (ou de préproduction) avec les structures centrales, les régions et les structures régionales, utilisez une base dédiée (jamais la base de démo `sigbd`).
+
+1. Choisissez la base réelle, par exemple `sigbd_prod` (jamais la base de démo `sigbd`).
+2. `NODE_ENV=production MONGODB_URI=mongodb://127.0.0.1:27017/sigbd_prod npm run seed:ref` (profils et modules).
+3. Éditez `backend/data/init/regions.csv` et `backend/data/init/structures.csv` ; mettez `valide` à `oui` **uniquement après confirmation par le SSEBF**.
+4. Vérifiez sans écrire : `NODE_ENV=production MONGODB_URI=mongodb://127.0.0.1:27017/sigbd_prod npm run init:structures`
+5. Écrivez : même commande avec `-- --apply` (refusé tant qu'une ligne a `valide=non`).
+6. `NODE_ENV=production MONGODB_URI=mongodb://127.0.0.1:27017/sigbd_prod npm run create-admin` (premier Admin 1, mot de passe provisoire affiché une seule fois).
+7. Connectez-vous en tant qu'Admin 1 et créez les vrais utilisateurs dans l'écran « Utilisateurs ».
+
+Les listes CSV proviennent de sources web non officielles et doivent être confirmées par le SSEBF. Les 3 structures centrales (SSEBF, DGBF, CELLULE_INFO) sont créées par le script. Les périodes seront gérées à l'étape 5. Les utilisateurs ne sont **pas** importés (ils sont saisis dans l'interface).
+
 ## Démarrage
 
 Terminal 1 — API (port 4000) :

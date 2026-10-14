@@ -73,6 +73,18 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 - [P8] `npm run archive` (SPEC §2, exportee -> archivee) référencé dans package.json mais script absent : backend/src/scripts/archive.js créé — archive strictement les saisies exportee dont la période (periode.end) est passée ; les saisies d'événement (sans periodeId) ne sont pas archivées (« dont la période est terminée », lecture stricte) ; ni ligne d'audit ni entrée validations (absentes des listes fermées de la SPEC §2/§8).
 - [P8] Expiration glissante réellement glissante : le cookie et le JWT sont régénérés à chaque requête authentifiée (setSessionCookie), le cookie maxAge et la modale d'avertissement suivent SESSION_TIMEOUT_MINUTES du .env (renvoyé par /auth/me sous le nom sessionTimeoutMinutes, avertissement 5 min avant, compte à rebours 60 s) — auparavant maxAge et seuil 25 min étaient codés en dur et le serveur n'allongeait jamais la session.
 
+## Step 4 – Real database initialization
+
+- CSV import with dry-run by default; --apply refused while any line is valide=non; --allow-unvalidated forbidden in production.
+- Never delete or overwrite ($setOnInsert only).
+- Structure code = TYPE-SLUGOFREGION (no invented abbreviations); slug = uppercase, accents removed, non-alphanumeric to underscore.
+- Label TYPE – Region with EN DASH because the frontend splits on it.
+- Central structures created by the script (SSEBF, DGBF, CELLULE_INFO).
+- Unique index on Structure.code.
+- Semicolon/BOM/CRLF support for French Excel.
+- Lists come from unofficial sources; points to confirm: Ambatosoa only in SRB list; Menabe absent from SRPE source; Analamanga SRSP possibly handled by central structure; possible Vatovavy/Fitovinany regrouping.
+- Users NOT imported (typed in UI); periods deferred to Step 5.
+
 ## Step 3 – Seed split
 
 - Split the single seed into reference.js (safe, only $setOnInsert for profils and modules) and demo.js (full demo data with purge and confirmation).
