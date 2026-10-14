@@ -102,6 +102,24 @@ Pour initialiser une base de production (ou de préproduction) avec les structur
 
 Les listes CSV proviennent de sources web non officielles et doivent être confirmées par le SSEBF. Les 3 structures centrales (SSEBF, DGBF, CELLULE_INFO) sont créées par le script. Les périodes seront gérées à l'étape 5. Les utilisateurs ne sont **pas** importés (ils sont saisis dans l'interface).
 
+## Générer les périodes
+
+Pourquoi : sans période, aucun rapport périodique ne peut être créé.
+
+Commande de vérification (dry-run) :
+```bash
+NODE_ENV=production MONGODB_URI=mongodb://127.0.0.1:27017/sigbd_prod npm run init:periodes -- --annee 2026 --premier-mois 10 --echeance-mensuelle-jour 5 --echeance-trimestrielle-jours 15
+```
+
+Commande d'écriture :
+```bash
+NODE_ENV=production MONGODB_URI=mongodb://127.0.0.1:27017/sigbd_prod npm run init:periodes -- --annee 2026 --premier-mois 10 --echeance-mensuelle-jour 5 --echeance-trimestrielle-jours 15 --apply
+```
+
+- Les règles d'échéance (jour du mois suivant pour les mensuelles, jours après la fin du trimestre pour les trimestrielles) sont des règles du SSEBF et n'ont **pas de valeur par défaut** ; les valeurs 5 et 15 dans l'exemple viennent des données de démonstration et doivent être confirmées.
+- Utilisez `--premier-mois` pour ne générer que les périodes à partir du mois de mise en service (sinon le tableau de bord affiche les périodes passées comme en retard pour toutes les structures).
+- Le script ne modifie ni ne supprime jamais les périodes existantes.
+
 ## Démarrage
 
 Terminal 1 — API (port 4000) :

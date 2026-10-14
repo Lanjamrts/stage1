@@ -11,4 +11,6 @@ const periodeSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+periodeSchema.index({ periodicity: 1, start: 1 }, { unique: true });
+
 export default mongoose.model('Periode', periodeSchema);

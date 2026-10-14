@@ -73,6 +73,17 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 - [P8] `npm run archive` (SPEC §2, exportee -> archivee) référencé dans package.json mais script absent : backend/src/scripts/archive.js créé — archive strictement les saisies exportee dont la période (periode.end) est passée ; les saisies d'événement (sans periodeId) ne sont pas archivées (« dont la période est terminée », lecture stricte) ; ni ligne d'audit ni entrée validations (absentes des listes fermées de la SPEC §2/§8).
 - [P8] Expiration glissante réellement glissante : le cookie et le JWT sont régénérés à chaque requête authentifiée (setSessionCookie), le cookie maxAge et la modale d'avertissement suivent SESSION_TIMEOUT_MINUTES du .env (renvoyé par /auth/me sous le nom sessionTimeoutMinutes, avertissement 5 min avant, compte à rebours 60 s) — auparavant maxAge et seuil 25 min étaient codés en dur et le serveur n'allongeait jamais la session.
 
+## Step 5 – Period generation
+
+- Script instead of API/UI (none exists yet; screens are a later step).
+- Deadline rules are REQUIRED arguments with no default (official SSEBF rules; demo values 5 and 15 come from the SPEC sample data).
+- Dates stored at 00:00 UTC with end = last day, like the demo seed (display-safe in UTC+3).
+- Natural key (periodicity, start) plus unique index, never overwrite, conflicts exit 1.
+- --premier-mois and the past-deadline guard because the dashboard counts every period with a passed deadline as expected for all regional structures.
+- Labels follow the demo seed convention ("<Mois> <annee>" and "T<n> <annee>").
+- Known existing limitation: archive.js treats a period as finished from 00:00 UTC of its last day.
+- The Rapport d'activites monthly-and-quarterly case is NOT handled here (Step 5b).
+
 ## Step 4 – Real database initialization
 
 - CSV import with dry-run by default; --apply refused while any line is valide=non; --allow-unvalidated forbidden in production.
