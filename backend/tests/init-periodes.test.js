@@ -69,7 +69,7 @@ describe('init-periodes script', { timeout: 120000 }, () => {
     expect(formatDate(sept.end)).toBe('2090-09-30');
     expect(formatDate(sept.deadline)).toBe('2090-10-05');
 
-    const dec = await Periode.findOne({ label: 'Decembre 2090' });
+    const dec = await Periode.findOne({ label: 'Décembre 2090' });
     expect(dec).not.toBeNull();
     expect(dec.periodicity).toBe('monthly');
     expect(formatDate(dec.deadline)).toBe('2091-01-05');
@@ -91,7 +91,7 @@ describe('init-periodes script', { timeout: 120000 }, () => {
   it('P3 annee bissextile : fevrier 2096 se termine le 29', async () => {
     const r = run('src/scripts/init-periodes.js', ['--annee', '2096', '--echeance-mensuelle-jour', '5', '--echeance-trimestrielle-jours', '15', '--apply']);
     expect(r.status).toBe(0);
-    const fev = await Periode.findOne({ label: 'Fevrier 2096' });
+    const fev = await Periode.findOne({ label: 'Février 2096' });
     expect(fev).not.toBeNull();
     expect(formatDate(fev.end)).toBe('2096-02-29');
   });
@@ -149,8 +149,8 @@ describe('init-periodes script', { timeout: 120000 }, () => {
   it('P7 les libelles sont en francais comme dans le seed', async () => {
     await run('src/scripts/init-periodes.js', [...defaultArgs(), '--apply']);
     const expectedLabels = [
-      'Janvier 2090', 'Fevrier 2090', 'Mars 2090', 'Avril 2090', 'Mai 2090', 'Juin 2090',
-      'Juillet 2090', 'Aout 2090', 'Septembre 2090', 'Octobre 2090', 'Novembre 2090', 'Decembre 2090',
+      'Janvier 2090', 'Février 2090', 'Mars 2090', 'Avril 2090', 'Mai 2090', 'Juin 2090',
+      'Juillet 2090', 'Août 2090', 'Septembre 2090', 'Octobre 2090', 'Novembre 2090', 'Décembre 2090',
       'T1 2090', 'T2 2090', 'T3 2090', 'T4 2090'
     ];
     for (const label of expectedLabels) {
@@ -210,17 +210,17 @@ describe('init-periodes script', { timeout: 120000 }, () => {
     expect(r1.stdout).toContain('Periodes : 4 a creer');
     expect(r1.stdout).toContain('Octobre 2090');
     expect(r1.stdout).toContain('Novembre 2090');
-    expect(r1.stdout).toContain('Decembre 2090');
+    expect(r1.stdout).toContain('Décembre 2090');
     expect(r1.stdout).toContain('T4 2090');
 
     const r2 = run('src/scripts/init-periodes.js', [...defaultArgs(), '--premier-mois', '8']);
     expect(r2.status).toBe(0);
     expect(r2.stdout).toContain('Periodes : 7 a creer');
-    expect(r2.stdout).toContain('Aout 2090');
+    expect(r2.stdout).toContain('Août 2090');
     expect(r2.stdout).toContain('Septembre 2090');
     expect(r2.stdout).toContain('Octobre 2090');
     expect(r2.stdout).toContain('Novembre 2090');
-    expect(r2.stdout).toContain('Decembre 2090');
+    expect(r2.stdout).toContain('Décembre 2090');
     expect(r2.stdout).toContain('T3 2090');
     expect(r2.stdout).toContain('T4 2090');
   });

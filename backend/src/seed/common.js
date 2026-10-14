@@ -31,5 +31,11 @@ export async function ensureModules() {
     );
     created += res.upsertedCount || 0;
   }
+  // Databases created before this field existed: fill it for RA only if it is missing.
+  // Never overwrites a value that already exists (a developer may have chosen otherwise).
+  await ModuleModel.updateOne(
+    { code: 'RA', allowedPeriodicities: { $exists: false } },
+    { $set: { allowedPeriodicities: ['monthly', 'quarterly'] } },
+  );
   return { created, existing: MODULES.length - created };
 }

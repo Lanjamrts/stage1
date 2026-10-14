@@ -84,6 +84,20 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 - Known existing limitation: archive.js treats a period as finished from 00:00 UTC of its last day.
 - The Rapport d'activites monthly-and-quarterly case is NOT handled here (Step 5b).
 
+## Step 5b – Accents in period labels
+
+- Month labels now use proper French accents (Février, Août, Décembre).
+- Databases already initialised with the old unaccented labels will report a conflict on the same (periodicity, start); in that case rename those periods by hand or recreate them. No migration is written in this step.
+
+## Step 6 – RA periodicity and accents
+
+- New field `allowedPeriodicities` (default `[]`) added to Module model; only RA sets it to `['monthly', 'quarterly']`.
+- `periodicity` remains the EXPECTED cadence used by the dashboard; `allowedPeriodicities` only widens what a client can create.
+- Dashboard intentionally unchanged: it still counts expected submissions using `periodicity` only. A quarterly RA saisie does not count as the three monthly expected submissions in the dashboard (to be confirmed by the SSEBF).
+- RA backfill in `ensureModules()` only when the field is missing (`$exists: false`); never overwrites a developer's choice.
+- Accents added to month labels in `init-periodes.js` and test expectations updated; existing databases with unaccented labels will conflict on (periodicity, start) — manual remedy required.
+- README fixed: completed the cut sentence about `--purge-audit` and added "Périodicité du Rapport d'activités" section.
+
 ## Step 4 – Real database initialization
 
 - CSV import with dry-run by default; --apply refused while any line is valide=non; --allow-unvalidated forbidden in production.

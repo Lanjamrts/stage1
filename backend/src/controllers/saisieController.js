@@ -12,6 +12,7 @@ import { optionsForModule } from '../services/moduleMeta.js';
 import { canTransition, TRANSITION_ERROR } from '../services/transitions.js';
 import { serializeSaisie, entryActor } from '../services/serializeSaisie.js';
 import { validateSubmit, validateDraft, computeAutos, STATUS_LABELS } from '../../../shared/rules.mjs';
+import { acceptedPeriodicities } from '../utils/periodicity.js';
 
 const OBJECT_ID = /^[0-9a-fA-F]{24}$/;
 const NOT_FOUND = 'Ressource introuvable.';
@@ -195,7 +196,7 @@ export async function createSaisie(req, res) {
     if (!periodeId) return res.status(400).json({ message: REQUIRED_MSG });
     const periode = await Periode.findById(periodeId);
     if (!periode) return res.status(404).json({ message: 'Période introuvable.' });
-    if (periode.periodicity !== moduleDoc.periodicity) {
+    if (!acceptedPeriodicities(moduleDoc).includes(periode.periodicity)) {
       return res.status(400).json({ message: 'La période ne correspond pas à la périodicité du module.' });
     }
     const existing = await Saisie.findOne({

@@ -18,9 +18,12 @@ export default function NouvelleSaisieModal({ module, periodes, isOpen, onClose,
 
   const isPeriodic = module?.kind === 'periodic';
 
-  // Périodes de la périodicité du module (plus récente en premier)
+  // Périodes acceptées selon allowedPeriodicities (ou periodicity par défaut)
+  const accepted = module?.allowedPeriodicities?.length ? module.allowedPeriodicities : [module?.periodicity];
+
+  // Périodes de la périodicité acceptée (plus récente en premier)
   const modulePeriodes = (periodes || [])
-    .filter((p) => (isPeriodic ? p.periodicity === module.periodicity : true))
+    .filter((p) => (isPeriodic ? accepted.includes(p.periodicity) : true))
     .sort((a, b) => new Date(b.start) - new Date(a.start));
 
   // Période par défaut = période courante (start <= aujourd'hui la plus récente)
@@ -108,7 +111,9 @@ export default function NouvelleSaisieModal({ module, periodes, isOpen, onClose,
           {isPeriodic
             ? 'Choisissez la période concernée.'
             : 'Indiquez la date de la référence de cet événement.'}
-          {isPeriodic && PERIODICITY_HINTS[module.periodicity]
+          {isPeriodic && accepted.length > 1
+            ? ' Périodicité : mensuelle ou trimestrielle.'
+            : isPeriodic && PERIODICITY_HINTS[module.periodicity]
             ? ` ${PERIODICITY_HINTS[module.periodicity]}`
             : ''}
         </p>

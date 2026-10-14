@@ -65,7 +65,7 @@ Crée les profils et les 13 gabarits s'ils n'existent pas. Sûr en production. N
 ```bash
 cd backend && npm run seed:demo
 ```
-(ou `npm run seed`) : données de démonstration. SUPPRIME les données (sauf le journal d'audit) après confirmation « OUI ». Options : `-- --yes` (sans confirmation), `-- --purge-audit` (supprime aussi le journal).
+(ou `npm run seed`) : données de démonstration. SUPPRIME les données (sauf le journal d'audit) après confirmation « OUI ». Options : `-- --yes` (sans confirmation), `-- --purge-audit` (supprime aussi le journal d'audit).
 
 ```bash
 cd backend && npm run create-admin
@@ -87,6 +87,10 @@ cd backend && npm run archive
 ```
 
 Passe en statut `archivee` les rapports `exportee` dont la période est terminée.
+
+## Périodicité du Rapport d'activités
+
+Le Rapport d'activités accepte une période mensuelle ou trimestrielle ; le tableau de bord n'attend que la cadence mensuelle ; règle à confirmer par le SSEBF.
 
 ## Initialiser une base réelle
 
