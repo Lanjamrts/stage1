@@ -2,6 +2,14 @@
 
 Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 
+## Step 7 – Developer experience
+
+- Root package.json with `install:all`, `setup`, `dev` (concurrently), `db:up`/`db:down` (docker compose), `test`, `build`.
+- `scripts/setup.mjs` copies .env.example → .env only if missing, generates 96-char JWT_SECRET, never overwrites.
+- `docker-compose.yml` for dev-only MongoDB (no auth, not for production).
+- `concurrently@^9` is the only new dependency added.
+- Production config refuses the example JWT_SECRET `votre-secret-jwt-d-au-moins-32-caracteres-ici` with clear error message.
+
 - [P1] Structure monorepo: dossiers /server et /client à la racine, chacun avec son package.json et ses scripts.
 - [P1] Fichiers de seed centralisés dans /server/src/seed/ et exécutés par `npm run seed` (idempotent: purge puis ré-insertion complète).
 - [P1] structures.code non unique (SRB existe dans 3 régions); l'identifiant réel est code+région, libellé unique « SRB – Analamanga ».

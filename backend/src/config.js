@@ -30,7 +30,15 @@ export function parseEnv(env) {
     const errors = parsed.error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join('; ');
     throw new Error(`Configuration invalide: ${errors}`);
   }
-  return parsed.data;
+  const data = parsed.data;
+
+  if (data.NODE_ENV === 'production') {
+    if (data.JWT_SECRET === 'votre-secret-jwt-d-au-moins-32-caracteres-ici') {
+      throw new Error('JWT_SECRET ne peut pas être la valeur d\'exemple en production');
+    }
+  }
+
+  return data;
 }
 
 export function loadConfig() {
@@ -62,6 +70,9 @@ export function loadConfig() {
     }
     if (config.JWT_SECRET === 'change-me-in-production-sigbd-2026') {
       throw new Error('JWT_SECRET ne peut pas être la valeur par défaut en production');
+    }
+    if (config.JWT_SECRET === 'votre-secret-jwt-d-au-moins-32-caracteres-ici') {
+      throw new Error('JWT_SECRET ne peut pas être la valeur d\'exemple en production');
     }
   }
 

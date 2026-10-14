@@ -10,7 +10,21 @@ et leur consultation en lecture seule.
 ## Prérequis
 
 - Node.js ≥ 18
-- MongoDB local (`mongodb://127.0.0.1:27017`)
+- MongoDB local (`mongodb://127.0.0.1:27017`) ou Docker (optionnel, voir `npm run db:up`)
+
+## Démarrage rapide
+
+```bash
+npm run install:all   # installe les dépendances (racine, backend, frontend)
+npm run setup         # crée les .env (backend + frontend) sans écraser l'existant
+npm run db:up         # (optionnel) démarre MongoDB dans Docker
+cd backend && npm run seed:demo
+npm run dev           # depuis la racine : lance l'API (port 4000) et le frontend (port 5173)
+```
+
+Puis ouvrir <http://localhost:5173> et se connecter avec `104562` / `Test@2026`.
+
+> **Note** : si un MongoDB local tourne déjà sur le port 27017, ne lancez pas `npm run db:up` (conflit de port).
 
 ## Installation
 
@@ -21,12 +35,22 @@ cd ../frontend && npm install
 
 ## Configuration
 
-Copiez les fichiers d'exemple et adaptez les valeurs :
+La méthode recommandée est d'utiliser le script de configuration automatique :
+
+```bash
+npm run setup
+```
+
+Ce script copie `backend/.env.example` vers `backend/.env` et `frontend/.env.example` vers `frontend/.env` **uniquement s'ils n'existent pas déjà** (jamais d'écrasement). Il génère aussi un `JWT_SECRET` aléatoire de 96 caractères dans `backend/.env`.
+
+Méthode manuelle (alternative) :
 
 ```bash
 cp backend/.env.example backend/.env
 cp frontend/.env.example frontend/.env
 ```
+
+Puis adaptez les valeurs, notamment `JWT_SECRET` en production.
 
 Variables backend (`.env`) :
 - `NODE_ENV` : `development` | `production` | `test` (défaut: `development`)
@@ -145,10 +169,14 @@ Puis ouvrir <http://localhost:5173>.
 ```bash
 cd backend && npm test
 ```
+Ou depuis la racine :
+```bash
+npm run test
+```
 
 Le script sème d'abord la base dédiée `sigbd_test`, puis exécute la suite Vitest
-(33 tests : RBAC, machine à états, audit append-only, `mustChangePassword`…).
-Le build de production du client : `cd frontend && npm run build`.
+(81 tests : RBAC, machine à états, audit append-only, `mustChangePassword`, périodicité, seed, setup, config…).
+Le build de production du client : `cd frontend && npm run build` ou `npm run build` depuis la racine.
 
 ## Comptes de démonstration
 
@@ -165,6 +193,16 @@ Mot de passe commun : `Test@2026`
 | `121775` | consultant  | DGBF (lecture seule)           |
 | `125430` | client      | doit changer son mot de passe  |
 | `098716` | client      | désactivé                      |
+
+### Que voit chaque compte ?
+
+D'après les menus définis dans `frontend/src/menus.js` :
+
+- **client** : Tableau de bord, Mes saisies
+- **admin2** : Données saisies, Consultation et téléchargement, Remarques
+- **admin1** : Tableau de bord, Utilisateurs, Collecte et téléchargement, Journal d'audit, Remarques
+- **developpeur** : Paramétrage, Remarques, Journal d'audit
+- **consultant** : Tableau de bord, Consultation des données
 
 ## Rôles et machine à états
 

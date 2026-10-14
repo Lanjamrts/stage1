@@ -1,0 +1,18 @@
+{
+  "name": "sigbd",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SIGBD - Système Informatisé de Gestion de la Base de Données (Ministère de l'Économie et des Finances, DGBF / SSEBF)",
+  "scripts": {
+    "install:all": "npm install && npm install --prefix backend && npm install --prefix frontend",
+    "setup": "node scripts/setup.mjs",
+    "dev": "concurrently -n api,web -c blue,green \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
+    "db:up": "docker compose up -d mongo",
+    "db:down": "docker compose down",
+    "test": "npm test --prefix backend",
+    "build": "npm run build --prefix frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^9"
+  }
+}
