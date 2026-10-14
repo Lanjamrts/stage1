@@ -94,7 +94,7 @@ Pour initialiser une base de production (ou de préproduction) avec les structur
 
 1. Choisissez la base réelle, par exemple `sigbd_prod` (jamais la base de démo `sigbd`).
 2. `NODE_ENV=production MONGODB_URI=mongodb://127.0.0.1:27017/sigbd_prod npm run seed:ref` (profils et modules).
-3. Éditez `backend/data/init/regions.csv` et `backend/data/init/structures.csv` ; mettez `valide` à `oui` **uniquement après confirmation par le SSEBF**.
+3. Éditez `backend/data/init/regions.csv` et `backend/data/init/structures.csv` ; mettez `valide` à `oui` **uniquement après confirmation par le SSEBF**. Types acceptes dans structures.csv : SRB, SRSP, SRPE, CIRBF, DRBF.
 4. Vérifiez sans écrire : `NODE_ENV=production MONGODB_URI=mongodb://127.0.0.1:27017/sigbd_prod npm run init:structures`
 5. Écrivez : même commande avec `-- --apply` (refusé tant qu'une ligne a `valide=non`).
 6. `NODE_ENV=production MONGODB_URI=mongodb://127.0.0.1:27017/sigbd_prod npm run create-admin` (premier Admin 1, mot de passe provisoire affiché une seule fois).

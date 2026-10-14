@@ -245,4 +245,60 @@ SRB;Analamanga;oui;
     expect(error).not.toBeNull();
     expect(error.code).toBe(11000);
   });
+
+  it('I10 le dry-run compte correctement sur une base deja initialisee', async () => {
+    await run('src/scripts/init-structures.js', ['--apply'], { INIT_DATA_DIR: tempDir });
+
+    const r1 = run('src/scripts/init-structures.js', [], { INIT_DATA_DIR: tempDir });
+    expect(r1.status).toBe(0);
+    expect(r1.stdout).toContain('Regions : 0 a creer');
+    expect(r1.stdout).toContain('Structures : 0 a creer');
+
+    const structuresCsv2 = `type;region;valide;note
+SRB;Analamanga;oui;
+SRSP;Analamanga;oui;
+SRPE;Analamanga;oui;
+CIRBF;Analamanga;oui;
+SRB;Atsinanana;oui;
+SRSP;Atsinanana;oui;
+SRPE;Atsinanana;oui;
+CIRBF;Atsinanana;oui;
+SRB;Diana;oui;
+SRSP;Diana;oui;
+SRPE;Diana;oui;
+CIRBF;Diana;oui;
+SRB;Atsimo-Andrefana;oui;
+`;
+    writeFixtures(tempDir, `region;valide;note
+Analamanga;oui;
+Atsinanana;oui;
+Diana;oui;
+Atsimo-Andrefana;oui;
+`, structuresCsv2);
+
+    const r2 = run('src/scripts/init-structures.js', [], { INIT_DATA_DIR: tempDir });
+    expect(r2.status).toBe(0);
+    expect(r2.stdout).toContain('Structures : 1 a creer');
+
+    const structCount = await Structure.countDocuments();
+    expect(structCount).toBe(15);
+  });
+
+  it('I11 DRBF est accepte dans structures.csv', async () => {
+    const regionsCsv = `region;valide;note
+Analamanga;oui;
+`;
+    const structuresCsv = `type;region;valide;note
+DRBF;Analamanga;oui;
+`;
+    writeFixtures(tempDir, regionsCsv, structuresCsv);
+
+    const r = run('src/scripts/init-structures.js', ['--apply'], { INIT_DATA_DIR: tempDir });
+    expect(r.status).toBe(0);
+
+    const drbf = await Structure.findOne({ code: 'DRBF-ANALAMANGA' });
+    expect(drbf).not.toBeNull();
+    expect(drbf.label).toBe('DRBF – Analamanga');
+    expect(drbf.type).toBe('DRBF');
+  });
 });

@@ -84,6 +84,9 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 - Semicolon/BOM/CRLF support for French Excel.
 - Lists come from unofficial sources; points to confirm: Ambatosoa only in SRB list; Menabe absent from SRPE source; Analamanga SRSP possibly handled by central structure; possible Vatovavy/Fitovinany regrouping.
 - Users NOT imported (typed in UI); periods deferred to Step 5.
+- Fixed the report counters: a CSV row already present in the database is no longer counted as "a creer" (the preview is what the user reads before --apply); covered by test I10.
+- DRBF is accepted in structures.csv (regional directorate that submits reports; not a central structure); no DRBF row is shipped until the SSEBF confirms the list; covered by test I11.
+- structures.csv rows are grouped by region (SRB, SRSP, SRPE, CIRBF for each region) rather than by type, which is easier to review with the SSEBF.
 
 ## Step 3 – Seed split
 

@@ -18,8 +18,8 @@ const CENTRAL_STRUCTURES = [
   { code: 'CELLULE_INFO', label: 'DGBF – Cellule Informatique', type: 'CELLULE_INFO', regionId: null },
 ];
 
-const VALID_TYPES = ['SRB', 'SRSP', 'SRPE', 'CIRBF'];
-const CENTRAL_TYPES = ['SSEBF', 'DGBF', 'CELLULE_INFO', 'DRBF'];
+const VALID_TYPES = ['SRB', 'SRSP', 'SRPE', 'CIRBF', 'DRBF'];
+const CENTRAL_TYPES = ['SSEBF', 'DGBF', 'CELLULE_INFO'];
 
 function slugify(regionName) {
   return regionName
@@ -252,8 +252,11 @@ async function main() {
   const centralToCreate = CENTRAL_STRUCTURES.filter(cs => !existingStructByCode.has(cs.code)).length;
   const centralExisting = CENTRAL_STRUCTURES.length - centralToCreate;
 
+  const csvToCreate = structInfos.filter((i) => !existingStructByCode.has(i.code)).length;
+  const csvExisting = structInfos.length - csvToCreate;
+
   console.log(`Regions : ${regionToCreate.length} a creer, ${regionExisting.length} deja presente(s)`);
-  console.log(`Structures : ${structInfos.length + centralToCreate} a creer, ${existingStructures.length + centralExisting} deja presente(s)`);
+  console.log(`Structures : ${csvToCreate + centralToCreate} a creer, ${csvExisting + centralExisting} deja presente(s)`);
   console.log(`Lignes non validees : ${totalUnvalidated}`);
 
   if (!APPLY) {
