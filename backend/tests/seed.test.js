@@ -123,4 +123,13 @@ describe('Seed split (reference vs demo)', { timeout: 120000 }, () => {
     const r = run('src/seed/reference.js', [], { NODE_ENV: 'production' });
     expect(r.status).toBe(0);
   });
+
+  it('S9 seed:demo sans --yes est refuse meme avec NODE_ENV=test', async () => {
+    const before = await Utilisateur.countDocuments();
+    const r = run('src/seed/demo.js', []);
+    expect(r.status).toBe(1);
+    expect(r.stderr).toContain('--yes');
+    const after = await Utilisateur.countDocuments();
+    expect(after).toBe(before);
+  });
 });

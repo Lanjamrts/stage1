@@ -83,6 +83,7 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 - Fixed typo "modules cres" → "modules crees".
 - Corrected SSEBF expansion in README from "Service Systèmes Électroniques de Budget et de Finances" to "Service des Structures Excentriques du Budget et des Finances (SSEBF)".
 - Known limitation: demo seed still deletes users, so audit lines may reference users that no longer exist (accepted: the log is append-only).
+- demo.js no longer skips the confirmation when NODE_ENV=test: only --yes skips it (prevents an unprompted purge if .env points to the dev database with NODE_ENV=test). Test S9 covers it.
 
 ## Step 2 – Backend hardening
 
@@ -98,7 +99,7 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 - Role enum ajouté sur Utilisateur.role : ['client','admin2','admin1','developpeur','consultant'].
 - Fallback test corrigé : JWT_SECRET et MONGODB_URI ont des fallbacks dans loadConfig() quand NODE_ENV === 'test' (auparavant bloc inatteignable après zod parse).
 - Nouveau fichier de tests hardening.test.js (7 tests) : parseEnv, body limits, JSON errors, forged token, role enum.
-- Seed refuse to run in production unless ALLOW_SEED_IN_PRODUCTION=true; guard placed in a separate module imported first so it runs before any other import.
+- Seed guard (guard.js) is imported first so it runs before any other import. Its variable was later unified to SEED_ALLOW_PRODUCTION (see Step 3).
 
 ## Step 1 – Logo
 

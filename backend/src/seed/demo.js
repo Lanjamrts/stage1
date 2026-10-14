@@ -72,7 +72,7 @@ const PERIODES = [
 ];
 
 async function confirmOrExit() {
-  if (YES || config.NODE_ENV === 'test') return;
+  if (YES) return;
   const dbName = new URL(config.MONGODB_URI).pathname.replace('/', '') || '(inconnue)';
   console.log(`ATTENTION : ce script SUPPRIME les donnees de la base "${dbName}" (regions, structures, utilisateurs, periodes, referentiels, modules, saisies, remarques) et recree des donnees de demonstration.`);
   console.log(PURGE_AUDIT ? 'Le journal d\'audit sera AUSSI supprime (--purge-audit).' : 'Le journal d\'audit est conserve.');
