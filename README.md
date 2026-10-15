@@ -264,6 +264,8 @@ shared/     rules.mjs — règles de formulaire partagées navigateur/serveur
 design/     planches de design de référence (lecture seule)
 SPEC.md     spécification fonctionnelle (faisant foi)
 DECISIONS.md journal des choix d'implémentation phase par phase
+docs/RECETTE.md  dossier de recette (livrable L5)
+docs/DEMO.md     script de démonstration (10 min)
 ```
 
 ## Déploiement

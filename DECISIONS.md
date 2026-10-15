@@ -184,3 +184,10 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 - `restore` refuse la production sans `--allow-production` ; confirmation interactive `OUI` via `readline` (même mécanique que `seed/demo.js`) ; refus en mode non interactif sans `--yes`.
 - Pas de nouvelle dépendance npm ; `loadtest.mjs` en Node natif (fetch, readline) : 5 comptes démo, 4 routes GET par rôle, p50/p95/p99, taux d'erreur, 429 ; sécurité : hôte localhost uniquement, max 1000 req/compte.
 - 6 tests backup (B1–B6) : création, refus écrasement, restauration, vérification, garde production, détection écart post-sauvegarde ; total 90 tests.
+
+## Step 10 – Passage final
+
+- Vérification clone neuf sur main : `npm run install:all`, `npm run setup` (.env en 600), seed, `npm run dev`, tests (90 passed), build → OK.
+- `docs/DEMO.md` ajouté : script 10 min avec 9 étapes, comptes/menus/boutons lus dans le code (grep), données du seed (RA/RH/RMI, périodes Sept/T3/Oct 2026, structures SRB/SRSP/CIRBF-ANL).
+- Étapes marquées « À vérifier » : aucune (toutes les étapes sont réalisables avec les données du seed et les écrans existants).
+- README : liens `docs/RECETTE.md` et `docs/DEMO.md` ajoutés dans « Structure du dépôt ».
