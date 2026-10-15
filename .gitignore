@@ -1,6 +1,7 @@
 node_modules/
 dist/
 .env
+backups/
 *.log
 .DS_Store
 stitch_sigbd_design_system_guide.zip
