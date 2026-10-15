@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 "use strict";
 
-import { copyFileSync, existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, readFileSync, writeFileSync, chmodSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { randomBytes } from 'node:crypto';
@@ -26,6 +26,11 @@ for (const pair of envPairs) {
 
   if (!existsSync(pair.target)) {
     copyFileSync(pair.example, pair.target);
+    try {
+      chmodSync(pair.target, 0o600);
+    } catch {
+      /* permissions are not supported on every platform */
+    }
     results.created.push(pair.target);
   } else {
     results.existing.push(pair.target);

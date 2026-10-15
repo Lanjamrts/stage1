@@ -15,11 +15,11 @@ et leur consultation en lecture seule.
 ## Démarrage rapide
 
 ```bash
-npm run install:all   # installe les dépendances (racine, backend, frontend)
-npm run setup         # crée les .env (backend + frontend) sans écraser l'existant
-npm run db:up         # (optionnel) démarre MongoDB dans Docker
-cd backend && npm run seed:demo
-npm run dev           # depuis la racine : lance l'API (port 4000) et le frontend (port 5173)
+npm run install:all                # installe les dépendances (racine, backend, frontend)
+npm run setup                      # crée les .env (backend + frontend) sans écraser l'existant
+npm run db:up                      # (optionnel) démarre MongoDB dans Docker
+npm run seed:demo --prefix backend # données de démonstration ; tapez OUI à la confirmation
+npm run dev                        # lance l'API (port 4000) et le frontend (port 5173)
 ```
 
 Puis ouvrir <http://localhost:5173> et se connecter avec `104562` / `Test@2026`.

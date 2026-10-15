@@ -2,7 +2,7 @@
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { spawnSync } from 'node:child_process';
-import { mkdirSync, rmSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
+import { mkdirSync, rmSync, writeFileSync, readFileSync, existsSync, statSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -58,6 +58,9 @@ describe('Setup script (scripts/setup.mjs)', { timeout: 30000 }, () => {
     expect(match[1]).not.toBe('votre-secret-jwt-d-au-moins-32-caracteres-ici');
     expect(match[1].length).toBe(96);
     expect(/^[0-9a-f]+$/i.test(match[1])).toBe(true);
+    if (process.platform !== 'win32') {
+      expect((statSync(envPath).mode & 0o077) === 0).toBe(true);
+    }
   });
 
   it('D2 : un .env existant n\'est jamais modifié (contenu identique octet pour octet)', () => {
