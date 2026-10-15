@@ -192,3 +192,4 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 - Étapes marquées « À vérifier » : aucune (toutes les étapes sont réalisables avec les données du seed et les écrans existants).
 - README : liens `docs/RECETTE.md` et `docs/DEMO.md` ajoutés dans « Structure du dépôt ».
 - DEMO.md corrigé : conflit brouillon Octobre 2026 dans le seed → passage à Septembre 2026 pour l'étape 1 et toutes les étapes suivantes ; libellés d'actions d'audit alignés sur l'affichage réel (ex. saisie_reject → « Rejet de saisie ») ; motif de rejet aligné sur les champs RA réels (« Indicateurs de performance ») ; références de code déplacées en commentaires HTML invisibles.
+- DEMO.md : filtre Période inexistant retiré, libellés de confirmation corrigés, références en commentaires HTML.
