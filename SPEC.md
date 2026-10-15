@@ -13,7 +13,7 @@ Application web du Ministère de l'Économie et des Finances ( DGBF / SSEBF ). T
 ## RÉFÉRENCE VISUELLE
 - Les écrans exportés par le designer sont dans un zip: ~/sigbd/stitch_sigbd_design_system_guide.zip. Dézippé dans ./design (lecture seule). Chaque dossier contient code.html (Tailwind HTML) et screen.png. Lire design/syst_me_de_design_sigbd_dgbf/DESIGN.md pour les couleurs, polices et tokens.
 - Reproduire les mises en page, textes, couleurs et composants de ces écrans en React ( extraire les composants partagés: AppShell, Sidebar, TopBar, StatusBadge, RoleChip, DataTable, Modal, Drawer, Toast, FormField, RepeatableTable, Banner ).
-- L'emblème du Ministère est le PNG dans design/. Le copier vers frontend/public/emblem.png et l'utiliser de là ( jamais de hotlink externe).
+- Les fichiers livrés sont frontend/public/emblem-128.png et frontend/public/emblem-256.png (original conservé dans frontend/assets-src/emblem-original.png).
 - QUAND UN ÉCRAN ENTRE EN CONFLIT AVEC CETTE SPÉCIFICATION, CETTE SPÉCIFICATION GAGNE. Défauts connus du zip à NE PAS copier:
  1. « Portail Client/Régional/Bénéficiaire/Déconcentré », « Exercice budgétaire… », « Ministère Éco & Fin », « Direction Générale » dans les sidebars: sidebar = emblème + « SIGBD » + menu du rôle + pied de page « DGBF · SSEBF » uniquement.
 

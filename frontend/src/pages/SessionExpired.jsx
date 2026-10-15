@@ -1,6 +1,9 @@
+import Logo from '../components/Common/Logo.jsx';
+
 export default function SessionExpired() {
   return (
-    <div className="min-h-screen bg-[#F5F7FA] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-[#F5F7FA] flex flex-col items-center justify-center px-4">
+      <div className="flex justify-center mb-6"><Logo size={56} withText /></div>
       <div className="w-full max-w-[480px] bg-white rounded-xl border border-[#E3E8EF] shadow-card p-10 text-center">
         <div className="w-14 h-14 mx-auto rounded-full bg-[#FEF3C7] flex items-center justify-center mb-5">
           <svg className="w-7 h-7 text-[#B7791F]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">

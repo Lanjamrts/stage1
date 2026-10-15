@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LANDING_BY_ROLE } from '../../menus.js';
+import Logo from '../Common/Logo.jsx';
 
 export default function LoginPage() {
   const [im, setIm] = useState('');
@@ -73,7 +74,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-[#F5F7FA] flex flex-col">
       <div className="h-1 w-full flex">
-        <div className="flex-1 bg-[#C8102E]" />
+        <div className="flex-1 bg-[#B42318]" />
         <div className="flex-1 bg-[#1E7B4F]" />
       </div>
 
@@ -82,11 +83,12 @@ export default function LoginPage() {
           {/* Panneau institutionnel */}
           <div className="md:w-[46%] bg-[#0B2A4A] text-white p-10 flex flex-col justify-between">
             <div>
-              <div className="text-[13px] tracking-wide text-white/80">
-                Ministère de l'Économie et des Finances
-              </div>
-              <div className="text-[12px] tracking-widest uppercase text-white/60 mt-1">
-                DGBF · SSEBF
+              <div className="flex items-center gap-4">
+                <Logo size={64} />
+                <div>
+                  <div className="text-[13px] tracking-wide text-white/80">Ministère de l'Économie et des Finances</div>
+                  <div className="text-[12px] tracking-widest uppercase text-white/60 mt-1">DGBF · SSEBF</div>
+                </div>
               </div>
               <div className="mt-8 text-[32px] font-semibold tracking-tight">SIGBD</div>
               <div className="mt-1 text-[15px] text-white/90 leading-snug">
@@ -166,13 +168,14 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
-                    aria-label="Afficher ou masquer le mot de passe"
+                    aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-[#5B6778] hover:text-[#1A2433]"
                     disabled={blocked}
                   >
                     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                       <circle cx="12" cy="12" r="3"></circle>
+                      {showPassword && <path d="M3 3l18 18"></path>}
                     </svg>
                   </button>
                 </div>

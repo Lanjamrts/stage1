@@ -12,6 +12,7 @@ export const MODULES_GROUP_1 = [
     code: 'RA',
     label: "Rapport d'activités",
     periodicity: 'monthly',
+    allowedPeriodicities: ['monthly', 'quarterly'],
     kind: 'periodic',
     structureTypes: ['SRB', 'SRSP', 'CIRBF'],
     fields: [

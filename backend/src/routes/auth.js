@@ -1,20 +1,23 @@
 import express from 'express';
 import rateLimit from 'express-rate-limit';
+import { getConfig } from '../config.js';
 
 import { login, logout, me, changePassword, refresh } from '../controllers/authController.js';
 import { requireAuth } from '../middleware/auth.js';
 
+const config = getConfig();
+
 const router = express.Router();
 
-const isTest = process.env.NODE_ENV === 'test';
-
 // Rate limit spécifique pour login (désactivé en test).
-// 20/5min : assez élevé pour que le verrouillage de compte (5 échecs) soit
-// visible par l'utilisateur avant d'être limité par IP.
+// IP-wide limit is deliberately generous because offices share one IP; brute force on one account is stopped by the 5-failures account lock.
 const loginLimiter = rateLimit({
-  windowMs: 5 * 60 * 1000, // 5 minutes
-  max: isTest ? 100000 : 20,
-  message: 'Trop de tentatives de connexion, veuillez réessayer plus tard.',
+  windowMs: config.LOGIN_RATE_LIMIT_WINDOW_MINUTES * 60 * 1000,
+  max: config.NODE_ENV === 'test' ? 100000 : config.LOGIN_RATE_LIMIT_MAX,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) =>
+    res.status(429).json({ code: 'RATE_LIMITED', message: 'Trop de tentatives de connexion. Réessayez dans quelques minutes.' }),
 });
 
 // Wrapper pour que les erreurs async renvoient une réponse 500 au lieu de planter

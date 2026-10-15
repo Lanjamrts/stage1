@@ -76,6 +76,7 @@ export async function getDashboard(req, res) {
     return byRegion.get(name);
   };
 
+  // Expected submissions use the module's primary cadence only (periodicity). allowedPeriodicities does not create expectations.
   for (const p of periods) {
     for (const m of mods) {
       if (m.kind !== 'periodic' || m.periodicity !== p.periodicity) continue;

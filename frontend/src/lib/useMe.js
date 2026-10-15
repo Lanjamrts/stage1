@@ -9,7 +9,7 @@ export default function useMe() {
     api('/auth/me')
       .then(setMe)
       .catch(() => setMe(null))
-      .finally(() => setLoading(false));
+      .finally(() => setLoading(false ));
   }, []);
   return { me, loading };
 }

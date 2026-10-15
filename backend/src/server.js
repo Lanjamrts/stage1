@@ -1,12 +1,10 @@
-import dotenv from 'dotenv';
 import express from 'express';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser';
 import mongoSanitize from 'express-mongo-sanitize';
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
+import { loadConfig } from './config.js';
 
 import authRoutes from './routes/auth.js';
 import moduleRoutes from './routes/modules.js';
@@ -22,7 +20,7 @@ import auditRoutes from './routes/audits.js';
 import configRoutes from './routes/config.js';
 import { requireAuth } from './middleware/auth.js';
 
-dotenv.config();
+const config = loadConfig();
 
 // Ne pas faire planter le serveur sur une promesse rejetée non gérée
 process.on('unhandledRejection', (reason) => {
@@ -30,27 +28,37 @@ process.on('unhandledRejection', (reason) => {
 });
 
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = config.PORT;
+
+if (config.TRUST_PROXY) {
+  app.set('trust proxy', 1); // exactly one reverse proxy in front of the API
+}
 
 // Middlewares de base
 app.use(helmet());
-app.use(express.json({ limit: '10kb' }));
+app.use(express.json({ limit: `${config.JSON_BODY_LIMIT_KB}kb` }));
 app.use(cookieParser());
 app.use(mongoSanitize());
 
-// Rate limiting pour toutes les routes (désactivé en environnement de test)
-const generalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: process.env.NODE_ENV === 'test' ? 100000 : 100,
-  message: 'Trop de requêtes depuis cette IP, veuillez réessayer plus tard.',
-});
-app.use('/api/', generalLimiter);
+const rateLimitHandler = (message) => (req, res) =>
+  res.status(429).json({ code: 'RATE_LIMITED', message });
 
 // Routes d'authentification (login sans auth, sous-routes gérées en interne)
 app.use('/api/auth', authRoutes);
 
 // Tout le reste sous /api est protégé (sauf login géré ci-dessus)
 app.use('/api', requireAuth());
+
+const userLimiter = rateLimit({
+  windowMs: config.RATE_LIMIT_WINDOW_MINUTES * 60 * 1000,
+  max: config.NODE_ENV === 'test' ? 100000 : config.RATE_LIMIT_USER_MAX,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => String(req.user?._id ?? 'anonymous'),
+  handler: rateLimitHandler('Trop de requêtes. Patientez quelques instants puis réessayez.'),
+});
+
+app.use('/api', userLimiter);
 
 app.use('/api/modules', moduleRoutes);
 app.use('/api/referentiels', referentielRoutes);
@@ -71,16 +79,25 @@ app.use((req, res) => {
 
 // Gestion des erreurs
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(err.status || 500).json({ message: err.message || 'Erreur interne du serveur' });
+  if (err && err.type === 'entity.too.large') {
+    return res.status(413).json({ code: 'PAYLOAD_TOO_LARGE', message: 'Les données envoyées sont trop volumineuses.' });
+  }
+  if (err && err.type === 'entity.parse.failed') {
+    return res.status(400).json({ code: 'INVALID_JSON', message: 'Requête invalide.' });
+  }
+  const status = Number.isInteger(err?.status) && err.status >= 400 && err.status < 500 ? err.status : 500;
+  if (status === 500) {
+    console.error(err?.stack || err);
+    return res.status(500).json({ code: 'INTERNAL_ERROR', message: 'Une erreur interne est survenue. Veuillez réessayer.' });
+  }
+  return res.status(status).json({ message: err.message || 'Requête invalide.' });
 });
 
 // Démarrer le serveur (sauté en environnement de test : supertest importe
 // l'app et Mongo est connecté par le setup des tests)
 async function startServer() {
   try {
-    const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/sigbd';
-    await mongoose.connect(MONGODB_URI);
+    await mongoose.connect(config.MONGODB_URI);
     console.log('✅ MongoDB connecté');
 
     app.listen(PORT, () => {
@@ -92,7 +109,7 @@ async function startServer() {
   }
 }
 
-if (process.env.NODE_ENV !== 'test') {
+if (config.NODE_ENV !== 'test') {
   startServer();
 }
 

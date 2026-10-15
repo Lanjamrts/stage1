@@ -8,16 +8,16 @@
 
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import { loadConfig } from '../config.js';
 
 import PeriodeModel from '../models/Periode.js';
 import SaisieModel from '../models/Saisie.js';
 
 dotenv.config();
-
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/sigbd';
+const config = loadConfig();
 
 async function main() {
-  await mongoose.connect(MONGODB_URI);
+  await mongoose.connect(config.MONGODB_URI);
 
   const periodesTerminees = await PeriodeModel.find({ end: { $lt: new Date() } }).select('_id').lean();
   const periodeIds = periodesTerminees.map((p) => p._id);

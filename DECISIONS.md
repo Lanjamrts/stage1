@@ -2,6 +2,14 @@
 
 Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 
+## Step 7 – Developer experience
+
+- Root package.json with `install:all`, `setup`, `dev` (concurrently), `db:up`/`db:down` (docker compose), `test`, `build`.
+- `scripts/setup.mjs` copies .env.example → .env only if missing, generates 96-char JWT_SECRET, never overwrites.
+- `docker-compose.yml` for dev-only MongoDB (no auth, not for production).
+- `concurrently@^9` is the only new dependency added.
+- Production config refuses the example JWT_SECRET `votre-secret-jwt-d-au-moins-32-caracteres-ici` with clear error message.
+
 - [P1] Structure monorepo: dossiers /server et /client à la racine, chacun avec son package.json et ses scripts.
 - [P1] Fichiers de seed centralisés dans /server/src/seed/ et exécutés par `npm run seed` (idempotent: purge puis ré-insertion complète).
 - [P1] structures.code non unique (SRB existe dans 3 régions); l'identifiant réel est code+région, libellé unique « SRB – Analamanga ».
@@ -72,3 +80,100 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 - [P8] Aucun élément des « non-objectifs » / « Défauts connus » de la SPEC n'a été repris (vérification grep sur le code : pas de relances, notifications, pièces jointes, lien « mot de passe oublié », suppression d'audit, menu consultant erroné…).
 - [P8] `npm run archive` (SPEC §2, exportee -> archivee) référencé dans package.json mais script absent : backend/src/scripts/archive.js créé — archive strictement les saisies exportee dont la période (periode.end) est passée ; les saisies d'événement (sans periodeId) ne sont pas archivées (« dont la période est terminée », lecture stricte) ; ni ligne d'audit ni entrée validations (absentes des listes fermées de la SPEC §2/§8).
 - [P8] Expiration glissante réellement glissante : le cookie et le JWT sont régénérés à chaque requête authentifiée (setSessionCookie), le cookie maxAge et la modale d'avertissement suivent SESSION_TIMEOUT_MINUTES du .env (renvoyé par /auth/me sous le nom sessionTimeoutMinutes, avertissement 5 min avant, compte à rebours 60 s) — auparavant maxAge et seuil 25 min étaient codés en dur et le serveur n'allongeait jamais la session.
+
+## Step 5 – Period generation
+
+- Script instead of API/UI (none exists yet; screens are a later step).
+- Deadline rules are REQUIRED arguments with no default (official SSEBF rules; demo values 5 and 15 come from the SPEC sample data).
+- Dates stored at 00:00 UTC with end = last day, like the demo seed (display-safe in UTC+3).
+- Natural key (periodicity, start) plus unique index, never overwrite, conflicts exit 1.
+- --premier-mois and the past-deadline guard because the dashboard counts every period with a passed deadline as expected for all regional structures.
+- Labels follow the demo seed convention ("<Mois> <annee>" and "T<n> <annee>").
+- Known existing limitation: archive.js treats a period as finished from 00:00 UTC of its last day.
+- The Rapport d'activites monthly-and-quarterly case is NOT handled here (Step 5b).
+
+## Step 5b – Accents in period labels
+
+- Month labels now use proper French accents (Février, Août, Décembre).
+- Databases already initialised with the old unaccented labels will report a conflict on the same (periodicity, start); in that case rename those periods by hand or recreate them. No migration is written in this step.
+
+## Step 6 – RA periodicity and accents
+
+- New field `allowedPeriodicities` (default `[]`) added to Module model; only RA sets it to `['monthly', 'quarterly']`.
+- `periodicity` remains the EXPECTED cadence used by the dashboard; `allowedPeriodicities` only widens what a client can create.
+- Dashboard intentionally unchanged: it still counts expected submissions using `periodicity` only. A quarterly RA saisie does not count as the three monthly expected submissions in the dashboard (to be confirmed by the SSEBF).
+- RA backfill in `ensureModules()` only when the field is missing (`$exists: false`); never overwrites a developer's choice.
+- Accents added to month labels in `init-periodes.js` and test expectations updated; existing databases with unaccented labels will conflict on (periodicity, start) — manual remedy required.
+- README fixed: completed the cut sentence about `--purge-audit` and added "Périodicité du Rapport d'activités" section.
+
+## Step 4 – Real database initialization
+
+- CSV import with dry-run by default; --apply refused while any line is valide=non; --allow-unvalidated forbidden in production.
+- Never delete or overwrite ($setOnInsert only).
+- Structure code = TYPE-SLUGOFREGION (no invented abbreviations); slug = uppercase, accents removed, non-alphanumeric to underscore.
+- Label TYPE – Region with EN DASH because the frontend splits on it.
+- Central structures created by the script (SSEBF, DGBF, CELLULE_INFO).
+- Unique index on Structure.code.
+- Semicolon/BOM/CRLF support for French Excel.
+- Lists come from unofficial sources; points to confirm: Ambatosoa only in SRB list; Menabe absent from SRPE source; Analamanga SRSP possibly handled by central structure; possible Vatovavy/Fitovinany regrouping.
+- Users NOT imported (typed in UI); periods deferred to Step 5.
+- Fixed the report counters: a CSV row already present in the database is no longer counted as "a creer" (the preview is what the user reads before --apply); covered by test I10.
+- DRBF is accepted in structures.csv (regional directorate that submits reports; not a central structure); no DRBF row is shipped until the SSEBF confirms the list; covered by test I11.
+- structures.csv rows are grouped by region (SRB, SRSP, SRPE, CIRBF for each region) rather than by type, which is easier to review with the SSEBF.
+
+## Step 3 – Seed split
+
+- Split the single seed into reference.js (safe, only $setOnInsert for profils and modules) and demo.js (full demo data with purge and confirmation).
+- Audit log kept by default in demo seed; --purge-audit flag to delete it explicitly.
+- Confirmation prompt requiring "OUI"; --yes flag to skip; non-interactive terminals refuse without --yes.
+- Unified production guard variable to SEED_ALLOW_PRODUCTION only (removed ALLOW_SEED_IN_PRODUCTION); guard.js applies only to demo seed, reference seed is always allowed in production.
+- seed:test script uses --yes --purge-audit for clean CI runs.
+- Fixed typo "modules cres" → "modules crees".
+- Corrected SSEBF expansion in README from "Service Systèmes Électroniques de Budget et de Finances" to "Service des Structures Excentriques du Budget et des Finances (SSEBF)".
+- Known limitation: demo seed still deletes users, so audit lines may reference users that no longer exist (accepted: the log is append-only).
+- demo.js no longer skips the confirmation when NODE_ENV=test: only --yes skips it (prevents an unprompted purge if .env points to the dev database with NODE_ENV=test). Test S9 covers it.
+
+## Step 2 – Backend hardening
+
+- TRUST_PROXY parsing: remplacé z.coerce.boolean() par z.enum(['true','false','1','0']).transform(...) pour éviter que la chaîne "false" ne devienne true.
+- trust proxy mis à 1 (au lieu de true) : express-rate-limit v7 lève ERR_ERL_PERMISSIVE_TRUST_PROXY avec true, et true permet aux clients de spoof leur IP via X-Forwarded-For.
+- Body limit porté à 2048 KB (au lieu de 10 KB) : les recensements et gabarits dépassent 10 KB.
+- Rate limit déplacé après requireAuth et clé par user id (req.user._id) : les bureaux partagent une IP, le limiteur par IP pénaliserait tout le monde.
+- Login limit 60 requêtes / 5 min (au lieu de 20) : le verrouillage compte à 5 échecs reste observable avant le 429 IP.
+- Réponses 429 en JSON avec code RATE_LIMITED (au lieu de texte brut) : cohérence API.
+- Gestionnaire d'erreurs ne fuit plus les messages internes : 413 PAYLOAD_TOO_LARGE, 400 INVALID_JSON, 500 INTERNAL_ERROR génériques.
+- requireAuth renvoie 401 sur id malformé (try/catch sur findById) : un token forgé ne fait plus planter le serveur.
+- Code mort supprimé : sameStructure, sameRegion (inutilisés, next() seulement).
+- Role enum ajouté sur Utilisateur.role : ['client','admin2','admin1','developpeur','consultant'].
+- Fallback test corrigé : JWT_SECRET et MONGODB_URI ont des fallbacks dans loadConfig() quand NODE_ENV === 'test' (auparavant bloc inatteignable après zod parse).
+- Nouveau fichier de tests hardening.test.js (7 tests) : parseEnv, body limits, JSON errors, forged token, role enum.
+- Seed guard (guard.js) is imported first so it runs before any other import. Its variable was later unified to SEED_ALLOW_PRODUCTION (see Step 3).
+
+## Step 1 – Logo
+
+- Corner transparency: original emblem-original.png (1254x1254) had transparent corners (verified via ImageMagick after installation; four corners returned srgba(0,0,0,0)). No flood-fill needed.
+- Generated optimized PNGs via ImageMagick convert with -strip -define png:compression-level=9:
+  - emblem-128.png: 27,194 bytes (27 KB, target <40 KB)
+  - emblem-256.png: 92,290 bytes (92 KB, target <120 KB)
+  - favicon.png: 8,104 bytes (8 KB, target <12 KB)
+  - apple-touch-icon.png: 49,258 bytes (49 KB, target <60 KB)
+- Total shipped images weight: 180 KB (<250 KB target).
+- Master file kept in git at frontend/assets-src/emblem-original.png; shipped files in frontend/public/.
+- Fallback "MEF" badge (navy circle with gold ring, white "MEF" text) implemented in Logo.jsx for broken-image scenarios — ensures no broken image icon ever appears.
+- Logo component used on all five public/auth pages plus sidebar (AppShell): LoginPage, ChangePasswordPage (both returns), SessionExpired, AccessDenied, AppShell.
+- Stripe color on LoginPage corrected from #C8102E to #B42318 to match app-wide red.
+- Favicon and apple-touch-icon added to index.html with theme-color #0B2A4A.
+- No npm dependencies added (ImageMagick used via system package).
+- Step 1 bis: <Logo> was imported but not rendered in ChangePasswordPage.jsx; it is now rendered in both returns (done screen and main form). Previous claim 'both returns' was inaccurate until this fix.
+
+## Step 8 – Acceptance dossier
+
+- Purpose of RECETTE.md: maps the 12 SPEC scenarios (T-01..T-12) to existing automated tests and written manual procedures; serves as deliverable L5.
+- Three état values: "Automatisé" = at least one automated test cited; "Procédure manuelle" = no automated test but manual procedure written; "Non couvert" = neither.
+- Anti-invention check (R1 in recette-doc.test.js): every test reference in RECETTE.md must exist as a real test file and contain the exact title string; fails CI if any reference is invented or drifted.
+- T-10 (backup/restore), T-11 (load/bandwidth), T-12 (browsers) deliberately left "Non couvert" / "Procédure manuelle" — T-12 has a checklist procedure for Chrome/Firefox/Edge; T-10/T-11 marked "À définir à l'étape suivante du projet."
+- Manual procedures written but not executed; results table in section 4 is blank by design.
+- .env permissions set to 600 (rw-------) via chmodSync in scripts/setup.mjs; skip on Windows.
+- README quick start fixed: uses `--prefix backend` for seed:demo so the shell stays at repo root; single bash block with 5 lines.
+- T-01 passé en procédure manuelle (aucun test automatique ne vérifie un échec de connexion)
+- T-04 : références limitées aux tests de validation de champs

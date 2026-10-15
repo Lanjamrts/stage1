@@ -50,6 +50,9 @@ const shape = {
   periodicity: z
     .string({ required_error: 'Ce champ est obligatoire.' })
     .refine((v) => PERIODICITIES.includes(v), 'Périodicité invalide.'),
+  allowedPeriodicities: z
+    .array(z.string().refine((v) => PERIODICITIES.includes(v), 'Périodicité invalide.'))
+    .optional(),
   kind: z
     .string({ required_error: 'Ce champ est obligatoire.' })
     .refine((v) => KINDS.includes(v), 'Type de gabarit invalide.'),
@@ -103,6 +106,7 @@ router.post(
       code: data.code,
       label: data.label,
       periodicity: data.periodicity,
+      allowedPeriodicities: data.allowedPeriodicities ?? [],
       kind: data.kind,
       structureTypes: data.structureTypes,
       fields: data.fields,
@@ -131,6 +135,7 @@ router.put(
 
     doc.label = data.label;
     doc.periodicity = data.periodicity;
+    if (data.allowedPeriodicities !== undefined) doc.allowedPeriodicities = data.allowedPeriodicities;
     doc.kind = data.kind;
     doc.structureTypes = data.structureTypes;
     doc.fields = data.fields;

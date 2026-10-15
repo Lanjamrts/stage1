@@ -1,0 +1,18 @@
+# DÉVELOPPEMENT UNIQUEMENT – pas d'authentification, ne pas utiliser en production.
+services:
+  mongo:
+    image: mongo:7
+    container_name: sigbd-mongo
+    ports:
+      - "127.0.0.1:27017:27017"
+    volumes:
+      - sigbd_mongo_data:/data/db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  sigbd_mongo_data:

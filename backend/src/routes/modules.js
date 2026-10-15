@@ -3,6 +3,7 @@ import express from 'express';
 import Module from '../models/Module.js';
 import Structure from '../models/Structure.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
+import { acceptedPeriodicities } from '../utils/periodicity.js';
 
 const router = express.Router();
 
@@ -37,6 +38,7 @@ router.get(
         label: m.label,
         kind: m.kind,
         periodicity: m.periodicity,
+        allowedPeriodicities: acceptedPeriodicities(m),
         structureTypes: m.structureTypes,
         version: m.version,
         active: m.active,
@@ -74,6 +76,7 @@ router.get(
       label: m.label,
       kind: m.kind,
       periodicity: m.periodicity,
+      allowedPeriodicities: acceptedPeriodicities(m),
       structureTypes: m.structureTypes,
       version: m.version,
       active: m.active,
