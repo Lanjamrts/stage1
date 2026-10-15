@@ -15,6 +15,9 @@
     "init:periodes": "node src/scripts/init-periodes.js",
     "archive": "node src/scripts/archive.js",
     "create-admin": "node src/scripts/create-admin.js",
+    "backup": "node src/scripts/backup.js",
+    "restore": "node src/scripts/restore.js",
+    "backup:verify": "node src/scripts/verify-backup.js",
     "test": "npm run seed:test && vitest run",
     "seed:test": "NODE_ENV=test MONGODB_URI=mongodb://127.0.0.1:27017/sigbd_test node src/seed/demo.js --yes --purge-audit"
   },

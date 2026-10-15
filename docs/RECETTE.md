@@ -2,7 +2,7 @@
 
 ## 1. Objet et environnement
 
-Ce dossier de recette valide les 12 scénarios de la spécification (SPEC.md) pour l'application SIGBD. Les tests automatisés s'exécutent sur la base de test dédiée `sigbd_test` ; les procédures manuelles utilisent les données de démonstration (`npm run seed:demo --prefix backend`). Pour lancer les tests automatisés : `npm test` à la racine du projet (ou `cd backend && npm test`). Le démarrage rapide (données de démo + serveurs) est décrit dans le README (section « Démarrage rapide »). Comptes de démo : voir le tableau du README (mot de passe commun `Test@2026`). **Important : les procédures manuelles sont ÉCRITES mais NON EXÉCUTÉES ; le tableau de résultats de la section 4 est donc vide.**
+Ce dossier de recette valide les 12 scénarios de la spécification (SPEC.md) pour l'application SIGBD. Les tests automatisés s'exécutent sur la base de test dédiée `sigbd_test` ; les procédures manuelles utilisent les données de démonstration (`npm run seed:demo --prefix backend`). Pour lancer les tests automatisés : `npm test` à la racine du projet (ou `cd backend && npm test`). Le démarrage rapide (données de démo + serveurs) est décrit dans le README (section « Démarrage rapide »). Comptes de démo : voir le tableau du README (mot de passe commun `Test@2026`). **Important : les procédures manuelles sont ÉCRITES mais NON EXÉCUTÉES ; le tableau de résultats de la section 4 est donc vide. Les tests automatisés T-10 et les vérifications d'archive (backup:verify) sont exécutés dans la suite de tests `npm test`.**
 
 ## 2. Synthèse
 
@@ -17,8 +17,8 @@ Ce dossier de recette valide les 12 scénarios de la spécification (SPEC.md) po
 | T-07 | Sélection de régions et types de rapport, téléchargement Excel et PDF | Automatisé |
 | T-08 | Envoi d'une remarque via la zone contextuelle | Automatisé |
 | T-09 | Contrôle des droits par profil (accès non autorisé) | Automatisé |
-| T-10 | Sauvegarde puis restauration de la base | Non couvert |
-| T-11 | Test de charge et de connexion à débit limité | Non couvert |
+| T-10 | Sauvegarde puis restauration de la base | Automatisé |
+| T-11 | Test de charge et de connexion à débit limité | Procédure manuelle |
 | T-12 | Compatibilité navigateurs | Procédure manuelle |
 
 ## 3. Scénarios
@@ -257,12 +257,21 @@ Aucun test automatique.
 **Critère d'acceptation :** Restauration complète et vérifiée
 
 **Tests automatiques :**
-Aucun test automatique.
+- backend/tests/backup.test.js :: B1 : backup cree une archive non vide et refuse d ecraser un fichier existant (API uniquement)
+- backend/tests/backup.test.js :: B2 : restore sans --yes en mode non interactif est refuse (API uniquement)
+- backend/tests/backup.test.js :: B3 : restore remet les collections supprimees avec le meme nombre de documents (API uniquement)
+- backend/tests/backup.test.js :: B4 : backup:verify confirme la restauration et supprime la base temporaire (API uniquement)
+- backend/tests/backup.test.js :: B5 : restore est refuse en production sans --allow-production (API uniquement)
+- backend/tests/backup.test.js :: B6 : backup:verify detecte un ecart quand la base a change apres la sauvegarde (API uniquement)
 
 **Procédure manuelle :**
-À définir à l'étape suivante du projet.
+1. Créer une sauvegarde : `npm run backup --prefix backend`
+2. Copier le fichier généré dans `backups/` vers un stockage externe (HORS du serveur)
+3. Sur une COPIE de la base (jamais la base de production) : `npm run restore --prefix backend -- backups/<fichier> --yes`
+4. Vérifier que les collections ont le même nombre de documents : `npm run backup:verify --prefix backend -- backups/<fichier>`
+4. Répéter cette procédure chaque trimestre et consigner les résultats.
 
-**État ** : Non couvert
+**État ** : Automatisé
 
 ### T-11
 
@@ -274,9 +283,14 @@ Aucun test automatique.
 Aucun test automatique.
 
 **Procédure manuelle :**
-À définir à l'étape suivante du projet.
+1. Préparer une base dédiée : `MONGODB_URI=mongodb://127.0.0.1:27017/sigbd_loadcheck node backend/src/seed/demo.js --yes`
+2. Démarrer l'API sur cette base : `MONGODB_URI=mongodb://127.0.0.1:27017/sigbd_loadcheck PORT=4000 node backend/src/server.js`
+3. Lancer le test de charge : `npm run loadtest -- --duration 20 --concurrency 5`
+4. Observer les résultats : p50/p95/p99, taux d'erreur, nombre de 429
+5. Pour le test à débit limité : ouvrir les outils de développement du navigateur (onglet Réseau), sélectionner le profil « Fast 3G » ou « Slow 3G », recharger la page, chronométrer l'affichage complet ; objectif : < 3 secondes.
+6. Nettoyer : arrêter l'API, supprimer la base `sigbd_loadcheck`.
 
-**État ** : Non couvert
+**État ** : Procédure manuelle
 
 ### T-12
 

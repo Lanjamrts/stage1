@@ -178,6 +178,46 @@ Le script sème d'abord la base dédiée `sigbd_test`, puis exécute la suite Vi
 (81 tests : RBAC, machine à états, audit append-only, `mustChangePassword`, périodicité, seed, setup, config…).
 Le build de production du client : `cd frontend && npm run build` ou `npm run build` depuis la racine.
 
+## Sauvegarde et restauration
+
+Les sauvegardes sont stockées dans le dossier `backups/` à la racine du dépôt (ignoré par git). Les fichiers sont créés avec les permissions 0600 (lecture/écriture propriétaire uniquement) car ils contiennent des empreintes de mots de passe et des données sensibles.
+
+Commandes (depuis la racine du projet) :
+
+```bash
+npm run backup --prefix backend           # crée backups/sigbd-<base>-<AAAAMMJJ-HHMMSS>Z.archive.gz
+npm run restore --prefix backend -- <fichier>  # restaure ; ajoutez --yes pour confirmer sans saisie
+npm run backup:verify --prefix backend [-- <fichier>]  # vérifie la dernière ou un fichier donné
+```
+
+Exemple de ligne cron quotidienne (DOCUMENTATION SEULEMENT, rien n'est installé automatiquement) :
+
+```bash
+0 2 * * * cd /chemin/vers/projet && npm run backup --prefix backend >> /var/log/sigbd-backup.log 2>&1
+```
+
+**Important** :
+- Copiez les sauvegardes HORS du serveur (ex: stockage objet, bande, autre machine).
+- Testez la restauration chaque trimestre sur une COPIE de la base (jamais sur la base de production directement).
+- Les archives contiennent des données sensibles (empreintes de mots de passe, données budgétaires). Le mode 0600 limite l'accès au propriétaire du fichier.
+
+## Test de charge
+
+```bash
+npm run loadtest -- --duration 20 --concurrency 5
+```
+
+Options :
+- `--url` : URL de l'API (défaut `http://localhost:4000`, doit être localhost ou 127.0.0.1)
+- `--duration` : durée en secondes (défaut 20)
+- `--concurrency` : nombre de workers parallèles (défaut 5)
+- `--p95-max` : seuil en ms pour le p95 global (optionnel, exit 1 si dépassé)
+
+Seuils suggérés (non imposés, à adapter selon l'infrastructure) :
+- p95 < 1000 ms par requête API pour qu'une page reste sous 3 s
+- Taux d'erreur 0 %
+- Débit limité : testez avec les outils de développement du navigateur (onglet Réseau), profil « Fast 3G » ou « Slow 3G », chronométrez l'affichage complet de la page ; objectif : < 3 secondes.
+
 ## Comptes de démonstration
 
 Mot de passe commun : `Test@2026`
