@@ -165,3 +165,13 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 - Favicon and apple-touch-icon added to index.html with theme-color #0B2A4A.
 - No npm dependencies added (ImageMagick used via system package).
 - Step 1 bis: <Logo> was imported but not rendered in ChangePasswordPage.jsx; it is now rendered in both returns (done screen and main form). Previous claim 'both returns' was inaccurate until this fix.
+
+## Step 8 – Acceptance dossier
+
+- Purpose of RECETTE.md: maps the 12 SPEC scenarios (T-01..T-12) to existing automated tests and written manual procedures; serves as deliverable L5.
+- Three état values: "Automatisé" = at least one automated test cited; "Procédure manuelle" = no automated test but manual procedure written; "Non couvert" = neither.
+- Anti-invention check (R1 in recette-doc.test.js): every test reference in RECETTE.md must exist as a real test file and contain the exact title string; fails CI if any reference is invented or drifted.
+- T-10 (backup/restore), T-11 (load/bandwidth), T-12 (browsers) deliberately left "Non couvert" / "Procédure manuelle" — T-12 has a checklist procedure for Chrome/Firefox/Edge; T-10/T-11 marked "À définir à l'étape suivante du projet."
+- Manual procedures written but not executed; results table in section 4 is blank by design.
+- .env permissions set to 600 (rw-------) via chmodSync in scripts/setup.mjs; skip on Windows.
+- README quick start fixed: uses `--prefix backend` for seed:demo so the shell stays at repo root; single bash block with 5 lines.
