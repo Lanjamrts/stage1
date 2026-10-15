@@ -175,3 +175,5 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 - Manual procedures written but not executed; results table in section 4 is blank by design.
 - .env permissions set to 600 (rw-------) via chmodSync in scripts/setup.mjs; skip on Windows.
 - README quick start fixed: uses `--prefix backend` for seed:demo so the shell stays at repo root; single bash block with 5 lines.
+- T-01 passé en procédure manuelle (aucun test automatique ne vérifie un échec de connexion)
+- T-04 : références limitées aux tests de validation de champs

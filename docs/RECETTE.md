@@ -8,7 +8,7 @@ Ce dossier de recette valide les 12 scénarios de la spécification (SPEC.md) po
 
 | N° | Scénario | État |
 |----|----------|------|
-| T-01 | Connexion avec identifiants valides / invalides | Automatisé |
+| T-01 | Connexion avec identifiants valides / invalides | Procédure manuelle |
 | T-02 | Création, recherche et suppression d'un utilisateur par l'Administrateur 1 | Automatisé |
 | T-03 | Saisie, enregistrement, modification puis enregistrement (Client) | Automatisé |
 | T-04 | Contrôles de saisie (champs obligatoires, formats) | Automatisé |
@@ -30,13 +30,7 @@ Ce dossier de recette valide les 12 scénarios de la spécification (SPEC.md) po
 **Critère d'acceptation :** Accès autorisé uniquement avec identifiants valides
 
 **Tests automatiques :**
-- backend/tests/rbac.test.js :: client : crée, enregistre un brouillon et soumet (API uniquement)
-- backend/tests/rbac.test.js :: admin1 : utilisateurs (créer, modifier profil, réinitialiser, désactiver) (API uniquement)
-- backend/tests/rbac.test.js :: admin1 : tableau de bord, collecte, historique, export, audit, remarques (API uniquement)
-- backend/tests/rbac.test.js :: developpeur : publie une version de gabarit, gère les listes et les remarques (API uniquement)
-- backend/tests/rbac.test.js :: consultant : consultation, rapport exporté et tableau de bord (lecture seule) (API uniquement)
-- backend/tests/hardening.test.js :: token forgé avec un id malformé renvoie 401, pas de blocage (API uniquement)
-- backend/tests/hardening.test.js :: JSON malformé renvoie 400 INVALID_JSON sans fuite du parser (API uniquement)
+Aucun test automatique.
 
 **Procédure manuelle :**
 1. Ouvrir http://localhost:5173
@@ -50,7 +44,7 @@ Ce dossier de recette valide les 12 scénarios de la spécification (SPEC.md) po
 9. Répéter avec le compte développeur `123009` → redirection vers « Paramétrage »
 10. Répéter avec le compte consultant `121775` → redirection vers « Tableau de bord »
 
-**État ** : Automatisé
+**État ** : Procédure manuelle
 
 ### T-02
 
@@ -110,8 +104,6 @@ Ce dossier de recette valide les 12 scénarios de la spécification (SPEC.md) po
 **Tests automatiques :**
 - backend/tests/rbac.test.js :: soumission avec champs obligatoires manquants → 400 (API uniquement)
 - backend/tests/periodicity.test.js :: POST RH avec Septembre 2026 → 400 et message attendu (API uniquement)
-- backend/tests/hardening.test.js :: un corps JSON de 150 KB n\'est PAS rejeté avec 413 (API uniquement)
-- backend/tests/hardening.test.js :: un corps de 3 MB renvoie 413 avec code PAYLOAD_TOO_LARGE (API uniquement)
 
 **Procédure manuelle :**
 1. Se connecter en client (`104562` / `Test@2026`)
