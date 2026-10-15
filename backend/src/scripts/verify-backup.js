@@ -3,8 +3,7 @@
 
 import { getDbName, getBackupDir, checkMongoTools, getConfigUri, runCommand } from './backup-common.js';
 import { resolve, join } from 'node:path';
-import { existsSync, readdirSync, statSync, mkdtempSync, rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
+import { existsSync, readdirSync, statSync } from 'node:fs';
 import mongoose from 'mongoose';
 
 checkMongoTools();
@@ -30,7 +29,7 @@ async function main() {
       .sort((a, b) => b.time - a.time);
     if (files.length === 0) {
       console.error(`Aucune sauvegarde trouvée dans ${backupDir}`);
-      process.exit(1);
+      return 1;
     }
     filePath = join(backupDir, files[0].name);
     console.log(`Sauvegarde la plus récente : ${filePath}`);
@@ -38,7 +37,7 @@ async function main() {
     filePath = resolve(filePath);
     if (!existsSync(filePath)) {
       console.error(`Fichier introuvable : ${filePath}`);
-      process.exit(1);
+      return 1;
     }
   }
 
@@ -50,41 +49,31 @@ async function main() {
   console.log(`Base temporaire de vérification : ${tempDbName}`);
   console.log(`Fichier de sauvegarde : ${filePath}`);
 
-  // Create temporary directory for mongodump
-  const dumpDir = mkdtempSync(join(tmpdir(), 'sigbd-verify-dump-'));
-  console.log(`Répertoire temporaire pour dump : ${dumpDir}`);
+  let sourceConn;
+  let tempConn;
+  let exitCode = 0;
 
   try {
-    // Step 1: Create directory dump of source database
-    console.log('Création du dump de la base source...');
-    const dumpResult = runCommand('mongodump', ['--uri=' + uri, '--out=' + dumpDir]);
-    if (dumpResult.status !== 0) {
-      console.error('Échec de mongodump :');
-      if (dumpResult.stderr) console.error(dumpResult.stderr);
-      if (dumpResult.stdout) console.error(dumpResult.stdout);
-      process.exit(1);
-    }
-    console.log('Dump créé avec succès.');
-
-    // Step 2: Restore from directory to target database
-    const sourceDumpDir = join(dumpDir, sourceDbName);
-    console.log('Restauration dans la base temporaire...');
+    console.log('Restauration de l\'archive dans la base temporaire...');
     const restoreResult = runCommand('mongorestore', [
-      '--uri=' + tempUri,
-      '--dir=' + sourceDumpDir,
-      '--drop'
+      '--uri=' + uriWithoutDb,
+      '--archive=' + filePath,
+      '--gzip',
+      '--drop',
+      '--nsInclude=' + sourceDbName + '.*',
+      '--nsFrom=' + sourceDbName + '.*',
+      '--nsTo=' + tempDbName + '.*'
     ]);
     if (restoreResult.status !== 0) {
       console.error('Échec de mongorestore :');
       if (restoreResult.stderr) console.error(restoreResult.stderr);
       if (restoreResult.stdout) console.error(restoreResult.stdout);
-      process.exit(1);
+      return 1;
     }
     console.log('Restauration temporaire réussie. Comparaison des collections...');
 
-    // Compare databases
-    const sourceConn = await mongoose.createConnection(uri);
-    const tempConn = await mongoose.createConnection(uriWithoutDb + tempDbName);
+    sourceConn = await mongoose.createConnection(uri);
+    tempConn = await mongoose.createConnection(uriWithoutDb + tempDbName);
 
     await sourceConn.asPromise();
     await tempConn.asPromise();
@@ -96,9 +85,13 @@ async function main() {
     console.log('collection | source | restaurée | OK/ÉCART');
     console.log('---------|--------|-----------|---------');
 
+    const sourceCollections = new Set(collections.map(c => c.name).filter(n => !n.startsWith('system.')));
+    const tempCollections = new Set();
+
     for (const coll of collections) {
       const name = coll.name;
       if (name.startsWith('system.')) continue;
+      tempCollections.add(name);
       const sourceCount = await sourceConn.db.collection(name).countDocuments();
       const tempCount = await tempConn.db.collection(name).countDocuments();
       const ok = sourceCount === tempCount;
@@ -106,32 +99,44 @@ async function main() {
       console.log(`${name} | ${sourceCount} | ${tempCount} | ${ok ? 'OK' : 'ÉCART'}`);
     }
 
-    console.log('');
+    // Check for collections in temp that are not in source
+    for (const name of tempCollections) {
+      if (!sourceCollections.has(name) && !name.startsWith('system.')) {
+        allOk = false;
+        const tempCount = await tempConn.db.collection(name).countDocuments();
+        console.log(`${name} | 0 | ${tempCount} | ÉCART`);
+      }
+    }
 
-    // Clean up
-    await tempConn.dropDatabase();
-    await sourceConn.close();
-    await tempConn.close();
+    console.log('');
 
     if (allOk) {
       console.log('Restauration vérifiée.');
-      process.exit(0);
     } else {
       console.log('ÉCART détecté.');
       console.log('Note : si des écritures ont eu lieu entre la sauvegarde et la vérification, des écarts légitimes peuvent apparaître.');
-      process.exit(1);
     }
+    exitCode = allOk ? 0 : 1;
+    return exitCode;
   } finally {
-    // Clean up dump directory
+    // Clean up temp database
     try {
-      rmSync(dumpDir, { recursive: true, force: true });
+      if (tempConn) {
+        await tempConn.dropDatabase();
+        await tempConn.close();
+      }
+    } catch {
+      // ignore
+    }
+    try {
+      if (sourceConn) await sourceConn.close();
     } catch {
       // ignore
     }
   }
 }
 
-main().catch(err => {
+main().then(code => process.exit(code)).catch(err => {
   console.error('Erreur :', err.message);
   process.exit(1);
 });

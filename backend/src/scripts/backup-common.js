@@ -1,14 +1,14 @@
 "use strict";
 
 import { loadConfig } from '../config.js';
-import { mkdirSync, existsSync, statSync } from 'node:fs';
+import { mkdirSync, existsSync, statSync, chmodSync, readdirSync, renameSync, rmdirSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const ROOT = resolve(__dirname, '..', '..');
+const ROOT = resolve(__dirname, '..', '..', '..');
 
 export function getDbName() {
   const config = loadConfig();
@@ -25,16 +25,35 @@ export function getBackupDir() {
   if (!existsSync(backupDir)) {
     mkdirSync(backupDir, { recursive: true, mode: 0o700 });
   } else {
-    const st = statSync(backupDir);
-    if ((st.mode & 0o777) !== 0o700) {
-      try {
-        // Best effort: try to tighten
-        // Note: chmodSync may not work on all platforms
-      } catch {
-        // ignore
-      }
+    try {
+      chmodSync(backupDir, 0o700);
+    } catch {
+      // ignore
     }
   }
+
+  // Migrate old backend/backups if it exists
+  const oldBackupDir = join(ROOT, 'backend', 'backups');
+  if (existsSync(oldBackupDir)) {
+    const files = readdirSync(oldBackupDir);
+    for (const file of files) {
+      if (file.endsWith('.archive.gz') || file.endsWith('.archive')) {
+        const oldPath = join(oldBackupDir, file);
+        const newPath = join(backupDir, file);
+        try {
+          renameSync(oldPath, newPath);
+        } catch {
+          // ignore if already exists or other error
+        }
+      }
+    }
+    try {
+      rmdirSync(oldBackupDir);
+    } catch {
+      // ignore if not empty or other error
+    }
+  }
+
   return backupDir;
 }
 

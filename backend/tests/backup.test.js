@@ -104,7 +104,7 @@ skipIfNoTools('Scripts de sauvegarde et restauration', { timeout: 60000 }, () =>
     // Try restore without --yes (stdin closed)
     const r2 = runScript('src/scripts/restore.js', [filePath]);
     expect(r2.status).toBe(1);
-    expect(r2.stderr + r2.stdout).toContain('Mode non interactif');
+    expect(r2.stderr + r2.stdout).toContain('Terminal non interactif');
   });
 
   it('B3 : restore remet les collections supprimees avec le meme nombre de documents', async () => {
@@ -164,5 +164,34 @@ skipIfNoTools('Scripts de sauvegarde et restauration', { timeout: 60000 }, () =>
     const r2 = runScript('src/scripts/restore.js', [filePath, '--yes'], { NODE_ENV: 'production' });
     expect(r2.status).toBe(1);
     expect(r2.stderr + r2.stdout).toContain('interdite en production');
+  });
+
+  it('B6 : backup:verify detecte un ecart quand la base a change apres la sauvegarde', async () => {
+    // Create backup
+    const r1 = runScript('src/scripts/backup.js');
+    expect(r1.status).toBe(0);
+    const files = readdirSync(TEMP_BACKUP_DIR).filter(f => f.endsWith('.archive.gz'));
+    const filePath = join(TEMP_BACKUP_DIR, files[0]);
+
+    // Add a document after backup
+    await mongoose.connection.db.collection('test_coll1').insertOne({ a: 4 });
+
+    // Verify should detect the difference
+    const r2 = runScript('src/scripts/verify-backup.js', [filePath]);
+    expect(r2.status).toBe(1);
+    expect(r2.stdout).toContain('ÉCART');
+
+    // Clean up temp db
+    const checkUri = 'mongodb://127.0.0.1:27017/sigbd_backupcheck_restorecheck';
+    let tempExists = false;
+    try {
+      await mongoose.connect(checkUri);
+      await mongoose.connection.db.listCollections().toArray();
+      tempExists = true;
+      await mongoose.disconnect();
+    } catch {
+      tempExists = false;
+    }
+    expect(tempExists).toBe(false);
   });
 });

@@ -177,3 +177,10 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 - README quick start fixed: uses `--prefix backend` for seed:demo so the shell stays at repo root; single bash block with 5 lines.
 - T-01 passé en procédure manuelle (aucun test automatique ne vérifie un échec de connexion)
 - T-04 : références limitées aux tests de validation de champs
+
+## Step 9 – Sauvegarde et test de charge
+
+- Sauvegarde = `mongodump --archive --gzip` vers `backups/` à la racine (mode 0600) ; restauration = `mongorestore --archive --gzip --drop --nsInclude` ; `backup:verify` restaure l'archive dans `<base>_restorecheck` et compare les compteurs de documents.
+- `restore` refuse la production sans `--allow-production` ; confirmation interactive `OUI` via `readline` (même mécanique que `seed/demo.js`) ; refus en mode non interactif sans `--yes`.
+- Pas de nouvelle dépendance npm ; `loadtest.mjs` en Node natif (fetch, readline) : 5 comptes démo, 4 routes GET par rôle, p50/p95/p99, taux d'erreur, 429 ; sécurité : hôte localhost uniquement, max 1000 req/compte.
+- 6 tests backup (B1–B6) : création, refus écrasement, restauration, vérification, garde production, détection écart post-sauvegarde ; total 90 tests.

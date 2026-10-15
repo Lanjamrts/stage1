@@ -2,9 +2,10 @@
 "use strict";
 
 import { getDbName, checkMongoTools, getConfigUri, runCommand } from './backup-common.js';
-import { readFileSync, existsSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { loadConfig } from '../config.js';
+import readline from 'node:readline/promises';
 
 checkMongoTools();
 
@@ -50,15 +51,15 @@ console.log(`Fichier de sauvegarde : ${filePath}`);
 console.log(`Base source dans l'archive : ${sourceDbName}`);
 
 if (!yes) {
-  if (process.stdin.isTTY) {
-    process.stdout.write('Confirmez la restauration en tapant OUI : ');
-    const answer = readFileSync(0, 'utf8').trim();
-    if (answer !== 'OUI') {
-      console.log('Restauration annulée.');
-      process.exit(1);
-    }
-  } else {
-    console.error('Mode non interactif : utilisez --yes pour confirmer sans saisie.');
+  if (!process.stdin.isTTY) {
+    console.error('Terminal non interactif : utilisez --yes pour confirmer sans saisie.');
+    process.exit(1);
+  }
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  const answer = await rl.question('Confirmez la restauration en tapant OUI : ');
+  rl.close();
+  if (answer.trim() !== 'OUI') {
+    console.log('Restauration annulée.');
     process.exit(1);
   }
 }
@@ -66,17 +67,17 @@ if (!yes) {
 const uri = getConfigUri();
 const uriWithoutDb = uri.replace(/\/[^/?]+(\?.*)?$/, '/');
 const mongorestoreArgs = [
-    '--uri=' + uriWithoutDb,
-    '--archive=' + filePath,
-    '--gzip',
-    '--drop',
-    '--nsInclude', sourceDbName + '.*'
-  ];
+  '--uri=' + uriWithoutDb,
+  '--archive=' + filePath,
+  '--gzip',
+  '--drop',
+  '--nsInclude', sourceDbName + '.*'
+];
 
-  if (sourceDb && sourceDb !== targetDb) {
-    mongorestoreArgs.push('--nsFrom=' + sourceDbName + '.*');
-    mongorestoreArgs.push('--nsTo=' + targetDb + '.*');
-  }
+if (sourceDb && sourceDb !== targetDb) {
+  mongorestoreArgs.push('--nsFrom=' + sourceDbName + '.*');
+  mongorestoreArgs.push('--nsTo=' + targetDb + '.*');
+}
 
 console.log('Exécution de mongorestore...');
 const result = runCommand('mongorestore', mongorestoreArgs);
