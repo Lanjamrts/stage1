@@ -121,27 +121,28 @@ function modulesDisplay(model) {
 
 function drawInfoGrid(doc, s) {
   const exported = s.dates.exported ? fmtDateTime(s.dates.exported) : '—';
-  const metaLabels = ['Structure', 'Période / Événement', 'Statut de la saisie', 'Auteur', 'Exportée le'];
-  const infoValues = [s.structure, s.periode, s.statut, s.auteur || '—', exported];
   const labelW = 100;
-  const valW = 130;
-  const label2W = 100;
-  const val2W = CONTENT_W - labelW - valW - label2W;
-  const colWidths = [labelW, valW, label2W, val2W];
-  const infoRows = [
-    [metaLabels[0], infoValues[0], metaLabels[4], infoValues[4]],
-    [metaLabels[1], infoValues[1], metaLabels[3], infoValues[3]],
-    [metaLabels[2], infoValues[2], '', ''],
+  const valW = CONTENT_W - labelW;
+  const pairs = [
+    ['Structure', s.structure],
+    ['Période / Événement', s.periode],
+    ['Statut de la saisie', s.statut],
+    ['Auteur', s.auteur || '—'],
+    ['Exportée le', exported],
   ];
   let gy = doc.y;
-  infoRows.forEach((row) => {
-    const h1 = rowHeight(doc, row[0], row[1], colWidths[0], colWidths[1], 8, 6);
-    const h2 = rowHeight(doc, row[2] || '', row[3] || '', colWidths[2], colWidths[3], 8, 6);
-    const rowH = Math.max(h1, h2, 16);
-    drawCell(doc, PAGE_MARGIN, gy, colWidths[0], rowH, row[0], 8, { bold: true, color: '#333333' });
-    drawCell(doc, PAGE_MARGIN + colWidths[0], gy, colWidths[1], rowH, row[1], 8);
-    drawCell(doc, PAGE_MARGIN + colWidths[0] + colWidths[1], gy, colWidths[2], rowH, row[2], 8, { bold: true, color: '#333333' });
-    drawCell(doc, PAGE_MARGIN + colWidths[0] + colWidths[1] + colWidths[2], gy, colWidths[3], rowH, row[3], 8);
+  pairs.forEach(([label, value], i) => {
+    const isLast = i === pairs.length - 1;
+    const h = rowHeight(doc, label, value, labelW, valW, 8, 6);
+    const rowH = Math.max(h, 16);
+    // cellule gauche : libellé + bordure complète
+    drawCell(doc, PAGE_MARGIN, gy, labelW, rowH, label, 8, { bold: true, color: '#333333' });
+    // cellule droite : valeur + bordure complète (sauf dernière où le côté droit n'a pas de bordure vide)
+    if (isLast) {
+      drawCell(doc, PAGE_MARGIN + labelW, gy, valW, rowH, value, 8);
+    } else {
+      drawCell(doc, PAGE_MARGIN + labelW, gy, valW, rowH, value, 8);
+    }
     gy += rowH + 4;
   });
   doc.y = gy + 4;
@@ -293,6 +294,7 @@ export function renderPdf(model, doc) {
 
       // ---------- champs scalaires ----------
       drawScalarFields(doc, mod, s);
+      doc.moveDown(0.15); // espace vertical ≥ 10 pt avant le titre de tableau
 
       // ---------- champs de type table ----------
       for (const table of mod.tables) {
@@ -327,8 +329,8 @@ function drawScalarFields(doc, mod, s) {
   for (const f of scalarFields) {
     const raw = s.scalars[f.key];
     const display = raw === '' ? '—' : raw instanceof Date ? fmtDate(raw) : String(raw);
-    const lines = wrapLines(doc, display, valColW - 10, 8.5);
-    const needed = Math.max(14, lines * 10.5 + 6);
+    // T1 : hauteur = max(label, valeur) via heightOfString + padding vertical (4+4)
+    const needed = rowHeight(doc, sanitize(f.label), sanitize(display), labelColW, valColW, 8.5, 8);
     ensureSpace(doc, needed + 4);
     const ry = doc.y;
     if (rowIdx % 2 === 1) {

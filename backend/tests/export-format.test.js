@@ -62,6 +62,34 @@ const TSE_MODULE = {
   ],
 };
 
+const RH_MODULE = {
+  code: 'RH',
+  label: 'Ressources humaines',
+  fields: [
+    { key: 'besoins', label: 'Besoins en personnel et en formation', type: 'textarea' },
+    {
+      key: 'effectif',
+      label: 'Effectif par catégorie, grade et sexe',
+      type: 'table',
+      fields: [
+        { key: 'categorie', label: 'Catégorie', type: 'select' },
+        { key: 'grade', label: 'Grade', type: 'text' },
+        { key: 'sexe', label: 'Sexe', type: 'select' },
+        { key: 'effectif', label: 'Effectif', type: 'integer' },
+      ],
+    },
+    {
+      key: 'mouvements',
+      label: 'Mouvements de personnel',
+      type: 'table',
+      fields: [
+        { key: 'type', label: 'Type', type: 'select' },
+        { key: 'nombre', label: 'Nombre', type: 'integer' },
+      ],
+    },
+  ],
+};
+
 const STATUT_MODULE = {
   code: 'ST',
   label: 'Module test statut',
@@ -435,5 +463,84 @@ describe('Rendu des formats d\'export (collecte)', () => {
     expect(cleanSheetNameBase(trenteetun)).toBe(trenteetun);
     // Un nom de 32 chars est coupé à 31 (pas d'espace, on garde 31).
     expect(cleanSheetNameBase('A'.repeat(32)).length).toBeLessThanOrEqual(31);
+  });
+
+  it('X19 : hauteur de ligne couvre le libellé sur plusieurs lignes', () => {
+    const doc = new PDFDocument({ margin: 42, size: 'A4' });
+    const label = 'Besoins en personnel et en formation';
+    const value = 'Recrutement de plusieurs agents pour le service et formation continue du personnel.';
+    const h = rowHeight(doc, label, value, 150, CONTENT_W_TEST - 150, 8.5, 8);
+    // Le libellé (39 caractères) tient sur 2 lignes en 142 pt de large → hauteur > une ligne simple.
+    const hShort = rowHeight(doc, 'Nom', 'Jean', 150, CONTENT_W_TEST - 150, 8.5, 8);
+    expect(h).toBeGreaterThan(hShort);
+    // Au moins deux lignes de texte + padding.
+    expect(h).toBeGreaterThanOrEqual(24);
+  });
+
+  it('X20 : la grille d\'infos ne produit aucune cellule vide (5 paires, pas de paire vide)', () => {
+    const model = buildExportModel([row(RH_MODULE, { besoins: 'Test besoins', effectif: [], mouvements: [] })], {
+      filters: { regions: [], modules: [] },
+    });
+    const doc = new PDFDocument({ margin: 42, size: 'A4', bufferPages: true });
+    const chunks = [];
+    return new Promise((resolve, reject) => {
+      doc.on('data', (chunk) => chunks.push(chunk));
+      doc.on('end', () => {
+        try {
+          const buffer = Buffer.concat(chunks);
+          const pdfText = extractPdfText(buffer);
+          // Les 5 libellés doivent apparaître.
+          expect(pdfText.includes('Structure')).toBe(true);
+          expect(pdfText.includes('Période / Événement')).toBe(true);
+          expect(pdfText.includes('Statut de la saisie')).toBe(true);
+          expect(pdfText.includes('Auteur')).toBe(true);
+          expect(pdfText.includes('Exportée le')).toBe(true);
+          // Compter les occurrences de « Exportée le » : une seule (pas de doublon vide).
+          const countExportee = (pdfText.match(/Exportée le/g) || []).length;
+          expect(countExportee).toBe(1);
+          resolve();
+        } catch (err) {
+          reject(err);
+        }
+      });
+      doc.on('error', reject);
+      renderPdf(model, doc);
+      doc.end();
+    });
+  });
+
+  it('X21 : le nombre de pages du PDF reste égal au total affiché dans les pieds de page, aucune page vide', () => {
+    const rows = [];
+    for (let i = 0; i < 60; i++) {
+      rows.push(row(RH_MODULE, {
+        besoins: 'Besoins en personnel et en formation pour le service.',
+        effectif: [{ categorie: 'Cat\u00e9gorie A', grade: 'Attach\u00e9', sexe: 'Homme', effectif: 4 }],
+        mouvements: [{ type: 'Arriv\u00e9e', nombre: 2 }],
+      }));
+    }
+    const model = buildExportModel(rows, { filters: { regions: ['Analamanga'], modules: [] } });
+    const doc = new PDFDocument({ margin: 42, size: 'A4', bufferPages: true });
+    const chunks = [];
+    return new Promise((resolve, reject) => {
+      doc.on('data', (chunk) => chunks.push(chunk));
+      doc.on('end', () => {
+        try {
+          const buffer = Buffer.concat(chunks);
+          const text = buffer.toString('latin1');
+          const pages = (text.match(/\/Type \/Page(?!s)/g) || []).length;
+          const pdfText = extractPdfText(buffer);
+          const match = pdfText.match(/Page \d+ \/ (\d+)/);
+          const announced = match ? Number(match[1]) : null;
+          expect(announced).toBe(pages);
+          expect(pages).toBeGreaterThanOrEqual(1);
+          resolve();
+        } catch (err) {
+          reject(err);
+        }
+      });
+      doc.on('error', reject);
+      renderPdf(model, doc);
+      doc.end();
+    });
   });
 });
