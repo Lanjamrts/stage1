@@ -181,6 +181,8 @@ Aucun test automatique.
 6. Même sélection → Exporter Excel et PDF (admin2 ne voit que sa région Analamanga)
 7. Se connecter en consultant (`121775`), aller dans « Consultation des données »
 8. Vérifier qu'il n'y a AUCUN bouton de téléchargement (le consultant n'a pas le droit de télécharger)
+9. Ouvrir le fichier `.xlsx` : vérifier que la première feuille est intitulée « Synthèse » (titre, sous-titres « Ministère de l'Économie et des Finances — DGBF / SSEBF », date d'export, régions, modules, nombre de saisies), puis qu'il existe une feuille par module exporté (ex. « RA », « RH ») avec des colonnes lisibles (« Structure », « Période / Événement », « Auteur », « Statut », champs du gabarit) et les nombres alignés à droite. Pour un module à tableau (ex. « RH »), vérifier la présence d'une feuille de tableau par tableau de saisie avec une ligne par ligne de saisie.
+10. Ouvrir le fichier `.pdf` : vérifier l'en-tête de chaque page (logo, « SIGBD », « Ministère de l'Économie et des Finances — DGBF / SSEBF », filet de séparation), le pied de page « Page X / Y » et « Document généré par SIGBD le … » en gris, le titre « Collecte des données » en page 1, puis pour chaque saisie le bloc « <code> — <libellé du module> », la grille d'informations, les champs scalaires en deux colonnes et les vrais tableaux pour les champs de type table.
 
 **État ** : Automatisé
 

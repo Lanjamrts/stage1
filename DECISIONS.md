@@ -81,6 +81,14 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 - [P8] `npm run archive` (SPEC §2, exportee -> archivee) référencé dans package.json mais script absent : backend/src/scripts/archive.js créé — archive strictement les saisies exportee dont la période (periode.end) est passée ; les saisies d'événement (sans periodeId) ne sont pas archivées (« dont la période est terminée », lecture stricte) ; ni ligne d'audit ni entrée validations (absentes des listes fermées de la SPEC §2/§8).
 - [P8] Expiration glissante réellement glissante : le cookie et le JWT sont régénérés à chaque requête authentifiée (setSessionCookie), le cookie maxAge et la modale d'avertissement suivent SESSION_TIMEOUT_MINUTES du .env (renvoyé par /auth/me sous le nom sessionTimeoutMinutes, avertissement 5 min avant, compte à rebours 60 s) — auparavant maxAge et seuil 25 min étaient codés en dur et le serveur n'allongeait jamais la session.
 
+## Step 12 – Exports Excel et PDF
+
+- `buildExportModel` (backend/src/services/exportModel.js) : modèle de données pur, typé depuis modules.js, dates à l'heure de Madagascar (Indian/Antananarivo, indépendant du fuseau du serveur), lignes de tableau groupées avec tous leurs sous-champs, valeurs vides → '' jamais « undefined ».
+- `exportXlsx.js` / `exportPdf.js` : feuille « Synthèse » en premier, une feuille par module et une feuille par tableau de saisie, style commun (en-tête #0B2A4A, bordures fines, figée + filtre, paysage sur une page), en-tête et pied de page « Page X / Y » sur chaque page PDF.
+- `exportCollecte` reconstruit sur ce modèle ; en-têtes HTTP, nom de fichier, streaming, journal d'audit et contrôles de rôle inchangés.
+- Helpers supprimés : flattenValues, labelMap, labelFor (plus utilisés ailleurs) ; fmtDate/fmtDateTime/periodCell remplacés par les versions pures d'exportModel.
+- Aucune nouvelle dépendance (exceljs et pdfkit déjà installées).
+
 ## Step 5 – Period generation
 
 - Script instead of API/UI (none exists yet; screens are a later step).

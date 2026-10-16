@@ -176,6 +176,7 @@ npm run test
 
 Le script sème d'abord la base dédiée `sigbd_test`, puis exécute la suite Vitest
 (81 tests : RBAC, machine à états, audit append-only, `mustChangePassword`, périodicité, seed, setup, config…).
+Les exports Excel et PDF suivent une mise en page commune (feuille de synthèse, une feuille par module, tableaux à lignes groupées, en-tête et pied de page PDF).
 Le build de production du client : `cd frontend && npm run build` ou `npm run build` depuis la racine.
 
 ## Sauvegarde et restauration
