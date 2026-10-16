@@ -196,7 +196,7 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 
 ## Step 11 – Final documentation fixes
 
-- Labels RECETTE.md corrigés : « Nouvel utilisateur » → « Ajouter un utilisateur », « Exporter Excel » → « Télécharger en Excel (.xlsx) », « Exporter PDF » → « Télécharger en PDF », et « Même sélection → Exporter Excel et PDF » → « Même sélection → Télécharger en Excel (.xlsx) et en PDF (admin2 ne voit que sa région Analamanga) ».
-- Limites de T-07 et T-10 écrites honnêtement : T-07 vérifie le 200 et la protection par rôle de l'export, pas le contenu xlsx/pdf (contrôle manuel) ; T-10 (B1–B6) ignorés si mongodump absent (cas CI), s'exécutent sur une machine avec mongodump/mongorestore, résultat à renseigner en section 4. État "Automatisé" conservé, aucun test cité retiré.
-- README Tests : "81 tests" → "90 tests, dont 6 tests de sauvegarde ignorés si mongodump est absent".
-- R4 ajouté dans backend/tests/recette-doc.test.js : extrait les libelles entre « » de docs/RECETTE.md (normalize ’ → ' et NBSP → espace), construit un haystack de tous les .js/.jsx de frontend/src et backend/src, vérifie que chaque libelle (hors allowlist ['Démarrage rapide', 'Fast 3G', 'Slow 3G']) est présent ; aucun test R1–R3 modifié, pas de nouvelle dépendance.
+- Libellés RECETTE.md corrigés : « Ajouter un utilisateur », « Télécharger en Excel (.xlsx) », « Télécharger en PDF » (vérifiés par grep dans frontend/src).
+- Limites T-07 et T-10 écrites honnêtement (État "Automatisé" conservé, aucune citation retirée).
+- README : "81 tests" → "91 tests, dont 6 tests de sauvegarde ignorés si mongodump est absent".
+- R4 ajouté dans backend/tests/recette-doc.test.js : vérifie que tout libellé « » de RECETTE.md existe dans frontend/src + backend/src ; allowlist ['Démarrage rapide', 'Fast 3G', 'Slow 3G'].
