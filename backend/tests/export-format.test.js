@@ -1,6 +1,6 @@
 "use strict";
 import { describe, it, expect } from 'vitest';
-import { buildExportModel, fmtDate, fmtDateTime } from '../src/services/exportModel.js';
+import { buildExportModel, fmtDate, fmtDateTime, formatPdfCell, computeTableColumnWidths } from '../src/services/exportModel.js';
 import { buildWorkbook } from '../src/services/exportXlsx.js';
 import { renderPdf } from '../src/services/exportPdf.js';
 import ExcelJS from 'exceljs';
@@ -8,6 +8,8 @@ import PDFDocument from 'pdfkit';
 import * as zlib from 'node:zlib';
 
 const ValueType = ExcelJS.ValueType;
+
+const CONTENT_W_TEST = 595 - 2 * 42;
 
 function extractPdfText(buffer) {
   const text = buffer.toString('latin1');
@@ -317,5 +319,58 @@ describe('Rendu des formats d\'export (collecte)', () => {
     const colA = synth.getColumn(1).width;
     expect(colA).toBeGreaterThanOrEqual(12);
     expect(colA).toBeLessThanOrEqual(45);
+  });
+
+  it('X13 : les dates des tableaux PDF sont ecrites au format jj/mm/aaaa et jamais en texte brut de date JavaScript', () => {
+    const dateField = { key: 'date_acquisition', label: "Date d'acquisition", type: 'date' };
+    const d = new Date('2026-03-12T03:00:00Z');
+    expect(formatPdfCell(dateField, d)).toBe('12/03/2026');
+    expect(formatPdfCell(dateField, d)).not.toMatch(/GMT/);
+    expect(formatPdfCell(dateField, d)).not.toMatch(/2026 03:00:00/);
+    expect(formatPdfCell(dateField, null)).toBe('—');
+    expect(formatPdfCell(dateField, '')).toBe('—');
+  });
+
+  it('X14 : un tableau a 11 colonnes ne depasse pas la marge droite et reste lisible', () => {
+    const doc = new PDFDocument({ margin: 42, size: 'A4' });
+    const labels = ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11'];
+    const rows = [
+      ['valeur longue une', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7', 'v8', 'v9', 'v10', 'v11'],
+      ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k'],
+    ];
+    const { widths, useFiches, minWidths } = computeTableColumnWidths(doc, labels, rows, CONTENT_W_TEST, 8);
+    const sum = widths.reduce((a, b) => a + b, 0);
+    expect(sum).toBeLessThanOrEqual(CONTENT_W_TEST + 1);
+    for (let i = 0; i < labels.length; i++) {
+      expect(widths[i]).toBeGreaterThanOrEqual(minWidths[i]);
+    }
+    // Si trop large, on bascule en fiches (useFiches true)
+    if (useFiches) {
+      expect(typeof useFiches).toBe('boolean');
+    }
+  });
+
+  it('X15 : un module qui n a que des tableaux ne cree pas de feuille Excel vide de champs', async () => {
+    const TABLE_ONLY_MODULE = {
+      code: 'TO',
+      label: 'Tableau seulement',
+      fields: [
+        {
+          key: 'lignes',
+          label: 'Lignes',
+          type: 'table',
+          fields: [
+            { key: 'a', label: 'Col A', type: 'text' },
+            { key: 'b', label: 'Col B', type: 'text' },
+          ],
+        },
+      ],
+    };
+    const wb = await writtenWorkbook([
+      row(TABLE_ONLY_MODULE, { lignes: [{ a: 'x', b: 'y' }] }),
+    ], { regions: [], modules: [] });
+    const names = wb.worksheets.map((ws) => ws.name);
+    expect(names).not.toContain('TO');
+    expect(names.some((n) => n.startsWith('TO \u2013'))).toBe(true);
   });
 });

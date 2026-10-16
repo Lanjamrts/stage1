@@ -7,6 +7,8 @@ import {
   fmtDateTime,
   fmtNumber,
   fieldHeaderLabel,
+  formatPdfCell,
+  computeTableColumnWidths,
 } from './exportModel.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -38,6 +40,10 @@ function wrapLines(doc, text, width, size) {
   return Math.max(1, Math.ceil(doc.widthOfString(String(text), { font: 'Helvetica', size }) / Math.max(width - 8, 10)));
 }
 
+function heightOfString(doc, text, width, size) {
+  return doc.heightOfString(String(text), { font: 'Helvetica', size, width: Math.max(width - 8, 10) });
+}
+
 function drawCell(doc, x, y, w, h, text, size, opts = {}) {
   const { bold = false, color = COLOR_BODY, align = 'left', fill = false, fillColor = '#FFFFFF' } = opts;
   if (fill) {
@@ -53,7 +59,7 @@ function drawPage1Header(doc) {
   const width = doc.page.width;
   const y0 = doc.y;
   const logoH = 64;
-  const logoW = 64; // emblème carré
+  const logoW = 64;
   const logoX = (width - logoW) / 2;
   doc.image(emblemFile(), logoX, y0, { height: logoH });
   let y = y0 + logoH + 10;
@@ -65,7 +71,7 @@ function drawPage1Header(doc) {
   );
   y += 14;
   doc.lineWidth(0.75).strokeColor(COLOR_HEADER).moveTo(PAGE_MARGIN, y).lineTo(width - PAGE_MARGIN, y).stroke();
-  doc.y = y + 14; // espace avant le titre
+  doc.y = y + 14;
 }
 
 function drawCompactHeader(doc) {
@@ -105,6 +111,143 @@ function modulesDisplay(model) {
   return '—';
 }
 
+function drawInfoGrid(doc, s) {
+  const exported = s.dates.exported ? fmtDateTime(s.dates.exported) : '—';
+  const metaLabels = ['Structure', 'Période / Événement', 'Statut de la saisie', 'Auteur', 'Exportée le'];
+  const infoValues = [s.structure, s.periode, s.statut, s.auteur || '—', exported];
+  const labelW = 100;
+  const valW = 130;
+  const label2W = 100;
+  const val2W = CONTENT_W - labelW - valW - label2W;
+  const colWidths = [labelW, valW, label2W, val2W];
+  const infoRows = [
+    [metaLabels[0], infoValues[0], metaLabels[4], infoValues[4]],
+    [metaLabels[1], infoValues[1], metaLabels[3], infoValues[3]],
+    [metaLabels[2], infoValues[2], '', ''],
+  ];
+  const rowH = 16;
+  const gridH = infoRows.length * rowH;
+  ensureSpace(doc, gridH + 6);
+  let gy = doc.y;
+  infoRows.forEach((row, ri) => {
+    const rowY = gy + ri * rowH;
+    drawCell(doc, PAGE_MARGIN, rowY, colWidths[0], rowH, row[0], 8, { bold: true, color: '#333333' });
+    drawCell(doc, PAGE_MARGIN + colWidths[0], rowY, colWidths[1], rowH, row[1], 8);
+    drawCell(doc, PAGE_MARGIN + colWidths[0] + colWidths[1], rowY, colWidths[2], rowH, row[2], 8, { bold: true, color: '#333333' });
+    drawCell(doc, PAGE_MARGIN + colWidths[0] + colWidths[1] + colWidths[2], rowY, colWidths[3], rowH, row[3], 8);
+  });
+  doc.y = gy + gridH + 6;
+}
+
+function drawScalarFields(doc, mod, s) {
+  const scalarFields = mod.fields;
+  const labelColW = 150;
+  const valColW = CONTENT_W - labelColW;
+  let rowIdx = 0;
+  for (const f of scalarFields) {
+    const raw = s.scalars[f.key];
+    const display = raw === '' ? '—' : raw instanceof Date ? fmtDate(raw) : String(raw);
+    const lines = wrapLines(doc, display, valColW - 10, 8.5);
+    const needed = Math.max(14, lines * 10.5 + 6);
+    ensureSpace(doc, needed + 4);
+    const ry = doc.y;
+    if (rowIdx % 2 === 1) {
+      doc.rect(PAGE_MARGIN, ry, CONTENT_W, needed).fill(COLOR_ALT).stroke(COLOR_BORDER);
+    } else {
+      doc.rect(PAGE_MARGIN, ry, CONTENT_W, needed).stroke(COLOR_BORDER);
+    }
+    doc.font('Helvetica-Bold').fontSize(8.5).fillColor(COLOR_GRAY).text(sanitize(f.label), PAGE_MARGIN, ry + 3, { width: labelColW - 8, lineBreak: false });
+    const isNumber = f.type === 'integer' || f.type === 'decimal';
+    const numText = isNumber ? fmtNumber(display) : display;
+    doc.font('Helvetica').fontSize(8.5).fillColor(COLOR_BODY).text(sanitize(numText), PAGE_MARGIN + labelColW + 4, ry + 3, { width: valColW - 12, align: isNumber ? 'right' : 'left', lineBreak: false });
+    doc.y = ry + needed;
+    rowIdx += 1;
+  }
+  doc.moveDown(0.2);
+}
+
+function drawTableFiche(doc, table, rows, s, startY) {
+  const nSub = table.fields.length;
+  let ty = startY;
+  for (let ri = 0; ri < rows.length; ri++) {
+    const row = rows[ri];
+    const ficheTitle = `Ligne ${ri + 1}`;
+    const titleH = 12;
+    ensureSpace(doc, titleH + 4);
+    doc.font('Helvetica-Bold').fontSize(8).fillColor(COLOR_HEADER).text(ficheTitle, PAGE_MARGIN, ty, { lineBreak: false });
+    doc.x = PAGE_MARGIN;
+    ty += titleH + 2;
+
+    const labelW = 120;
+    const valW = CONTENT_W - labelW;
+    let rowY = ty;
+    for (const f of table.fields) {
+      const cellH = 14;
+      ensureSpace(doc, cellH + 2);
+      drawCell(doc, PAGE_MARGIN, rowY, labelW, cellH, f.label, 8, { bold: true, color: '#333333' });
+      const val = formatPdfCell(f, row[f.key]);
+      drawCell(doc, PAGE_MARGIN + labelW, rowY, valW, cellH, val, 8);
+      rowY += cellH + 1;
+    }
+    ty = rowY + 4;
+  }
+  return ty;
+}
+
+function drawTableGrid(doc, table, rows, s, startY, size) {
+  const colLabels = table.fields.map((f) => fieldHeaderLabel(f.label));
+  const nSub = table.fields.length;
+
+  // Prepare cell values (formatted)
+  const formattedRows = rows.map((row) =>
+    table.fields.map((f) => formatPdfCell(f, row[f.key]))
+  );
+
+  const { widths, useFiches, minWidths } = computeTableColumnWidths(doc, colLabels, formattedRows, CONTENT_W, size);
+
+  if (useFiches) {
+    return drawTableFiche(doc, table, rows, s, startY);
+  }
+
+  let ty = startY;
+  const headerH = Math.max(16, ...colLabels.map((l) => heightOfString(doc, l, widths[0] - 8, size))) + 6;
+  ensureSpace(doc, headerH + 14);
+
+  colLabels.forEach((label, ci) => {
+    const x = PAGE_MARGIN + widths.slice(0, ci).reduce((a, b) => a + b, 0);
+    drawCell(doc, x, ty, widths[ci], headerH, label, size, { bold: true, color: '#FFFFFF', fill: true, fillColor: COLOR_HEADER });
+  });
+  ty += headerH;
+
+  for (const row of formattedRows) {
+    let maxLines = 1;
+    row.forEach((cell, ci) => {
+      maxLines = Math.max(maxLines, wrapLines(doc, cell, widths[ci] - 8, size));
+    });
+    const rowH2 = maxLines * (size * 1.3 + 1) + 6;
+
+    if (ensureSpace(doc, rowH2 + 6)) {
+      ty = doc.y;
+      colLabels.forEach((label, ci) => {
+        const x = PAGE_MARGIN + widths.slice(0, ci).reduce((a, b) => a + b, 0);
+        drawCell(doc, x, ty, widths[ci], headerH, label, size, { bold: true, color: '#FFFFFF', fill: true, fillColor: COLOR_HEADER });
+      });
+      ty += headerH;
+    }
+
+    const rowY = ty;
+    row.forEach((cell, ci) => {
+      const x = PAGE_MARGIN + widths.slice(0, ci).reduce((a, b) => a + b, 0);
+      const f = table.fields[ci];
+      const isNumber = f && (f.type === 'integer' || f.type === 'decimal');
+      drawCell(doc, x, rowY, widths[ci], rowH2, cell, size, { align: isNumber ? 'right' : 'left' });
+    });
+    ty += rowH2;
+  }
+
+  return ty + 8;
+}
+
 export function renderPdf(model, doc) {
   doc.font('Helvetica');
   let totalPages = 1;
@@ -117,13 +260,22 @@ export function renderPdf(model, doc) {
   drawPage1Header(doc);
 
   // ---------- sommaire page 1 ----------
-  doc.font('Helvetica-Bold').fontSize(16).fillColor(COLOR_BODY).text(sanitize('Collecte des données'), { lineBreak: false });
+  doc.font('Helvetica-Bold').fontSize(16).fillColor(COLOR_BODY)
+    .text(sanitize('Collecte des données'), PAGE_MARGIN, doc.y, { width: CONTENT_W });
+  doc.x = PAGE_MARGIN;
   doc.moveDown(0.4);
-  doc.font('Helvetica').fontSize(10).fillColor(COLOR_BODY);
-  doc.text(sanitize(`Date d'export : ${fmtDateTime(model.generatedAt)}`));
-  doc.text(`Régions : ${sanitize(regionsDisplay(model))}`);
-  doc.text(`Modules : ${sanitize(modulesDisplay(model))}`);
-  doc.text(`Nombre de saisies : ${model.count}`);
+
+  const infoLines = [
+    `Date d'export : ${fmtDateTime(model.generatedAt)}`,
+    `Régions : ${regionsDisplay(model)}`,
+    `Modules : ${modulesDisplay(model)}`,
+    `Nombre de saisies : ${model.count}`,
+  ];
+  infoLines.forEach((line) => {
+    doc.font('Helvetica').fontSize(10).fillColor(COLOR_BODY)
+      .text(sanitize(line), PAGE_MARGIN, doc.y, { width: CONTENT_W });
+    doc.x = PAGE_MARGIN;
+  });
   doc.moveDown(0.6);
 
   if (model.count === 0) {
@@ -132,110 +284,29 @@ export function renderPdf(model, doc) {
     return;
   }
 
-  const metaLabels = ['Structure', 'Période / Événement', 'Statut de la saisie', 'Auteur', 'Exportée le'];
-
   for (const mod of model.modules) {
     for (const s of mod.saisies) {
       // ---------- titre de bloc ----------
       ensureSpace(doc, 42);
-      doc.font('Helvetica-Bold').fontSize(11).fillColor(COLOR_HEADER).text(sanitize(`${mod.code} — ${mod.label}`));
+      doc.font('Helvetica-Bold').fontSize(11).fillColor(COLOR_HEADER).text(sanitize(`${mod.code} — ${mod.label}`), PAGE_MARGIN, doc.y, { width: CONTENT_W });
+      doc.x = PAGE_MARGIN;
       doc.moveDown(0.2);
 
       // ---------- grille d'informations ----------
-      const exported = s.dates.exported ? fmtDateTime(s.dates.exported) : '—';
-      const infoValues = [s.structure, s.periode, s.statut, s.auteur || '—', exported];
-      const labelW = 100;
-      const valW = 130;
-      const label2W = 100;
-      const val2W = CONTENT_W - labelW - valW - label2W;
-      const colWidths = [labelW, valW, label2W, val2W];
-      const infoRows = [
-        [metaLabels[0], infoValues[0], metaLabels[4], infoValues[4]],
-        [metaLabels[1], infoValues[1], metaLabels[3], infoValues[3]],
-        [metaLabels[2], infoValues[2], '', ''],
-      ];
-      const rowH = 16;
-      const gridH = infoRows.length * rowH;
-      ensureSpace(doc, gridH + 6);
-      let gy = doc.y;
-      infoRows.forEach((row, ri) => {
-        const rowY = gy + ri * rowH;
-        // cellule 1 : label
-        drawCell(doc, PAGE_MARGIN, rowY, colWidths[0], rowH, row[0], 8, { bold: true, color: '#333333' });
-        // cellule 2 : valeur
-        drawCell(doc, PAGE_MARGIN + colWidths[0], rowY, colWidths[1], rowH, row[1], 8);
-        // cellule 3 : label
-        drawCell(doc, PAGE_MARGIN + colWidths[0] + colWidths[1], rowY, colWidths[2], rowH, row[2], 8, { bold: true, color: '#333333' });
-        // cellule 4 : valeur
-        drawCell(doc, PAGE_MARGIN + colWidths[0] + colWidths[1] + colWidths[2], rowY, colWidths[3], rowH, row[3], 8);
-      });
-      doc.y = gy + gridH + 6;
+      drawInfoGrid(doc, s);
 
-      // ---------- champs scalaires (tableau deux colonnes) ----------
-      const scalarFields = mod.fields;
-      const labelColW = 150;
-      const valColW = CONTENT_W - labelColW;
-      let rowIdx = 0;
-      for (const f of scalarFields) {
-        const raw = s.scalars[f.key];
-        const display = raw === '' ? '—' : raw instanceof Date ? fmtDate(raw) : String(raw);
-        const lines = wrapLines(doc, display, valColW - 10, 8.5);
-        const needed = Math.max(14, lines * 10.5 + 6);
-        ensureSpace(doc, needed + 4);
-        const ry = doc.y;
-        if (rowIdx % 2 === 1) {
-          doc.rect(PAGE_MARGIN, ry, CONTENT_W, needed).fill(COLOR_ALT).stroke(COLOR_BORDER);
-        } else {
-          doc.rect(PAGE_MARGIN, ry, CONTENT_W, needed).stroke(COLOR_BORDER);
-        }
-        doc.font('Helvetica-Bold').fontSize(8.5).fillColor(COLOR_GRAY).text(sanitize(f.label), PAGE_MARGIN, ry + 3, { width: labelColW - 8, lineBreak: false });
-        const isNumber = f.type === 'integer' || f.type === 'decimal';
-        const numText = isNumber ? fmtNumber(display) : display;
-        doc.font('Helvetica').fontSize(8.5).fillColor(COLOR_BODY).text(sanitize(numText), PAGE_MARGIN + labelColW + 4, ry + 3, { width: valColW - 12, align: isNumber ? 'right' : 'left', lineBreak: false });
-        doc.y = ry + needed;
-        rowIdx += 1;
-      }
-      doc.moveDown(0.2);
+      // ---------- champs scalaires ----------
+      drawScalarFields(doc, mod, s);
 
       // ---------- champs de type table ----------
       for (const table of mod.tables) {
         const rows = s.tables[table.key] || [];
         if (rows.length === 0) continue;
-        const colLabels = ['Structure', 'Période / Événement', ...table.fields.map((f) => fieldHeaderLabel(f.label))];
-        const nSub = table.fields.length;
-        const subW = nSub > 0 ? (CONTENT_W - 130) / nSub : 0;
-        const colWidths = [65, 70, ...Array(nSub).fill(subW)];
-        const headerH = 16;
-        let ty = doc.y;
-        ensureSpace(doc, headerH + 14);
-        ty = doc.y;
-        colLabels.forEach((label, ci) => {
-          drawCell(doc, PAGE_MARGIN + colWidths.slice(0, ci).reduce((a, b) => a + b, 0), ty, colWidths[ci], headerH, label, 8, { bold: true, color: '#FFFFFF', fill: true, fillColor: COLOR_HEADER });
-        });
-        ty += headerH;
-        for (const row of rows) {
-          const cells = [s.structure, s.periode, ...table.fields.map((f) => row[f.key] === '' ? '—' : row[f.key])];
-          let maxLines = 1;
-          cells.forEach((cell, ci) => {
-            maxLines = Math.max(maxLines, wrapLines(doc, cell, colWidths[ci] - 8, 8));
-          });
-          const rowH2 = maxLines * 10.5 + 6;
-          if (ensureSpace(doc, rowH2 + 6)) {
-            ty = doc.y;
-            colLabels.forEach((label, ci) => {
-              drawCell(doc, PAGE_MARGIN + colWidths.slice(0, ci).reduce((a, b) => a + b, 0), ty, colWidths[ci], headerH, label, 8, { bold: true, color: '#FFFFFF', fill: true, fillColor: COLOR_HEADER });
-            });
-            ty += headerH;
-          }
-          const rowY = ty;
-          cells.forEach((cell, ci) => {
-            const isNumber = table.fields[ci - 2] && (table.fields[ci - 2].type === 'integer' || table.fields[ci - 2].type === 'decimal');
-            const txt = isNumber ? fmtNumber(cell) : cell;
-            drawCell(doc, PAGE_MARGIN + colWidths.slice(0, ci).reduce((a, b) => a + b, 0), rowY, colWidths[ci], rowH2, txt, 8, { align: (ci >= 2 && isNumber) ? 'right' : 'left' });
-          });
-          ty += rowH2;
-        }
-        doc.y = ty + 8;
+        const size = 8;
+        const headerEstimate = 24;
+        ensureSpace(doc, headerEstimate + 14);
+        const beforeY = doc.y;
+        doc.y = drawTableGrid(doc, table, rows, s, doc.y, size);
       }
     }
   }

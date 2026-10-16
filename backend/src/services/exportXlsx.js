@@ -227,6 +227,11 @@ export function buildWorkbook(model) {
 
   // ------------------------------------------------------------- une feuille par module
   for (const mod of model.modules) {
+    // Si aucun champ scalaire, la feuille ne ferait que reprendre les colonnes méta
+    // déjà présentes dans « Synthèse » : on la saute et on crée seulement les
+    // feuilles de tableaux.
+    if (mod.fields.length === 0) continue;
+
     const sheetName = uniqueSheetName(wb, mod.code);
     const sheet = wb.addWorksheet(sheetName);
     setupPage(sheet);

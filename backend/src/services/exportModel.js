@@ -169,6 +169,68 @@ export function fieldHeaderLabel(label) {
   return String(label);
 }
 
+// Formate une cellule de tableau PDF pour un champ donné (jamais de String(Date) brute).
+export function formatPdfCell(field, value) {
+  if (value === null || value === undefined || value === '') return '—';
+  if (value instanceof Date) {
+    if (field.type === 'date') return fmtDate(value);
+    return fmtDateTime(value);
+  }
+  if (typeof value === 'number') {
+    if (field.type === 'integer' || field.type === 'decimal') return fmtNumber(value);
+    return String(value);
+  }
+  return String(value).trim();
+}
+
+// Calcule les largeurs de colonnes d'un tableau PDF (pure, prend un doc pour widthOfString).
+// Retourne { widths, useFiches, minWidths }.
+export function computeTableColumnWidths(doc, labels, rows, contentW, size = 8) {
+  const n = labels.length;
+  const minWidths = [];
+  const avgLengths = [];
+
+  for (let ci = 0; ci < n; ci++) {
+    let maxWordW = doc.widthOfString(String(labels[ci]), { font: 'Helvetica', size });
+    let totalLen = String(labels[ci]).length;
+    let count = 1;
+
+    for (const row of rows) {
+      const cell = String(row[ci] == null ? '' : row[ci]);
+      const words = cell.split(/\s+/);
+      for (const w of words) {
+        if (w.length === 0) continue;
+        maxWordW = Math.max(maxWordW, doc.widthOfString(w, { font: 'Helvetica', size }));
+      }
+      totalLen += cell.length;
+      count += 1;
+    }
+
+    minWidths.push(maxWordW + 8);
+    avgLengths.push(totalLen / count);
+  }
+
+  const sumMin = minWidths.reduce((a, b) => a + b, 0);
+  const useFiches = sumMin > contentW;
+
+  let widths;
+  if (useFiches) {
+    widths = [...minWidths];
+  } else {
+    const sumAvg = avgLengths.reduce((a, b) => a + b, 0);
+    const extra = contentW - sumMin;
+    widths = minWidths.map((mw, i) => {
+      const share = sumAvg > 0 ? extra * (avgLengths[i] / sumAvg) : extra / n;
+      return mw + share;
+    });
+    let sum = widths.reduce((a, b) => a + b, 0);
+    const diff = contentW - sum;
+    widths[0] += diff;
+  }
+
+  return { widths, useFiches, minWidths };
+}
+
 // Construit le modèle d'export à partir de lignes sérialisées (serializeSaisie avec withFields).
 export function buildExportModel(rows, { filters = {}, generatedAt = new Date() } = {}) {
   const modulesMap = new Map();
