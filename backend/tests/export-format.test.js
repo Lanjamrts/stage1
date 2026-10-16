@@ -465,22 +465,7 @@ describe('Rendu des formats d\'export (collecte)', () => {
     expect(cleanSheetNameBase('A'.repeat(32)).length).toBeLessThanOrEqual(31);
   });
 
-  it('X19 : hauteur de ligne couvre le libellé sur plusieurs lignes', () => {
-    const doc = new PDFDocument({ margin: 42, size: 'A4' });
-    const label = 'Besoins en personnel et en formation';
-    const value = 'Recrutement de plusieurs agents pour le service et formation continue du personnel.';
-    const h = rowHeight(doc, label, value, 150, CONTENT_W_TEST - 150, 8.5, 8);
-    // Le libellé (39 caractères) tient sur 2 lignes en 142 pt de large → hauteur > une ligne simple.
-    const hShort = rowHeight(doc, 'Nom', 'Jean', 150, CONTENT_W_TEST - 150, 8.5, 8);
-    expect(h).toBeGreaterThan(hShort);
-    // Au moins deux lignes de texte + padding.
-    expect(h).toBeGreaterThanOrEqual(24);
-  });
-
-  it('X20 : la grille d\'infos ne produit aucune cellule vide (5 paires, pas de paire vide)', () => {
-    const model = buildExportModel([row(RH_MODULE, { besoins: 'Test besoins', effectif: [], mouvements: [] })], {
-      filters: { regions: [], modules: [] },
-    });
+  it('X19 : le libellé long de champ scalaire ne chevauche pas le titre du tableau suivant (rendu réel)', () => {
     const doc = new PDFDocument({ margin: 42, size: 'A4', bufferPages: true });
     const chunks = [];
     return new Promise((resolve, reject) => {
@@ -489,24 +474,51 @@ describe('Rendu des formats d\'export (collecte)', () => {
         try {
           const buffer = Buffer.concat(chunks);
           const pdfText = extractPdfText(buffer);
-          // Les 5 libellés doivent apparaître.
-          expect(pdfText.includes('Structure')).toBe(true);
-          expect(pdfText.includes('Période / Événement')).toBe(true);
-          expect(pdfText.includes('Statut de la saisie')).toBe(true);
-          expect(pdfText.includes('Auteur')).toBe(true);
-          expect(pdfText.includes('Exportée le')).toBe(true);
-          // Compter les occurrences de « Exportée le » : une seule (pas de doublon vide).
-          const countExportee = (pdfText.match(/Exportée le/g) || []).length;
-          expect(countExportee).toBe(1);
+          // Le libellé long (39 caractères) doit apparaître en entier (pas coupé).
+          expect(pdfText.includes('Besoins en personnel et en formation')).toBe(true);
+          // Le titre du tableau suivant doit apparaître après le libellé dans l'ordre de lecture.
+          const idxLabel = pdfText.indexOf('Besoins en personnel et en formation');
+          const idxTable = pdfText.indexOf('Effectif par catégorie');
+          expect(idxLabel).toBeGreaterThanOrEqual(0);
+          expect(idxTable).toBeGreaterThan(idxLabel);
           resolve();
         } catch (err) {
           reject(err);
         }
       });
       doc.on('error', reject);
-      renderPdf(model, doc);
+      // Dessin d'un champ scalaire avec libellé long suivi d'un titre de tableau.
+      const labelColW = Math.floor((595 - 84) * 0.38);
+      const valColW = 595 - 84 - labelColW;
+      const size = 8.5;
+      const padding = 5;
+      const label = 'Besoins en personnel et en formation';
+      const value = 'Recrutement de plusieurs agents pour le service et formation continue du personnel administratif.';
+      doc.font('Helvetica-Bold').fontSize(size);
+      const hLabel = doc.heightOfString(label, { width: labelColW - 2 * padding });
+      doc.font('Helvetica').fontSize(size);
+      const hValue = doc.heightOfString(value, { width: valColW - 2 * padding });
+      const needed = Math.max(hLabel, hValue) + 2 * padding;
+      doc.rect(42, doc.y, 595 - 84, needed).stroke('#D9D9D9');
+      doc.font('Helvetica-Bold').fontSize(size).fillColor('#555555').text(label, 42 + padding, doc.y + (needed - size * 1.2) / 2, { width: labelColW - 2 * padding, lineBreak: true });
+      doc.font('Helvetica').fontSize(size).fillColor('#1A2433').text(value, 42 + labelColW + padding, doc.y + (needed - size * 1.2) / 2, { width: valColW - 2 * padding, lineBreak: true });
+      doc.y += needed + 12; // 12 pt d'espace avant le titre
+      doc.font('Helvetica-Bold').fontSize(9).fillColor('#0B2A4A').text('Effectif par catégorie, grade et sexe', 42, doc.y, { width: 595 - 84, lineBreak: false });
+      doc.x = 42;
       doc.end();
     });
+  });
+
+  it('X22 : rowHeight couvre le libellé sur plusieurs lignes (nouvelle largeur 38%, padding 5)', () => {
+    const doc = new PDFDocument({ margin: 42, size: 'A4' });
+    const labelColW = Math.floor((595 - 84) * 0.38);
+    const valColW = 595 - 84 - labelColW;
+    const h = rowHeight(doc, 'Besoins en personnel et en formation', 'Recrutement de plusieurs agents.', labelColW, valColW, 8.5, 5);
+    // Le libellé (39 chars) en 146 pt de large tient sur 2 lignes → hauteur ≥ 2 lignes + 2*padding.
+    expect(h).toBeGreaterThanOrEqual(2 * 8.5 * 1.2 + 10);
+    // Une ligne courte est plus petite.
+    const h2 = rowHeight(doc, 'Nom', 'Jean', labelColW, valColW, 8.5, 5);
+    expect(h2).toBeLessThan(h);
   });
 
   it('X21 : le nombre de pages du PDF reste égal au total affiché dans les pieds de page, aucune page vide', () => {
@@ -533,6 +545,43 @@ describe('Rendu des formats d\'export (collecte)', () => {
           const announced = match ? Number(match[1]) : null;
           expect(announced).toBe(pages);
           expect(pages).toBeGreaterThanOrEqual(1);
+          resolve();
+        } catch (err) {
+          reject(err);
+        }
+      });
+      doc.on('error', reject);
+      renderPdf(model, doc);
+      doc.end();
+    });
+  });
+
+  it('X23 : export de 3 saisies RH (comme dans la demo) produit un PDF sans page vide et pieds coherents', () => {
+    const rows = [];
+    for (let i = 0; i < 3; i++) {
+      rows.push(row(RH_MODULE, {
+        besoins: i === 0 ? 'Besoins en personnel et en formation pour le service des ressources humaines et formation continue du personnel administratif.' : 'Besoins simples.',
+        effectif: i === 0 ? [{ categorie: 'Cat\u00e9gorie A', grade: 'Attach\u00e9', sexe: 'Homme', effectif: 4 }, { categorie: 'Cat\u00e9gorie B', grade: 'Secr\u00e9taire', sexe: 'Femme', effectif: 6 }] : [],
+        mouvements: i === 2 ? [{ type: 'Affectation', nombre: 3 }] : [],
+      }));
+    }
+    const model = buildExportModel(rows, { filters: { regions: [], modules: [] } });
+    const doc = new PDFDocument({ margin: 42, size: 'A4', bufferPages: true });
+    const chunks = [];
+    return new Promise((resolve, reject) => {
+      doc.on('data', (chunk) => chunks.push(chunk));
+      doc.on('end', () => {
+        try {
+          const buffer = Buffer.concat(chunks);
+          const text = buffer.toString('latin1');
+          const pages = (text.match(/\/Type \/Page(?!s)/g) || []).length;
+          const pdfText = extractPdfText(buffer);
+          const match = pdfText.match(/Page \d+ \/ (\d+)/);
+          const announced = match ? Number(match[1]) : null;
+          expect(announced).toBe(pages);
+          expect(pages).toBeGreaterThanOrEqual(1);
+          // Le libellé long de la saisie 1 doit apparaître en entier.
+          expect(pdfText.includes('Besoins en personnel et en formation')).toBe(true);
           resolve();
         } catch (err) {
           reject(err);

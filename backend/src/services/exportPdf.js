@@ -45,14 +45,16 @@ function heightOfString(doc, text, width, size) {
 }
 
 function drawCell(doc, x, y, w, h, text, size, opts = {}) {
-  const { bold = false, color = COLOR_BODY, align = 'left', fill = false, fillColor = '#FFFFFF' } = opts;
+  const { bold = false, color = COLOR_BODY, align = 'left', fill = false, fillColor = '#FFFFFF', centerVertical = false } = opts;
   if (fill) {
     doc.rect(x, y, w, h).fill(fillColor).stroke(COLOR_BORDER);
   } else {
     doc.rect(x, y, w, h).stroke(COLOR_BORDER);
   }
   doc.font(bold ? 'Helvetica-Bold' : 'Helvetica').fontSize(size).fillColor(color);
-  doc.text(sanitize(text), x + 4, y + 3, { width: w - 8, align, lineBreak: false });
+  const textH = doc.heightOfString(String(text), { font: bold ? 'Helvetica-Bold' : 'Helvetica', size });
+  const textY = centerVertical ? y + (h - textH) / 2 : y + 3;
+  doc.text(sanitize(text), x + 4, textY, { width: w - 8, align, lineBreak: false });
 }
 
 // Hauteur d'une ligne libellé/valeur : couvre le texte le plus long sur plusieurs lignes.
@@ -158,7 +160,7 @@ function drawBlockTitle(doc, mod) {
 function drawTableTitle(doc, table) {
   doc.font('Helvetica-Bold').fontSize(9).fillColor(COLOR_HEADER).text(sanitize(table.label), PAGE_MARGIN, doc.y, { width: CONTENT_W, lineBreak: false });
   doc.x = PAGE_MARGIN;
-  doc.moveDown(0.15);
+  doc.y += 8; // 8 pt après le titre avant l'en-tête du tableau
 }
 
 function drawTableFiche(doc, table, rows, s, startY) {
@@ -208,7 +210,7 @@ function drawTableGrid(doc, table, rows, s, startY, size) {
 
   colLabels.forEach((label, ci) => {
     const x = PAGE_MARGIN + widths.slice(0, ci).reduce((a, b) => a + b, 0);
-    drawCell(doc, x, ty, widths[ci], headerH, label, size, { bold: true, color: '#FFFFFF', fill: true, fillColor: COLOR_HEADER });
+    drawCell(doc, x, ty, widths[ci], headerH, label, size, { bold: true, color: '#FFFFFF', fill: true, fillColor: COLOR_HEADER, centerVertical: true });
   });
   ty += headerH;
 
@@ -323,29 +325,39 @@ export function renderPdf(model, doc) {
 
 function drawScalarFields(doc, mod, s) {
   const scalarFields = mod.fields;
-  const labelColW = 150;
+  const labelColW = Math.floor(CONTENT_W * 0.38); // 38 % de la largeur utile pour le libellé
   const valColW = CONTENT_W - labelColW;
+  const size = 8.5;
+  const padding = 5;
   let rowIdx = 0;
   for (const f of scalarFields) {
     const raw = s.scalars[f.key];
     const display = raw === '' ? '—' : raw instanceof Date ? fmtDate(raw) : String(raw);
-    // T1 : hauteur = max(label, valeur) via heightOfString + padding vertical (4+4)
-    const needed = rowHeight(doc, sanitize(f.label), sanitize(display), labelColW, valColW, 8.5, 8);
-    ensureSpace(doc, needed + 4);
+    const label = sanitize(f.label);
+    const value = sanitize(display);
+    // Hauteur de ligne = max(hauteur libellé, hauteur valeur) + 2 * padding
+    doc.font('Helvetica-Bold').fontSize(size);
+    const hLabel = doc.heightOfString(label, { width: labelColW - 2 * padding });
+    doc.font('Helvetica').fontSize(size);
+    const hValue = doc.heightOfString(value, { width: valColW - 2 * padding });
+    const needed = Math.max(hLabel, hValue) + 2 * padding;
+    ensureSpace(doc, needed);
     const ry = doc.y;
     if (rowIdx % 2 === 1) {
       doc.rect(PAGE_MARGIN, ry, CONTENT_W, needed).fill(COLOR_ALT).stroke(COLOR_BORDER);
     } else {
       doc.rect(PAGE_MARGIN, ry, CONTENT_W, needed).stroke(COLOR_BORDER);
     }
-    doc.font('Helvetica-Bold').fontSize(8.5).fillColor(COLOR_GRAY).text(sanitize(f.label), PAGE_MARGIN, ry + 3, { width: labelColW - 8, lineBreak: false });
+    const textY = ry + (needed - size * 1.2) / 2; // centrage vertical approximatif
+    doc.font('Helvetica-Bold').fontSize(size).fillColor(COLOR_GRAY).text(label, PAGE_MARGIN + padding, textY, { width: labelColW - 2 * padding, lineBreak: true });
     const isNumber = f.type === 'integer' || f.type === 'decimal';
     const numText = isNumber ? fmtNumber(display) : display;
-    doc.font('Helvetica').fontSize(8.5).fillColor(COLOR_BODY).text(sanitize(numText), PAGE_MARGIN + labelColW + 4, ry + 3, { width: valColW - 12, align: isNumber ? 'right' : 'left', lineBreak: false });
+    const valAlign = isNumber ? 'right' : 'left';
+    doc.font('Helvetica').fontSize(size).fillColor(COLOR_BODY).text(numText, PAGE_MARGIN + labelColW + padding, textY, { width: valColW - 2 * padding, align: valAlign, lineBreak: true });
     doc.y = ry + needed;
     rowIdx += 1;
   }
-  doc.moveDown(0.2);
+  doc.moveDown(12 / 7.2); // 12 pt d'espace avant le titre du tableau suivant
 }
 
 function drawFooters(doc, total, generatedAt) {
