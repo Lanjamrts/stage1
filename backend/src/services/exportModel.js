@@ -47,6 +47,48 @@ export function fmtNumber(n) {
   return numberFmt.format(num).replace(/[\u202f\u00a0]/g, ' ');
 }
 
+// Composantes calendaires/horaires d'un instant dans le fuseau de Madagascar.
+export function madagascarComponents(d) {
+  const date = new Date(d);
+  if (Number.isNaN(date.getTime())) return null;
+  const parts = new Intl.DateTimeFormat('fr-CA', {
+    timeZone: TZ,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  }).formatToParts(date);
+  const get = (t) => {
+    const p = parts.find((x) => x.type === t);
+    return p ? Number(p.value) : 0;
+  };
+  return {
+    year: get('year'),
+    month: get('month'),
+    day: get('day'),
+    hour: get('hour'),
+    minute: get('minute'),
+    second: get('second'),
+  };
+}
+
+// Date Excel dont les composantes UTC calquent l'affichage Madagascar (date-heure).
+export function toMadagascarUtcDate(d) {
+  const c = madagascarComponents(d);
+  if (!c) return d;
+  return new Date(Date.UTC(c.year, c.month - 1, c.day, c.hour, c.minute, c.second));
+}
+
+// Date Excel dont les composantes UTC calquent la date calendaire Madagascar (date seule, minuit).
+export function toMadagascarDateOnly(d) {
+  const c = madagascarComponents(d);
+  if (!c) return d;
+  return new Date(Date.UTC(c.year, c.month - 1, c.day));
+}
+
 function isEmpty(v) {
   return v === null || v === undefined || v === '';
 }
@@ -99,15 +141,48 @@ function periodeCell(s) {
   return '';
 }
 
+function regionOf(structureLabel) {
+  if (!structureLabel) return '';
+  const parts = String(structureLabel).split(' – ');
+  return parts.length > 1 ? parts[parts.length - 1] : '';
+}
+
+// Colonnes méta communes (Synthèse, feuilles modules, grille PDF). 'Statut'
+// est conservé car un champ de gabarit peut s'appeler « Statut » et doit alors
+// devenir « Statut (champ) » pour ne pas confondre avec « Statut de la saisie ».
+export const META_LABELS = [
+  'Structure',
+  'Code module',
+  'Module',
+  'Période / Événement',
+  'Statut de la saisie',
+  'Statut',
+  'Auteur',
+  'Exportée le',
+];
+
+// Libellé de colonne pour un champ du gabarit : '(champ)' en cas de collision méta.
+export function fieldHeaderLabel(label) {
+  if (META_LABELS.includes(String(label))) {
+    return `${label} (champ)`;
+  }
+  return String(label);
+}
+
 // Construit le modèle d'export à partir de lignes sérialisées (serializeSaisie avec withFields).
 export function buildExportModel(rows, { filters = {}, generatedAt = new Date() } = {}) {
   const modulesMap = new Map();
+  const regionsPresent = new Set();
+  const modulesPresent = new Set();
 
   for (const r of rows || []) {
     const module = r.module || {};
     const fields = module.fields || [];
     const code = r.moduleCode || '';
     const label = r.moduleLabel || '';
+
+    if (r.structureLabel) regionsPresent.add(regionOf(r.structureLabel));
+    if (label) modulesPresent.add(label);
 
     let mod = modulesMap.get(code);
     if (!mod) {
@@ -168,6 +243,8 @@ export function buildExportModel(rows, { filters = {}, generatedAt = new Date() 
       regions: Array.isArray(filters.regions) ? filters.regions : [],
       modules: Array.isArray(filters.modules) ? filters.modules : [],
     },
+    regionsPresent: [...regionsPresent],
+    modulesPresent: [...modulesPresent],
     count,
     modules,
   };

@@ -1,13 +1,21 @@
 "use strict";
 import ExcelJS from 'exceljs';
-import { fmtDateTime } from './exportModel.js';
+import {
+  fmtDate,
+  fmtDateTime,
+  toMadagascarUtcDate,
+  toMadagascarDateOnly,
+  fieldHeaderLabel,
+  META_LABELS,
+} from './exportModel.js';
 
 const HEADER_BG = 'FF0B2A4A';
 const HEADER_COLOR = 'FFFFFFFF';
 const BORDER_COLOR = 'FFBFBFBF';
-const ALT_ROW_BG = 'FFF2F5F8';
 const MAX_SHEET = 31;
 const INVALID_SHEET_CHARS = /[\[\]:*?\/\\]/g;
+const MIN_WIDTH = 12;
+const MAX_WIDTH = 45;
 
 function baseCellStyle(cell) {
   cell.font = { name: 'Calibri', size: 11 };
@@ -39,6 +47,7 @@ function styleHeaderRow(sheet, rowNum, firstCol, lastCol) {
 
 function setupPage(sheet) {
   sheet.pageSetup.orientation = 'landscape';
+  sheet.pageSetup.fitToPage = true;
   sheet.pageSetup.fitToWidth = 1;
   sheet.pageSetup.fitToHeight = 0;
   sheet.pageSetup.printTitlesRow = '1:1';
@@ -75,20 +84,37 @@ function shortTableLabel(label) {
   return s.length > 24 ? s.slice(0, 24) : s;
 }
 
+function textLength(v) {
+  return String(v == null ? '' : v).length;
+}
+
+function clampWidth(w) {
+  return Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, w));
+}
+
+// Écrit une valeur typée dans une cellule Excel.
 function writeValue(cell, value, kind) {
   baseCellStyle(cell);
   if (value === null || value === undefined || value === '') {
     cell.value = '';
     return;
   }
-  if (value instanceof Date) {
-    cell.value = value;
+  if (kind === 'datetime') {
+    const d = toMadagascarUtcDate(value);
+    cell.value = d;
+    cell.numFmt = 'dd/mm/yyyy hh:mm';
+    cell.alignment = { vertical: 'center', horizontal: 'center' };
+    return;
+  }
+  if (kind === 'date') {
+    const d = toMadagascarDateOnly(value);
+    cell.value = d;
     cell.numFmt = 'dd/mm/yyyy';
     cell.alignment = { vertical: 'center', horizontal: 'center' };
     return;
   }
-  if (typeof value === 'number') {
-    cell.value = value;
+  if (kind === 'integer' || kind === 'decimal') {
+    cell.value = typeof value === 'number' ? value : Number(value) || 0;
     cell.numFmt = kind === 'decimal' ? '#,##0.00' : '#,##0';
     cell.alignment = { vertical: 'center', horizontal: 'right' };
     return;
@@ -97,17 +123,52 @@ function writeValue(cell, value, kind) {
   cell.alignment = { vertical: 'top', wrapText: true };
 }
 
+function computeColumnWidths(headerCells, rowsCells) {
+  // headerCells: [{text, kind}], rowsCells: array of [{text, kind}]
+  const maxes = headerCells.map((h) => textLength(h.text));
+  for (const row of rowsCells) {
+    for (let i = 0; i < row.length; i++) {
+      maxes[i] = Math.max(maxes[i], textLength(row[i].text));
+    }
+  }
+  return maxes.map((m) => clampWidth(m + 2));
+}
+
 export function buildWorkbook(model) {
   const wb = new ExcelJS.Workbook();
   wb.created = model.generatedAt;
   wb.modified = model.generatedAt;
   wb.creator = 'SIGBD';
 
+  const regionsLabel =
+    model.filters.regions.length
+      ? model.filters.regions.join(', ')
+      : model.regionsPresent.length
+        ? `Toutes les régions (${model.regionsPresent.join(', ')})`
+        : '—';
+  const modulesLabel =
+    model.filters.modules.length
+      ? model.filters.modules.join(', ')
+      : model.modulesPresent.length
+        ? `Tous les modules (${model.modulesPresent.join(', ')})`
+        : '—';
+
   // ------------------------------------------------------------------ Synthèse
   const synth = wb.addWorksheet('Synthèse');
   setupPage(synth);
 
-  const synthWidths = [26, 12, 34, 24, 12, 24, 22, 22, 22];
+  const synthHeaders = [
+    'Structure',
+    'Code module',
+    'Module',
+    'Période / Événement',
+    'Statut de la saisie',
+    'Auteur',
+    'Créée le',
+    'Soumise le',
+    'Exportée le',
+  ];
+  const synthWidths = [26, 12, 34, 24, 20, 24, 20, 20, 20];
   synth.columns = synthWidths.map((w) => ({ width: w }));
 
   synth.getCell('A1').value = 'SIGBD — Collecte des données';
@@ -116,22 +177,19 @@ export function buildWorkbook(model) {
   synth.getCell('A2').font = { name: 'Calibri', size: 10, color: { argb: 'FF444444' } };
   synth.getCell('A3').value = `Date d'export : ${fmtDateTime(model.generatedAt)}`;
   synth.getCell('A3').font = { name: 'Calibri', size: 10 };
-  synth.getCell('A4').value = `Régions : ${model.filters.regions.length ? model.filters.regions.join(', ') : '—'}`;
+  synth.getCell('A4').value = `Régions : ${regionsLabel}`;
   synth.getCell('A4').font = { name: 'Calibri', size: 10 };
-  synth.getCell('A5').value = `Modules : ${model.filters.modules.length ? model.filters.modules.join(', ') : '—'}`;
+  synth.getCell('A5').value = `Modules : ${modulesLabel}`;
   synth.getCell('A5').font = { name: 'Calibri', size: 10 };
   synth.getCell('A6').value = `Nombre de saisies : ${model.count}`;
   synth.getCell('A6').font = { name: 'Calibri', size: 10, bold: true };
 
   const headerRowNum = 8;
-  const synthHeaders = [
-    'Structure', 'Code module', 'Module', 'Période / Événement', 'Statut', 'Auteur',
-    'Créée le', 'Soumise le', 'Exportée le',
-  ];
   synthHeaders.forEach((h, i) => synth.getCell(headerRowNum, i + 1).value = h);
   styleHeaderRow(synth, headerRowNum, 1, synthHeaders.length);
 
   let rowNum = headerRowNum + 1;
+  const synthDataRows = [];
   if (model.count === 0) {
     const msg = synth.getCell(rowNum, 1);
     msg.value = 'Aucune donnée à exporter pour cette sélection.';
@@ -139,45 +197,76 @@ export function buildWorkbook(model) {
   } else {
     for (const mod of model.modules) {
       for (const s of mod.saisies) {
-        const vals = [
-          s.structure, mod.code, mod.label, s.periode, s.statut, s.auteur,
-          s.dates.created, s.dates.submitted, s.dates.exported,
+        const cells = [
+          { text: s.structure, kind: 'text' },
+          { text: mod.code, kind: 'text' },
+          { text: mod.label, kind: 'text' },
+          { text: s.periode, kind: 'text' },
+          { text: s.statut, kind: 'text' },
+          { text: s.auteur, kind: 'text' },
+          { text: s.dates.created, kind: 'datetime' },
+          { text: s.dates.submitted, kind: 'datetime' },
+          { text: s.dates.exported, kind: 'datetime' },
         ];
-        vals.forEach((v, i) => writeValue(synth.getCell(rowNum, i + 1), v, 'text'));
-        synth.getCell(rowNum, 7).numFmt = 'dd/mm/yyyy hh:mm';
-        synth.getCell(rowNum, 8).numFmt = 'dd/mm/yyyy hh:mm';
-        synth.getCell(rowNum, 9).numFmt = 'dd/mm/yyyy hh:mm';
+        synthDataRows.push(cells);
+        cells.forEach((c, i) => writeValue(synth.getCell(rowNum, i + 1), c.text, c.kind));
         for (let c = 7; c <= 9; c++) {
           const cell = synth.getCell(rowNum, c);
-          if (cell.value === '') cell.value = '';
           cell.alignment = { vertical: 'center', horizontal: 'center' };
         }
         rowNum += 1;
       }
     }
   }
+  // Recaler les largeurs sur le contenu réel (header + données).
+  const synthCells = synthHeaders.map((h, i) => ({ text: h, kind: i < 6 ? 'text' : 'datetime' }));
+  const synthWidthsFinal = computeColumnWidths(synthCells, synthDataRows);
+  synth.columns = synthWidthsFinal.map((w) => ({ width: w }));
   synth.autoFilter = `A${headerRowNum}:${colLetter(synthHeaders.length)}${headerRowNum}`;
   synth.views = [{ state: 'frozen', ySplit: 1, topLeftCell: `A${headerRowNum + 1}` }];
 
   // ------------------------------------------------------------- une feuille par module
-  const used = new Set(['Synthèse']);
   for (const mod of model.modules) {
     const sheetName = uniqueSheetName(wb, mod.code);
-    used.add(sheetName);
     const sheet = wb.addWorksheet(sheetName);
     setupPage(sheet);
 
-    const headers = ['Structure', 'Période / Événement', 'Auteur', 'Statut', ...mod.fields.map((f) => f.label)];
+    const metaHeaders = ['Structure', 'Période / Événement', 'Statut de la saisie', 'Auteur'];
+    const fieldHeaders = mod.fields.map((f) => fieldHeaderLabel(f.label));
+    const headers = [...metaHeaders, ...fieldHeaders];
     const colCount = headers.length;
-    sheet.columns = headers.map((h, i) => ({ width: i < 4 ? 22 : Math.min(60, Math.max(14, String(h).length + 8)) }));
+
+    // Largeurs : contenu max + 2, borné.
+    const dataRows = [];
+    for (const s of mod.saisies) {
+      const cells = [
+        { text: s.structure, kind: 'text' },
+        { text: s.periode, kind: 'text' },
+        { text: s.statut, kind: 'text' },
+        { text: s.auteur, kind: 'text' },
+      ];
+      mod.fields.forEach((f) => {
+        const raw = s.scalars[f.key];
+        cells.push({ text: raw === '' ? '' : raw instanceof Date ? fmtDate(raw) : String(raw), kind: f.type });
+      });
+      dataRows.push(cells);
+    }
+    const headerCells = headers.map((h) => ({ text: h, kind: 'text' }));
+    const widths = computeColumnWidths(headerCells, dataRows);
+    sheet.columns = widths.map((w) => ({ width: w }));
+
     headers.forEach((h, i) => sheet.getCell(1, i + 1).value = h);
     styleHeaderRow(sheet, 1, 1, colCount);
 
     let r = 2;
     for (const s of mod.saisies) {
-      const base = [s.structure, s.periode, s.auteur, s.statut];
-      base.forEach((v, i) => writeValue(sheet.getCell(r, i + 1), v, 'text'));
-      mod.fields.forEach((f, ci) => writeValue(sheet.getCell(r, 5 + ci), s.scalars[f.key], f.type));
+      writeValue(sheet.getCell(r, 1), s.structure, 'text');
+      writeValue(sheet.getCell(r, 2), s.periode, 'text');
+      writeValue(sheet.getCell(r, 3), s.statut, 'text');
+      writeValue(sheet.getCell(r, 4), s.auteur, 'text');
+      mod.fields.forEach((f, ci) => {
+        writeValue(sheet.getCell(r, 5 + ci), s.scalars[f.key], f.type);
+      });
       r += 1;
     }
     sheet.autoFilter = `A1:${colLetter(colCount)}1`;
@@ -188,13 +277,31 @@ export function buildWorkbook(model) {
   for (const mod of model.modules) {
     for (const table of mod.tables) {
       const sheetName = uniqueSheetName(wb, `${mod.code} – ${shortTableLabel(table.label)}`);
-      used.add(sheetName);
       const sheet = wb.addWorksheet(sheetName);
       setupPage(sheet);
 
-      const headers = ['Structure', 'Période / Événement', ...table.fields.map((f) => f.label)];
+      const headers = ['Structure', 'Période / Événement', ...table.fields.map((f) => fieldHeaderLabel(f.label))];
       const colCount = headers.length;
-      sheet.columns = headers.map((h, i) => ({ width: i < 2 ? 22 : Math.min(60, Math.max(14, String(h).length + 8)) }));
+
+      const dataRows = [];
+      for (const s of mod.saisies) {
+        const tableRows = s.tables[table.key] || [];
+        for (const row of tableRows) {
+          const cells = [
+            { text: s.structure, kind: 'text' },
+            { text: s.periode, kind: 'text' },
+          ];
+          table.fields.forEach((f) => {
+            const raw = row[f.key];
+            cells.push({ text: raw === '' ? '' : raw instanceof Date ? fmtDate(raw) : String(raw), kind: f.type });
+          });
+          dataRows.push(cells);
+        }
+      }
+      const headerCells = headers.map((h) => ({ text: h, kind: 'text' }));
+      const widths = computeColumnWidths(headerCells, dataRows);
+      sheet.columns = widths.map((w) => ({ width: w }));
+
       headers.forEach((h, i) => sheet.getCell(1, i + 1).value = h);
       styleHeaderRow(sheet, 1, 1, colCount);
 

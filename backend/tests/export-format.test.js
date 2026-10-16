@@ -5,8 +5,31 @@ import { buildWorkbook } from '../src/services/exportXlsx.js';
 import { renderPdf } from '../src/services/exportPdf.js';
 import ExcelJS from 'exceljs';
 import PDFDocument from 'pdfkit';
+import * as zlib from 'node:zlib';
 
 const ValueType = ExcelJS.ValueType;
+
+function extractPdfText(buffer) {
+  const text = buffer.toString('latin1');
+  let out = '';
+  let idx = 0;
+  while ((idx = text.indexOf('stream', idx)) >= 0) {
+    const start = text.indexOf('\n', idx) + 1;
+    const end = text.indexOf('endstream', start);
+    if (end < 0) break;
+    const raw = Buffer.from(text.slice(start, end), 'latin1');
+    let dec = '';
+    try { dec = zlib.inflateSync(raw).toString('latin1'); } catch { dec = raw.toString('latin1'); }
+    for (const h of [...dec.matchAll(/<([0-9A-Fa-f\s]+)>/g)]) {
+      const hex = h[1].replace(/\s/g, '');
+      for (let i = 0; i + 1 < hex.length; i += 2) {
+        out += String.fromCharCode(parseInt(hex.slice(i, i + 2), 16));
+      }
+    }
+    idx = end + 9;
+  }
+  return out;
+}
 
 const RA_MODULE = {
   code: 'RA',
@@ -34,6 +57,15 @@ const TSE_MODULE = {
     { key: 'date_acte', label: "Date de l'acte", type: 'date' },
     { key: 'nature', label: 'Nature', type: 'select' },
     { key: 'std', label: 'STD', type: 'multiselect' },
+  ],
+};
+
+const STATUT_MODULE = {
+  code: 'ST',
+  label: 'Module test statut',
+  fields: [
+    { key: 'statut', label: 'Statut', type: 'select' },
+    { key: 'objet', label: 'Objet', type: 'text' },
   ],
 };
 
@@ -197,7 +229,7 @@ describe('Rendu des formats d\'export (collecte)', () => {
           const buffer = Buffer.concat(chunks);
           expect(buffer.slice(0, 5).toString('ascii')).toBe('%PDF-');
           const text = buffer.toString('latin1');
-          const pages = (text.match(/\/Type\s*\/Page/g) || []).length;
+          const pages = (text.match(/\/Type \/Page(?!s)/g) || []).length;
           expect(pages).toBeGreaterThanOrEqual(2);
           resolve();
         } catch (err) {
@@ -220,5 +252,70 @@ describe('Rendu des formats d\'export (collecte)', () => {
       });
     });
     expect(found).toBe(true);
+  });
+
+  it('X9 : un export d une saisie produit exactement une page PDF avec Page 1 / 1', () => {
+    const model = buildExportModel([row(RA_MODULE, { activites: [], indicateurs: [], difficultes: '', perspectives: '' })], {
+      filters: { regions: [], modules: [] },
+    });
+    const doc = new PDFDocument({ margin: 42, size: 'A4', bufferPages: true });
+    const chunks = [];
+    return new Promise((resolve, reject) => {
+      doc.on('data', (chunk) => chunks.push(chunk));
+      doc.on('end', () => {
+        try {
+          const buffer = Buffer.concat(chunks);
+          expect(buffer.slice(0, 5).toString('ascii')).toBe('%PDF-');
+          const text = buffer.toString('latin1');
+          const pages = (text.match(/\/Type \/Page(?!s)/g) || []).length;
+          const pdfText = extractPdfText(buffer);
+          expect(pages).toBe(1);
+          expect(pdfText.includes('Page 1 / 1')).toBe(true);
+          resolve();
+        } catch (err) {
+          reject(err);
+        }
+      });
+      doc.on('error', reject);
+      renderPdf(model, doc);
+      doc.end();
+    });
+  });
+
+  it('X10 : les heures ecrites dans l Excel sont celles de Madagascar (instant 2026-10-16T07:14:04Z → cellule 10:14)', async () => {
+    const r = row(TSE_MODULE, { montant: 10, date_acte: '', nature: '', std: [] });
+    r.dates.created = new Date('2026-10-16T07:14:04Z');
+    const wb = await writtenWorkbook([r], { regions: [], modules: [] });
+    const synth = wb.getWorksheet('Synth\u00e8se');
+    const cell = synth.getCell(9, 7);
+    expect(cell.type).toBe(ValueType.Date);
+    expect(cell.value instanceof Date).toBe(true);
+    expect(cell.value.getUTCHours()).toBe(10);
+    expect(cell.value.getUTCMinutes()).toBe(14);
+    expect(cell.value.getUTCSeconds()).toBe(4);
+    expect(cell.numFmt).toBe('dd/mm/yyyy hh:mm');
+  });
+
+  it('X11 : le libelle Statut de la saisie est distinct du champ Statut', async () => {
+    const wb = await writtenWorkbook([row(STATUT_MODULE, { statut: 'Valid\u00e9', objet: 'test' })], { regions: [], modules: [] });
+    const st = wb.getWorksheet('ST');
+    const headers = [];
+    st.getRow(1).eachCell((cell) => headers.push(String(cell.value || '')));
+    expect(headers).toContain('Statut de la saisie');
+    expect(headers).toContain('Statut (champ)');
+    expect(headers.indexOf('Statut de la saisie')).not.toBe(headers.indexOf('Statut (champ)'));
+  });
+
+  it('X12 : fitToPage est actif et la largeur des colonnes suit le contenu', async () => {
+    const wb = await writtenWorkbook([row(RA_MODULE, { activites: [], indicateurs: [], difficultes: '', perspectives: '' })], { regions: [], modules: [] });
+    for (const ws of wb.worksheets) {
+      expect(ws.pageSetup.fitToPage).toBe(true);
+      expect(ws.pageSetup.orientation).toBe('landscape');
+      expect(ws.pageSetup.fitToWidth).toBe(1);
+    }
+    const synth = wb.getWorksheet('Synth\u00e8se');
+    const colA = synth.getColumn(1).width;
+    expect(colA).toBeGreaterThanOrEqual(12);
+    expect(colA).toBeLessThanOrEqual(45);
   });
 });

@@ -163,7 +163,9 @@ export async function exportCollecte(req, res) {
     regions: req.query.regions
       ? String(req.query.regions).split(',').map((s) => s.trim()).filter(Boolean)
       : [],
-    modules: [...new Set(rows.map((r) => r.moduleLabel).filter(Boolean))],
+    modules: req.query.module || req.query.modules
+      ? [...new Set(rows.map((r) => r.moduleLabel).filter(Boolean))]
+      : [],
   };
   const model = buildExportModel(rows, { filters, generatedAt: new Date() });
 

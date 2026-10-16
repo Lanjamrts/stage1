@@ -201,3 +201,14 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 - README : liens `docs/RECETTE.md` et `docs/DEMO.md` ajoutés dans « Structure du dépôt ».
 - DEMO.md corrigé : conflit brouillon Octobre 2026 dans le seed → passage à Septembre 2026 pour l'étape 1 et toutes les étapes suivantes ; libellés d'actions d'audit alignés sur l'affichage réel (ex. saisie_reject → « Rejet de saisie ») ; motif de rejet aligné sur les champs RA réels (« Indicateurs de performance ») ; références de code déplacées en commentaires HTML invisibles.
 - DEMO.md : filtre Période inexistant retiré, libellés de confirmation corrigés, références en commentaires HTML.
+
+## Step 12.1 – Corrections des exports Excel/PDF
+
+- PDF : plus de page blanche en fin d'export. Le pied de page est écrit après le contenu sur chaque page via `bufferedPageRange()` / `switchToPage(i)`, avec `doc.page.margins.bottom` temporairement à 0 et `lineBreak: false`, puis restauré. « Page X / Y » utilise le nombre réel de pages. Un export d'une saisie = exactement 1 page.
+- PDF : nouvel en-tête formel. Page 1 : logo centré (64 pt), « SIGBD » (Helvetica-Bold 20 pt, #0B2A4A), « Ministère de l'Économie et des Finances — DGBF / SSEBF » (9 pt, gris), filet fin pleine largeur (0,75 pt, #0B2A4A), puis 14 pt avant le titre. Pages suivantes : en-tête compact (logo 24 pt à gauche, ligne « SIGBD — Ministère… » à droite centrées verticalement, filet sous-jacent). Les en-têtes sont dessinés à chaque création de page (événement `pageAdded`) et `doc.y` est positionné sous l'en-tête.
+- Excel : les cellules date-heure (`Créée le`, `Soumise le`, `Exportée le`) stockent les composantes calendaires/horaires de Madagascar (Indian/Antananarivo) en UTC (`Date.UTC`) pour un affichage sans décalage ; les champs date seule sont à minuit sans décalage.
+- « Régions : — » devient « Toutes les régions (<présents>) » quand le filtre est absent, idem « Tous les modules (<présents>) » pour Excel et PDF.
+- « Statut de la saisie » remplace « Statut » comme colonne méta (Synthèse, feuilles modules, grille PDF). Un champ de gabarit dont le libellé collide avec une colonne méta reçoit le suffixe « (champ) » (ex. « Statut (champ) »).
+- PDF : grille d'informations à colonnes de largeur fixe dans la marge utile avec retour à la ligne ; nombres integer/decimal formatés via `fmtNumber` (espace ordinaire) et alignés à droite.
+- Excel : largeur de colonne = contenu max + 2, bornée [12, 45], `wrapText` ; `pageSetup` { orientation: 'landscape', fitToPage: true, fitToWidth: 1, fitToHeight: 0 } sur chaque feuille, répétition de l'en-tête (`printTitlesRow`). Vérifié en rechargeant le fichier : `ws.pageSetup.fitToPage === true`.
+- Tests ajoutés : X9 (1 saisie = 1 page, « Page 1 / 1 »), X10 (heure Madagascar dans Excel), X11 (Statut de la saisie distinct du champ Statut), X12 (fitToPage actif, largeurs au contenu). Aucun test existant modifié. Nouvelle dépendance : aucune.
