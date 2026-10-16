@@ -63,16 +63,36 @@ function colLetter(n) {
   return s;
 }
 
+// T5 : nettoie un nom de feuille Excel.
+// - supprime les caractères interdits []:*?/\
+// - coupe au dernier espace avant 31 caractères (jamais au milieu d'un mot)
+// - retire la ponctuation de fin [ ,;:.–-]
+// - garantit une valeur non vide
+export function cleanSheetNameBase(name) {
+  let s = String(name || '').replace(INVALID_SHEET_CHARS, ' ').trim();
+  if (s.length > MAX_SHEET) {
+    s = s.slice(0, MAX_SHEET);
+    const lastSpace = s.lastIndexOf(' ');
+    if (lastSpace > 0) {
+      s = s.slice(0, lastSpace);
+    }
+  }
+  // retire toujours la ponctuation de fin [ ,;:.–-]
+  s = s.replace(/[ ,;:\u2013\u2014\.-]+$/, '');
+  return s || 'Feuil1';
+}
+
 function cleanSheetName(name) {
-  return String(name || '').replace(INVALID_SHEET_CHARS, ' ').trim();
+  return cleanSheetNameBase(name);
 }
 
 function uniqueSheetName(wb, base) {
-  let name = cleanSheetName(base).slice(0, MAX_SHEET) || 'Feuil1';
+  const cleaned = cleanSheetNameBase(base) || 'Feuil1';
+  let name = cleaned.slice(0, MAX_SHEET);
   let counter = 2;
   while (wb.getWorksheet(name)) {
     const suffix = ` (${counter})`;
-    name = cleanSheetName(base).slice(0, MAX_SHEET - suffix.length) + suffix;
+    name = cleaned.slice(0, MAX_SHEET - suffix.length) + suffix;
     counter += 1;
     if (counter > 100) break;
   }
@@ -80,8 +100,7 @@ function uniqueSheetName(wb, base) {
 }
 
 function shortTableLabel(label) {
-  const s = String(label || 'Tableau');
-  return s.length > 24 ? s.slice(0, 24) : s;
+  return cleanSheetNameBase(String(label || 'Tableau'));
 }
 
 function textLength(v) {
@@ -281,7 +300,7 @@ export function buildWorkbook(model) {
   // ------------------------------------------------------------- feuilles des tableaux
   for (const mod of model.modules) {
     for (const table of mod.tables) {
-      const sheetName = uniqueSheetName(wb, `${mod.code} – ${shortTableLabel(table.label)}`);
+      const sheetName = uniqueSheetName(wb, `${mod.code} – ${table.label}`);
       const sheet = wb.addWorksheet(sheetName);
       setupPage(sheet);
 

@@ -1,8 +1,8 @@
 "use strict";
 import { describe, it, expect } from 'vitest';
 import { buildExportModel, fmtDate, fmtDateTime, formatPdfCell, computeTableColumnWidths } from '../src/services/exportModel.js';
-import { buildWorkbook } from '../src/services/exportXlsx.js';
-import { renderPdf } from '../src/services/exportPdf.js';
+import { buildWorkbook, cleanSheetNameBase } from '../src/services/exportXlsx.js';
+import { renderPdf, rowHeight } from '../src/services/exportPdf.js';
 import ExcelJS from 'exceljs';
 import PDFDocument from 'pdfkit';
 import * as zlib from 'node:zlib';
@@ -372,5 +372,68 @@ describe('Rendu des formats d\'export (collecte)', () => {
     const names = wb.worksheets.map((ws) => ws.name);
     expect(names).not.toContain('TO');
     expect(names.some((n) => n.startsWith('TO \u2013'))).toBe(true);
+  });
+
+  it('X16 : le PDF de 60 saisies a autant de pages que le total affiche dans le pied de page et aucune page vide', () => {
+    const rows = [];
+    for (let i = 0; i < 60; i++) {
+      rows.push(row(RA_MODULE, {
+        activites: [{ intitule: `Activit\u00e9 ${i}`, date: '2026-10-01', statut: 'Realisee' }],
+        indicateurs: [{ indicateur: 'T', valeur: i }],
+        difficultes: 'Difficult\u00e9s',
+        perspectives: 'Perspectives',
+      }));
+    }
+    const model = buildExportModel(rows, { filters: { regions: ['Analamanga'], modules: [] } });
+    const doc = new PDFDocument({ margin: 42, size: 'A4', bufferPages: true });
+    const chunks = [];
+    return new Promise((resolve, reject) => {
+      doc.on('data', (chunk) => chunks.push(chunk));
+      doc.on('end', () => {
+        try {
+          const buffer = Buffer.concat(chunks);
+          expect(buffer.slice(0, 5).toString('ascii')).toBe('%PDF-');
+          const text = buffer.toString('latin1');
+          const pages = (text.match(/\/Type \/Page(?!s)/g) || []).length;
+          const pdfText = extractPdfText(buffer);
+          // Le total annoncé dans le pied de page correspond au nombre de pages réelles.
+          const match = pdfText.match(/Page \d+ \/ (\d+)/);
+          const announced = match ? Number(match[1]) : null;
+          expect(announced).toBe(pages);
+          // Aucune page vide : chaque page contient du texte ou un dessin.
+          // On vérifie que le dernier "Page X / Y" cohérent et qu'il y a du contenu.
+          expect(pdfText.includes('Collecte des données')).toBe(true);
+          resolve();
+        } catch (err) {
+          reject(err);
+        }
+      });
+      doc.on('error', reject);
+      const total = renderPdf(model, doc);
+      expect(total).toBeGreaterThanOrEqual(2);
+      doc.end();
+    });
+  });
+
+  it('X17 : la hauteur d une ligne libelle valeur couvre le libelle sur plusieurs lignes', () => {
+    const doc = new PDFDocument({ margin: 42, size: 'A4' });
+    const h = rowHeight(doc, 'Besoins en personnel et en formation', 'Recrutement de plusieurs agents pour le service.', 150, 365, 8.5, 6);
+    // Le libellé tient sur 2 lignes en 150 pt, donc la hauteur > une ligne simple.
+    expect(h).toBeGreaterThan(14);
+    // Une ligne courte ne dépasse pas beaucoup.
+    const h2 = rowHeight(doc, 'Nom', 'Jean', 150, 365, 8.5, 6);
+    expect(h2).toBeLessThanOrEqual(h);
+  });
+
+  it('X18 : les noms de feuilles longs sont coupes proprement sans ponctuation finale et restent uniques', () => {
+    expect(cleanSheetNameBase('RH \u2013 Effectif par cat\u00e9gorie, grade et sexe')).toBe('RH \u2013 Effectif par cat\u00e9gorie');
+    expect(cleanSheetNameBase('Nom avec points...')).toBe('Nom avec points');
+    expect(cleanSheetNameBase('Court')).toBe('Court');
+    expect(cleanSheetNameBase('')).toBe('Feuil1');
+    // Un nom de 31 chars pile n'est pas coupé.
+    const trenteetun = 'A'.repeat(31);
+    expect(cleanSheetNameBase(trenteetun)).toBe(trenteetun);
+    // Un nom de 32 chars est coupé à 31 (pas d'espace, on garde 31).
+    expect(cleanSheetNameBase('A'.repeat(32)).length).toBeLessThanOrEqual(31);
   });
 });

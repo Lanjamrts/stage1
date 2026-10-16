@@ -55,6 +55,14 @@ function drawCell(doc, x, y, w, h, text, size, opts = {}) {
   doc.text(sanitize(text), x + 4, y + 3, { width: w - 8, align, lineBreak: false });
 }
 
+// Hauteur d'une ligne libellé/valeur : couvre le texte le plus long sur plusieurs lignes.
+// Pure (prend le doc pour heightOfString), exportée pour les tests.
+export function rowHeight(doc, label, value, labelW, valueW, size = 8.5, padding = 6) {
+  const h1 = doc.heightOfString(String(label), { font: 'Helvetica', size, width: Math.max(labelW - 8, 10) });
+  const h2 = doc.heightOfString(String(value), { font: 'Helvetica', size, width: Math.max(valueW - 8, 10) });
+  return Math.max(h1, h2) + padding;
+}
+
 function drawPage1Header(doc) {
   const width = doc.page.width;
   const y0 = doc.y;
@@ -125,18 +133,190 @@ function drawInfoGrid(doc, s) {
     [metaLabels[1], infoValues[1], metaLabels[3], infoValues[3]],
     [metaLabels[2], infoValues[2], '', ''],
   ];
-  const rowH = 16;
-  const gridH = infoRows.length * rowH;
-  ensureSpace(doc, gridH + 6);
   let gy = doc.y;
-  infoRows.forEach((row, ri) => {
-    const rowY = gy + ri * rowH;
-    drawCell(doc, PAGE_MARGIN, rowY, colWidths[0], rowH, row[0], 8, { bold: true, color: '#333333' });
-    drawCell(doc, PAGE_MARGIN + colWidths[0], rowY, colWidths[1], rowH, row[1], 8);
-    drawCell(doc, PAGE_MARGIN + colWidths[0] + colWidths[1], rowY, colWidths[2], rowH, row[2], 8, { bold: true, color: '#333333' });
-    drawCell(doc, PAGE_MARGIN + colWidths[0] + colWidths[1] + colWidths[2], rowY, colWidths[3], rowH, row[3], 8);
+  infoRows.forEach((row) => {
+    const h1 = rowHeight(doc, row[0], row[1], colWidths[0], colWidths[1], 8, 6);
+    const h2 = rowHeight(doc, row[2] || '', row[3] || '', colWidths[2], colWidths[3], 8, 6);
+    const rowH = Math.max(h1, h2, 16);
+    drawCell(doc, PAGE_MARGIN, gy, colWidths[0], rowH, row[0], 8, { bold: true, color: '#333333' });
+    drawCell(doc, PAGE_MARGIN + colWidths[0], gy, colWidths[1], rowH, row[1], 8);
+    drawCell(doc, PAGE_MARGIN + colWidths[0] + colWidths[1], gy, colWidths[2], rowH, row[2], 8, { bold: true, color: '#333333' });
+    drawCell(doc, PAGE_MARGIN + colWidths[0] + colWidths[1] + colWidths[2], gy, colWidths[3], rowH, row[3], 8);
+    gy += rowH + 4;
   });
-  doc.y = gy + gridH + 6;
+  doc.y = gy + 4;
+}
+
+function drawBlockTitle(doc, mod) {
+  doc.font('Helvetica-Bold').fontSize(11).fillColor(COLOR_HEADER).text(sanitize(`${mod.code} — ${mod.label}`), PAGE_MARGIN, doc.y, { width: CONTENT_W });
+  doc.x = PAGE_MARGIN;
+  doc.moveDown(0.2);
+}
+
+// T3 : titre au-dessus d'un champ de type table.
+function drawTableTitle(doc, table) {
+  doc.font('Helvetica-Bold').fontSize(9).fillColor(COLOR_HEADER).text(sanitize(table.label), PAGE_MARGIN, doc.y, { width: CONTENT_W, lineBreak: false });
+  doc.x = PAGE_MARGIN;
+  doc.moveDown(0.15);
+}
+
+function drawTableFiche(doc, table, rows, s, startY) {
+  const labelW = 120;
+  const valW = CONTENT_W - labelW;
+  let ty = startY;
+  for (let ri = 0; ri < rows.length; ri++) {
+    const row = rows[ri];
+    const ficheTitle = `Ligne ${ri + 1}`;
+    const titleH = 12;
+    ensureSpace(doc, titleH + 4);
+    doc.font('Helvetica-Bold').fontSize(8).fillColor(COLOR_HEADER).text(ficheTitle, PAGE_MARGIN, ty, { lineBreak: false });
+    doc.x = PAGE_MARGIN;
+    ty += titleH + 2;
+
+    let rowY = ty;
+    for (const f of table.fields) {
+      const cellH = rowHeight(doc, f.label, formatPdfCell(f, row[f.key]), labelW, valW, 8, 5);
+      ensureSpace(doc, cellH + 2);
+      drawCell(doc, PAGE_MARGIN, rowY, labelW, cellH, f.label, 8, { bold: true, color: '#333333' });
+      const val = formatPdfCell(f, row[f.key]);
+      drawCell(doc, PAGE_MARGIN + labelW, rowY, valW, cellH, val, 8);
+      rowY += cellH + 1;
+    }
+    ty = rowY + 4;
+  }
+  return ty;
+}
+
+function drawTableGrid(doc, table, rows, s, startY, size) {
+  const colLabels = table.fields.map((f) => fieldHeaderLabel(f.label));
+
+  // Prepare cell values (formatted)
+  const formattedRows = rows.map((row) =>
+    table.fields.map((f) => formatPdfCell(f, row[f.key]))
+  );
+
+  const { widths, useFiches, minWidths } = computeTableColumnWidths(doc, colLabels, formattedRows, CONTENT_W, size);
+
+  if (useFiches) {
+    return drawTableFiche(doc, table, rows, s, startY);
+  }
+
+  let ty = startY;
+  const headerH = Math.max(16, ...colLabels.map((l) => heightOfString(doc, l, widths[0] - 8, size))) + 6;
+  ensureSpace(doc, headerH + 14);
+
+  colLabels.forEach((label, ci) => {
+    const x = PAGE_MARGIN + widths.slice(0, ci).reduce((a, b) => a + b, 0);
+    drawCell(doc, x, ty, widths[ci], headerH, label, size, { bold: true, color: '#FFFFFF', fill: true, fillColor: COLOR_HEADER });
+  });
+  ty += headerH;
+
+  for (const row of formattedRows) {
+    let maxLines = 1;
+    row.forEach((cell, ci) => {
+      maxLines = Math.max(maxLines, wrapLines(doc, cell, widths[ci] - 8, size));
+    });
+    const rowH2 = Math.max(maxLines * (size * 1.3 + 1) + 6, 16);
+
+    if (ensureSpace(doc, rowH2 + 6)) {
+      ty = doc.y;
+      colLabels.forEach((label, ci) => {
+        const x = PAGE_MARGIN + widths.slice(0, ci).reduce((a, b) => a + b, 0);
+        drawCell(doc, x, ty, widths[ci], headerH, label, size, { bold: true, color: '#FFFFFF', fill: true, fillColor: COLOR_HEADER });
+      });
+      ty += headerH;
+    }
+
+    const rowY = ty;
+    row.forEach((cell, ci) => {
+      const x = PAGE_MARGIN + widths.slice(0, ci).reduce((a, b) => a + b, 0);
+      const f = table.fields[ci];
+      const isNumber = f && (f.type === 'integer' || f.type === 'decimal');
+      drawCell(doc, x, rowY, widths[ci], rowH2, cell, size, { align: isNumber ? 'right' : 'left' });
+    });
+    ty += rowH2;
+  }
+
+  return ty + 8;
+}
+
+export function renderPdf(model, doc) {
+  doc.font('Helvetica');
+  doc.on('pageAdded', () => {
+    drawCompactHeader(doc);
+  });
+
+  // ---------- page 1 : en-tête formel centré ----------
+  drawPage1Header(doc);
+
+  // ---------- sommaire page 1 ----------
+  doc.font('Helvetica-Bold').fontSize(16).fillColor(COLOR_BODY)
+    .text(sanitize('Collecte des données'), PAGE_MARGIN, doc.y, { width: CONTENT_W });
+  doc.x = PAGE_MARGIN;
+  doc.moveDown(0.4);
+
+  const infoLines = [
+    `Date d'export : ${fmtDateTime(model.generatedAt)}`,
+    `Régions : ${regionsDisplay(model)}`,
+    `Modules : ${modulesDisplay(model)}`,
+    `Nombre de saisies : ${model.count}`,
+  ];
+  infoLines.forEach((line) => {
+    doc.font('Helvetica').fontSize(10).fillColor(COLOR_BODY)
+      .text(sanitize(line), PAGE_MARGIN, doc.y, { width: CONTENT_W });
+    doc.x = PAGE_MARGIN;
+  });
+  doc.moveDown(0.6);
+
+  if (model.count === 0) {
+    doc.font('Helvetica').fontSize(10).fillColor('#777777').text('Aucune donnée à exporter pour cette sélection.');
+    const total = doc.bufferedPageRange().count;
+    drawFooters(doc, total, model.generatedAt);
+    doc.flushPages();
+    return total;
+  }
+
+  for (const mod of model.modules) {
+    for (const s of mod.saisies) {
+      // ---------- T4 : ne pas séparer une saisie de son contenu ----------
+      // Espace nécessaire minimal : titre bloc + grille info + première ligne de contenu.
+      const needed = 42 + 48 + 16;
+      if (ensureSpace(doc, needed)) {
+        // nouvelle page déjà dotée de l'en-tête compact via pageAdded
+      }
+
+      // ---------- titre de bloc ----------
+      drawBlockTitle(doc, mod);
+
+      // ---------- grille d'informations ----------
+      drawInfoGrid(doc, s);
+
+      // ---------- champs scalaires ----------
+      drawScalarFields(doc, mod, s);
+
+      // ---------- champs de type table ----------
+      for (const table of mod.tables) {
+        const rows = s.tables[table.key] || [];
+        if (rows.length === 0) continue;
+        const size = 8;
+        // T3 : titre de tableau, jamais seul en bas de page.
+        const titleH = 14;
+        const headerEstimate = 24;
+        if (ensureSpace(doc, titleH + headerEstimate + 16)) {
+          // nouvelle page déjà dotée de l'en-tête compact via pageAdded
+        }
+        drawTableTitle(doc, table);
+        doc.y = drawTableGrid(doc, table, rows, s, doc.y, size);
+      }
+    }
+  }
+
+  // ---------- T1 : pieds de page après le contenu, une seule passe ----------
+  const range = doc.bufferedPageRange();
+  const total = range.count;
+  drawFooters(doc, total, model.generatedAt);
+  doc.flushPages();
+  return total;
 }
 
 function drawScalarFields(doc, mod, s) {
@@ -166,172 +346,17 @@ function drawScalarFields(doc, mod, s) {
   doc.moveDown(0.2);
 }
 
-function drawTableFiche(doc, table, rows, s, startY) {
-  const nSub = table.fields.length;
-  let ty = startY;
-  for (let ri = 0; ri < rows.length; ri++) {
-    const row = rows[ri];
-    const ficheTitle = `Ligne ${ri + 1}`;
-    const titleH = 12;
-    ensureSpace(doc, titleH + 4);
-    doc.font('Helvetica-Bold').fontSize(8).fillColor(COLOR_HEADER).text(ficheTitle, PAGE_MARGIN, ty, { lineBreak: false });
-    doc.x = PAGE_MARGIN;
-    ty += titleH + 2;
-
-    const labelW = 120;
-    const valW = CONTENT_W - labelW;
-    let rowY = ty;
-    for (const f of table.fields) {
-      const cellH = 14;
-      ensureSpace(doc, cellH + 2);
-      drawCell(doc, PAGE_MARGIN, rowY, labelW, cellH, f.label, 8, { bold: true, color: '#333333' });
-      const val = formatPdfCell(f, row[f.key]);
-      drawCell(doc, PAGE_MARGIN + labelW, rowY, valW, cellH, val, 8);
-      rowY += cellH + 1;
-    }
-    ty = rowY + 4;
-  }
-  return ty;
-}
-
-function drawTableGrid(doc, table, rows, s, startY, size) {
-  const colLabels = table.fields.map((f) => fieldHeaderLabel(f.label));
-  const nSub = table.fields.length;
-
-  // Prepare cell values (formatted)
-  const formattedRows = rows.map((row) =>
-    table.fields.map((f) => formatPdfCell(f, row[f.key]))
-  );
-
-  const { widths, useFiches, minWidths } = computeTableColumnWidths(doc, colLabels, formattedRows, CONTENT_W, size);
-
-  if (useFiches) {
-    return drawTableFiche(doc, table, rows, s, startY);
-  }
-
-  let ty = startY;
-  const headerH = Math.max(16, ...colLabels.map((l) => heightOfString(doc, l, widths[0] - 8, size))) + 6;
-  ensureSpace(doc, headerH + 14);
-
-  colLabels.forEach((label, ci) => {
-    const x = PAGE_MARGIN + widths.slice(0, ci).reduce((a, b) => a + b, 0);
-    drawCell(doc, x, ty, widths[ci], headerH, label, size, { bold: true, color: '#FFFFFF', fill: true, fillColor: COLOR_HEADER });
-  });
-  ty += headerH;
-
-  for (const row of formattedRows) {
-    let maxLines = 1;
-    row.forEach((cell, ci) => {
-      maxLines = Math.max(maxLines, wrapLines(doc, cell, widths[ci] - 8, size));
-    });
-    const rowH2 = maxLines * (size * 1.3 + 1) + 6;
-
-    if (ensureSpace(doc, rowH2 + 6)) {
-      ty = doc.y;
-      colLabels.forEach((label, ci) => {
-        const x = PAGE_MARGIN + widths.slice(0, ci).reduce((a, b) => a + b, 0);
-        drawCell(doc, x, ty, widths[ci], headerH, label, size, { bold: true, color: '#FFFFFF', fill: true, fillColor: COLOR_HEADER });
-      });
-      ty += headerH;
-    }
-
-    const rowY = ty;
-    row.forEach((cell, ci) => {
-      const x = PAGE_MARGIN + widths.slice(0, ci).reduce((a, b) => a + b, 0);
-      const f = table.fields[ci];
-      const isNumber = f && (f.type === 'integer' || f.type === 'decimal');
-      drawCell(doc, x, rowY, widths[ci], rowH2, cell, size, { align: isNumber ? 'right' : 'left' });
-    });
-    ty += rowH2;
-  }
-
-  return ty + 8;
-}
-
-export function renderPdf(model, doc) {
-  doc.font('Helvetica');
-  let totalPages = 1;
-  doc.on('pageAdded', () => {
-    totalPages += 1;
-    drawCompactHeader(doc);
-  });
-
-  // ---------- page 1 : en-tête formel centré ----------
-  drawPage1Header(doc);
-
-  // ---------- sommaire page 1 ----------
-  doc.font('Helvetica-Bold').fontSize(16).fillColor(COLOR_BODY)
-    .text(sanitize('Collecte des données'), PAGE_MARGIN, doc.y, { width: CONTENT_W });
-  doc.x = PAGE_MARGIN;
-  doc.moveDown(0.4);
-
-  const infoLines = [
-    `Date d'export : ${fmtDateTime(model.generatedAt)}`,
-    `Régions : ${regionsDisplay(model)}`,
-    `Modules : ${modulesDisplay(model)}`,
-    `Nombre de saisies : ${model.count}`,
-  ];
-  infoLines.forEach((line) => {
-    doc.font('Helvetica').fontSize(10).fillColor(COLOR_BODY)
-      .text(sanitize(line), PAGE_MARGIN, doc.y, { width: CONTENT_W });
-    doc.x = PAGE_MARGIN;
-  });
-  doc.moveDown(0.6);
-
-  if (model.count === 0) {
-    doc.font('Helvetica').fontSize(10).fillColor('#777777').text('Aucune donnée à exporter pour cette sélection.');
-    drawFooters(doc, totalPages, model.generatedAt);
-    return;
-  }
-
-  for (const mod of model.modules) {
-    for (const s of mod.saisies) {
-      // ---------- titre de bloc ----------
-      ensureSpace(doc, 42);
-      doc.font('Helvetica-Bold').fontSize(11).fillColor(COLOR_HEADER).text(sanitize(`${mod.code} — ${mod.label}`), PAGE_MARGIN, doc.y, { width: CONTENT_W });
-      doc.x = PAGE_MARGIN;
-      doc.moveDown(0.2);
-
-      // ---------- grille d'informations ----------
-      drawInfoGrid(doc, s);
-
-      // ---------- champs scalaires ----------
-      drawScalarFields(doc, mod, s);
-
-      // ---------- champs de type table ----------
-      for (const table of mod.tables) {
-        const rows = s.tables[table.key] || [];
-        if (rows.length === 0) continue;
-        const size = 8;
-        const headerEstimate = 24;
-        ensureSpace(doc, headerEstimate + 14);
-        const beforeY = doc.y;
-        doc.y = drawTableGrid(doc, table, rows, s, doc.y, size);
-      }
-    }
-  }
-
-  drawFooters(doc, totalPages, model.generatedAt);
-}
-
 function drawFooters(doc, total, generatedAt) {
   const left = sanitize(`Document généré par SIGBD le ${fmtDateTime(generatedAt)}`);
-  const bottom = doc.page.height - 26;
-  try {
+  const bottom = PAGE_HEIGHT - 30;
+  const range = doc.bufferedPageRange();
+  for (let i = 0; i < range.count; i++) {
+    doc.switchToPage(range.start + i);
     doc.page.margins.bottom = 0;
-  } catch (e) {
-    // marges non accessibles ; on tente quand même
-  }
-  for (let i = 0; i < total; i++) {
-    doc.switchToPage(i);
     doc.font('Helvetica').fontSize(8).fillColor('#666666');
     doc.text(left, PAGE_MARGIN, bottom, { width: 260, lineBreak: false });
     doc.text(`Page ${i + 1} / ${total}`, PAGE_MARGIN, bottom, { width: PAGE_WIDTH - 2 * PAGE_MARGIN, align: 'right', lineBreak: false });
-  }
-  try {
     doc.page.margins.bottom = PAGE_MARGIN;
-  } catch (e) {
-    // restauration
   }
-  doc.switchToPage(total > 0 ? total - 1 : 0);
+  doc.switchToPage(range.start + Math.max(range.count - 1, 0));
 }
