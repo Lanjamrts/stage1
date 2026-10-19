@@ -197,7 +197,10 @@ export function formatPdfCell(field, value) {
     return fmtDateTime(value);
   }
   if (typeof value === 'number') {
-    if (field.type === 'integer' || field.type === 'decimal') return fmtNumber(value);
+    if (field.type === 'integer' || field.type === 'decimal') {
+      if (isPlainNumberField(field)) return String(value);
+      return fmtNumber(value);
+    }
     return String(value);
   }
   return String(value).trim();

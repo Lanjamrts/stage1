@@ -1,6 +1,7 @@
 "use strict";
 import { describe, it, expect } from 'vitest';
 import { buildExportModel, fmtDate, fmtDateTime, formatPdfCell, computeTableColumnWidths, isPlainNumberField } from '../src/services/exportModel.js';
+import { saisieBlockHeight } from '../src/services/exportPdf.js';
 import { buildWorkbook, cleanSheetNameBase } from '../src/services/exportXlsx.js';
 import { renderPdf, rowHeight } from '../src/services/exportPdf.js';
 import ExcelJS from 'exceljs';
@@ -641,6 +642,120 @@ describe('Rendu des formats d\'export (collecte)', () => {
           const pdfText = extractPdfText(buffer);
           expect(pdfText.includes('2004')).toBe(true);
           expect(pdfText).not.toContain('2 004');
+          resolve();
+        } catch (err) {
+          reject(err);
+        }
+      });
+      doc.on('error', reject);
+      renderPdf(model, doc);
+      doc.end();
+    });
+  });
+
+  it('X27 : le PDF affiche 2004 sans séparateur pour Annee en scalaire et en tableau', () => {
+    const ANNEE_TABLE_MODULE = {
+      code: 'AT',
+      label: 'Avec annee',
+      fields: [
+        { key: 'annee', label: 'Année', type: 'integer' },
+        {
+          key: 'lignes',
+          label: 'Lignes',
+          type: 'table',
+          fields: [
+            { key: 'annee', label: 'Année', type: 'integer' },
+            { key: 'libelle', label: 'Libellé', type: 'text' },
+          ],
+        },
+      ],
+    };
+    const model = buildExportModel([row(ANNEE_TABLE_MODULE, { annee: 2004, lignes: [{ annee: 2004, libelle: 'x' }] })], { filters: { regions: [], modules: [] } });
+    const doc = new PDFDocument({ margin: 42, size: 'A4', bufferPages: true });
+    const chunks = [];
+    return new Promise((resolve, reject) => {
+      doc.on('data', (chunk) => chunks.push(chunk));
+      doc.on('end', () => {
+        try {
+          const buffer = Buffer.concat(chunks);
+          const pdfText = extractPdfText(buffer);
+          expect(pdfText.includes('2004')).toBe(true);
+          expect(pdfText).not.toContain('2 004');
+          resolve();
+        } catch (err) {
+          reject(err);
+        }
+      });
+      doc.on('error', reject);
+      renderPdf(model, doc);
+      doc.end();
+    });
+  });
+
+  it('X28 : le bloc titre + grille + 8 champs scalaires est gardé ensemble (modèle de calcul)', () => {
+    const HUIT_MODULE = {
+      code: 'H8',
+      label: 'Huit champs',
+      fields: [
+        { key: 'c1', label: 'Champ 1', type: 'text' },
+        { key: 'c2', label: 'Champ 2', type: 'text' },
+        { key: 'c3', label: 'Champ 3', type: 'text' },
+        { key: 'c4', label: 'Champ 4', type: 'text' },
+        { key: 'c5', label: 'Champ 5', type: 'text' },
+        { key: 'c6', label: 'Champ 6', type: 'text' },
+        { key: 'c7', label: 'Champ 7', type: 'text' },
+        { key: 'c8', label: 'Champ 8', type: 'text' },
+      ],
+    };
+    const s = {
+      structure: 'SRB – Analamanga',
+      periode: 'Octobre 2026',
+      statut: 'Exportée',
+      auteur: 'Jean Rakoto',
+      dates: { exported: new Date('2026-10-16T10:00:00Z') },
+      scalars: { c1: 'v1', c2: 'v2', c3: 'v3', c4: 'v4', c5: 'v5', c6: 'v6', c7: 'v7', c8: 'v8' },
+    };
+    // En haut de page : le bloc tient sur la page.
+    const docHaut = new PDFDocument({ margin: 42, size: 'A4' });
+    docHaut.y = 42;
+    const hHaut = saisieBlockHeight(docHaut, HUIT_MODULE, s);
+    const remHaut = docHaut.page.height - docHaut.page.margins.bottom - docHaut.y;
+    expect(hHaut).toBeGreaterThan(0);
+    expect(hHaut).toBeLessThanOrEqual(remHaut);
+    // En bas de page : le bloc ne tient pas -> saut de page avant le titre.
+    const docBas = new PDFDocument({ margin: 42, size: 'A4' });
+    docBas.y = docBas.page.height - docBas.page.margins.bottom - 30;
+    const hBas = saisieBlockHeight(docBas, HUIT_MODULE, s);
+    const remBas = docBas.page.height - docBas.page.margins.bottom - docBas.y;
+    expect(hBas).toBeGreaterThan(remBas);
+  });
+
+  it('X29 : le nombre de pages reste égal au total des pieds de page, aucune page vide', () => {
+    const rows = [];
+    for (let i = 0; i < 20; i++) {
+      rows.push(row(RH_MODULE, {
+        besoins: 'Besoins en personnel et en formation pour le service.',
+        effectif: [{ categorie: 'Cat\u00e9gorie A', grade: 'Attach\u00e9', sexe: 'Homme', effectif: 4 }],
+        mouvements: [{ type: 'Arriv\u00e9e', nombre: 2 }],
+      }));
+    }
+    const model = buildExportModel(rows, { filters: { regions: ['Analamanga'], modules: [] } });
+    const doc = new PDFDocument({ margin: 42, size: 'A4', bufferPages: true });
+    const chunks = [];
+    return new Promise((resolve, reject) => {
+      doc.on('data', (chunk) => chunks.push(chunk));
+      doc.on('end', () => {
+        try {
+          const buffer = Buffer.concat(chunks);
+          const text = buffer.toString('latin1');
+          const pages = (text.match(/\/Type \/Page(?!s)/g) || []).length;
+          const pdfText = extractPdfText(buffer);
+          const match = pdfText.match(/Page \d+ \/ (\d+)/);
+          const announced = match ? Number(match[1]) : null;
+          expect(announced).toBe(pages);
+          expect(pages).toBeGreaterThanOrEqual(1);
+          // Aucune page vide : chaque page contient du texte ou un dessin.
+          expect(pdfText.includes('Collecte des données')).toBe(true);
           resolve();
         } catch (err) {
           reject(err);

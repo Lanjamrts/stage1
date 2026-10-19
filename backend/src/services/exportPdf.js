@@ -151,8 +151,8 @@ function drawInfoGrid(doc, s) {
   doc.y = gy + 4;
 }
 
-function drawBlockTitle(doc, mod) {
-  doc.font('Helvetica-Bold').fontSize(11).fillColor(COLOR_HEADER).text(sanitize(`${mod.code} — ${mod.label}`), PAGE_MARGIN, doc.y, { width: CONTENT_W });
+function drawBlockTitle(doc, mod, suite = false) {
+  doc.font('Helvetica-Bold').fontSize(11).fillColor(COLOR_HEADER).text(sanitize(`${mod.code} — ${mod.label}${suite ? ' (suite)' : ''}`), PAGE_MARGIN, doc.y, { width: CONTENT_W });
   doc.x = PAGE_MARGIN;
   doc.moveDown(0.2);
 }
@@ -236,12 +236,51 @@ function drawTableGrid(doc, table, rows, s, startY, size) {
       const x = PAGE_MARGIN + widths.slice(0, ci).reduce((a, b) => a + b, 0);
       const f = table.fields[ci];
       const isNumber = f && (f.type === 'integer' || f.type === 'decimal');
-      drawCell(doc, x, rowY, widths[ci], rowH2, cell, size, { align: isNumber ? 'right' : 'left' });
+      const plain = isNumber && isPlainNumberField(f);
+      drawCell(doc, x, rowY, widths[ci], rowH2, cell, size, { align: plain ? 'left' : (isNumber ? 'right' : 'left') });
     });
     ty += rowH2;
   }
 
   return ty + 8;
+}
+
+// Calcule la hauteur nécessaire pour le titre + grille d'infos + champs scalaires
+// d'une saisie, avec les mêmes fonctions que le rendu (rowHeight / heightOfString).
+export function saisieBlockHeight(doc, mod, s) {
+  let h = 0;
+  // titre du bloc (fontSize 11 + moveDown 0.2)
+  h += 14;
+  // grille d'informations
+  const labelW = 100;
+  const valW = CONTENT_W - labelW;
+  const exported = s.dates.exported ? fmtDateTime(s.dates.exported) : '—';
+  const pairs = [
+    ['Structure', s.structure],
+    ['Période / Événement', s.periode],
+    ['Statut de la saisie', s.statut],
+    ['Auteur', s.auteur || '—'],
+    ['Exportée le', exported],
+  ];
+  pairs.forEach(([label, value]) => {
+    const hh = rowHeight(doc, label, value, labelW, valW, 8, 6);
+    h += Math.max(hh, 16) + 4;
+  });
+  h += 4; // doc.y = gy + 4
+  // champs scalaires
+  const labelColW = Math.floor(CONTENT_W * 0.38);
+  const valColW = CONTENT_W - labelColW;
+  const size = 8.5;
+  const padding = 5;
+  mod.fields.forEach((f) => {
+    const raw = s.scalars[f.key];
+    const display = raw === '' ? '—' : raw instanceof Date ? fmtDate(raw) : String(raw);
+    const hLabel = doc.heightOfString(sanitize(f.label), { font: 'Helvetica', size, width: labelColW - 2 * padding });
+    const hValue = doc.heightOfString(sanitize(display), { font: 'Helvetica', size, width: valColW - 2 * padding });
+    h += Math.max(hLabel, hValue) + 2 * padding;
+  });
+  h += 12; // espace final moveDown
+  return h;
 }
 
 export function renderPdf(model, doc) {
@@ -283,9 +322,10 @@ export function renderPdf(model, doc) {
   for (const mod of model.modules) {
     for (const s of mod.saisies) {
       // ---------- T4 : ne pas séparer une saisie de son contenu ----------
-      // Espace nécessaire minimal : titre bloc + grille info + première ligne de contenu.
-      const needed = 42 + 48 + 16;
-      if (ensureSpace(doc, needed)) {
+      // Si le bloc (titre + grille + champs scalaires) ne tient pas dans l'espace restant,
+      // sauter de page AVANT le titre du bloc.
+      const blockNeeded = saisieBlockHeight(doc, mod, s);
+      if (ensureSpace(doc, blockNeeded)) {
         // nouvelle page déjà dotée de l'en-tête compact via pageAdded
       }
 
@@ -331,6 +371,7 @@ function drawScalarFields(doc, mod, s) {
   const size = 8.5;
   const padding = 5;
   let rowIdx = 0;
+  let drewAny = false; // un champ scalaire a déjà été dessiné sur cette page
   for (const f of scalarFields) {
     const raw = s.scalars[f.key];
     const display = raw === '' ? '—' : raw instanceof Date ? fmtDate(raw) : String(raw);
@@ -342,7 +383,13 @@ function drawScalarFields(doc, mod, s) {
     doc.font('Helvetica').fontSize(size);
     const hValue = doc.heightOfString(value, { width: valColW - 2 * padding });
     const needed = Math.max(hLabel, hValue) + 2 * padding;
-    ensureSpace(doc, needed);
+    const remaining = doc.page.height - doc.page.margins.bottom - doc.y;
+    if (remaining < needed && drewAny) {
+      // couper entre deux champs et répéter le titre du bloc en (suite)
+      doc.addPage();
+      drawBlockTitle(doc, mod, true);
+      drewAny = false;
+    }
     const ry = doc.y;
     if (rowIdx % 2 === 1) {
       doc.rect(PAGE_MARGIN, ry, CONTENT_W, needed).fill(COLOR_ALT).stroke(COLOR_BORDER);
@@ -358,6 +405,7 @@ function drawScalarFields(doc, mod, s) {
     doc.font('Helvetica').fontSize(size).fillColor(COLOR_BODY).text(numText, PAGE_MARGIN + labelColW + padding, textY, { width: valColW - 2 * padding, align: valAlign, lineBreak: true });
     doc.y = ry + needed;
     rowIdx += 1;
+    drewAny = true;
   }
   doc.moveDown(12 / 7.2); // 12 pt d'espace avant le titre du tableau suivant
 }
