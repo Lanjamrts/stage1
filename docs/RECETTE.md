@@ -171,6 +171,21 @@ Aucun test automatique.
 - backend/tests/rbac.test.js :: admin2 : consulte sa région (liste, collecte, export) et envoie une remarque (API uniquement)
 - backend/tests/rbac.test.js :: admin1 : tableau de bord, collecte, historique, export, audit, remarques (API uniquement)
 - backend/tests/rbac.test.js :: consultant : consultation, rapport exporté et tableau de bord (lecture seule) (API uniquement)
+- backend/tests/export-format.test.js :: X4 : le classeur contient Synthese, une feuille par module et des noms de feuille valides et uniques
+- backend/tests/export-format.test.js :: X5 : les cellules numeriques et dates sont de vrais nombres et de vraies dates avec format
+- backend/tests/export-format.test.js :: X6 : l en-tete est fige, filtre et les colonnes de dates sont assez larges
+- backend/tests/export-format.test.js :: X7 : le PDF est genere sur plusieurs pages avec en-tete et pied de page sans erreur
+- backend/tests/export-format.test.js :: X8 : un export vide produit un message clair dans l Excel
+- backend/tests/export-format.test.js :: X9 : un export d une saisie produit exactement une page PDF avec Page 1 / 1
+- backend/tests/export-format.test.js :: X10 : les heures ecrites dans l Excel sont celles de Madagascar (instant 2026-10-16T07:14:04Z → cellule 10:14)
+- backend/tests/export-format.test.js :: X11 : le libelle Statut de la saisie est distinct du champ Statut
+- backend/tests/export-format.test.js :: X12 : fitToPage est actif et la largeur des colonnes suit le contenu
+- backend/tests/export-format.test.js :: X15 : un module qui n a que des tableaux ne cree pas de feuille Excel vide de champs
+- backend/tests/export-format.test.js :: X16 : le PDF de 60 saisies a autant de pages que le total affiche dans le pied de page et aucune page vide
+- backend/tests/export-format.test.js :: X21 : le nombre de pages du PDF reste égal au total affiché dans les pieds de page, aucune page vide
+- backend/tests/export-format.test.js :: X23 : export de 3 saisies RH (comme dans la demo) produit un PDF sans page vide et pieds coherents
+
+**Limite :** Les tests automatiques vérifient la structure du fichier Excel (feuille Synthèse, une feuille par module, noms de feuille valides et uniques) et du PDF (pages, en-tête, pied de page, pas de page vide) avec des données générées ; ils ne remplacent pas la vérification visuelle manuelle contre les données validées réales, qui est la procédure manuelle ci-dessous.
 
 **Procédure manuelle :**
 1. Se connecter en admin1 (`120344` / `Test@2026`), aller dans « Collecte et téléchargement »
@@ -181,6 +196,8 @@ Aucun test automatique.
 6. Même sélection → Exporter Excel et PDF (admin2 ne voit que sa région Analamanga)
 7. Se connecter en consultant (`121775`), aller dans « Consultation des données »
 8. Vérifier qu'il n'y a AUCUN bouton de téléchargement (le consultant n'a pas le droit de télécharger)
+9. Ouvrir le fichier `.xlsx` : vérifier que la première feuille est intitulée « Synthèse » (titre, sous-titres « Ministère de l'Économie et des Finances — DGBF / SSEBF », date d'export, régions, modules, nombre de saisies), puis qu'il existe une feuille par module exporté (ex. « RA », « RH ») avec des colonnes lisibles (« Structure », « Période / Événement », « Auteur », « Statut », champs du gabarit) et les nombres alignés à droite. Pour un module à tableau (ex. « RH »), vérifier la présence d'une feuille de tableau par tableau de saisie avec une ligne par ligne de saisie.
+10. Ouvrir le fichier `.pdf` : vérifier l'en-tête de chaque page (logo, « SIGBD », « Ministère de l'Économie et des Finances — DGBF / SSEBF », filet de séparation), le pied de page « Page X / Y » et « Document généré par SIGBD le … » en gris, le titre « Collecte des données » en page 1, puis pour chaque saisie le bloc « <code> — <libellé du module> », la grille d'informations, les champs scalaires en deux colonnes et les vrais tableaux pour les champs de type table.
 
 **État ** : Automatisé
 

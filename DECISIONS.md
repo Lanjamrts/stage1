@@ -81,6 +81,14 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 - [P8] `npm run archive` (SPEC §2, exportee -> archivee) référencé dans package.json mais script absent : backend/src/scripts/archive.js créé — archive strictement les saisies exportee dont la période (periode.end) est passée ; les saisies d'événement (sans periodeId) ne sont pas archivées (« dont la période est terminée », lecture stricte) ; ni ligne d'audit ni entrée validations (absentes des listes fermées de la SPEC §2/§8).
 - [P8] Expiration glissante réellement glissante : le cookie et le JWT sont régénérés à chaque requête authentifiée (setSessionCookie), le cookie maxAge et la modale d'avertissement suivent SESSION_TIMEOUT_MINUTES du .env (renvoyé par /auth/me sous le nom sessionTimeoutMinutes, avertissement 5 min avant, compte à rebours 60 s) — auparavant maxAge et seuil 25 min étaient codés en dur et le serveur n'allongeait jamais la session.
 
+## Step 12 – Exports Excel et PDF
+
+- `buildExportModel` (backend/src/services/exportModel.js) : modèle de données pur, typé depuis modules.js, dates à l'heure de Madagascar (Indian/Antananarivo, indépendant du fuseau du serveur), lignes de tableau groupées avec tous leurs sous-champs, valeurs vides → '' jamais « undefined ».
+- `exportXlsx.js` / `exportPdf.js` : feuille « Synthèse » en premier, une feuille par module et une feuille par tableau de saisie, style commun (en-tête #0B2A4A, bordures fines, figée + filtre, paysage sur une page), en-tête et pied de page « Page X / Y » sur chaque page PDF.
+- `exportCollecte` reconstruit sur ce modèle ; en-têtes HTTP, nom de fichier, streaming, journal d'audit et contrôles de rôle inchangés.
+- Helpers supprimés : flattenValues, labelMap, labelFor (plus utilisés ailleurs) ; fmtDate/fmtDateTime/periodCell remplacés par les versions pures d'exportModel.
+- Aucune nouvelle dépendance (exceljs et pdfkit déjà installées).
+
 ## Step 5 – Period generation
 
 - Script instead of API/UI (none exists yet; screens are a later step).
@@ -193,3 +201,37 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 - README : liens `docs/RECETTE.md` et `docs/DEMO.md` ajoutés dans « Structure du dépôt ».
 - DEMO.md corrigé : conflit brouillon Octobre 2026 dans le seed → passage à Septembre 2026 pour l'étape 1 et toutes les étapes suivantes ; libellés d'actions d'audit alignés sur l'affichage réel (ex. saisie_reject → « Rejet de saisie ») ; motif de rejet aligné sur les champs RA réels (« Indicateurs de performance ») ; références de code déplacées en commentaires HTML invisibles.
 - DEMO.md : filtre Période inexistant retiré, libellés de confirmation corrigés, références en commentaires HTML.
+
+## Step 12.1 – Corrections des exports Excel/PDF
+
+- PDF : plus de page blanche en fin d'export. Le pied de page est écrit après le contenu sur chaque page via `bufferedPageRange()` / `switchToPage(i)`, avec `doc.page.margins.bottom` temporairement à 0 et `lineBreak: false`, puis restauré. « Page X / Y » utilise le nombre réel de pages. Un export d'une saisie = exactement 1 page.
+- PDF : nouvel en-tête formel. Page 1 : logo centré (64 pt), « SIGBD » (Helvetica-Bold 20 pt, #0B2A4A), « Ministère de l'Économie et des Finances — DGBF / SSEBF » (9 pt, gris), filet fin pleine largeur (0,75 pt, #0B2A4A), puis 14 pt avant le titre. Pages suivantes : en-tête compact (logo 24 pt à gauche, ligne « SIGBD — Ministère… » à droite centrées verticalement, filet sous-jacent). Les en-têtes sont dessinés à chaque création de page (événement `pageAdded`) et `doc.y` est positionné sous l'en-tête.
+- Excel : les cellules date-heure (`Créée le`, `Soumise le`, `Exportée le`) stockent les composantes calendaires/horaires de Madagascar (Indian/Antananarivo) en UTC (`Date.UTC`) pour un affichage sans décalage ; les champs date seule sont à minuit sans décalage.
+- « Régions : — » devient « Toutes les régions (<présents>) » quand le filtre est absent, idem « Tous les modules (<présents>) » pour Excel et PDF.
+- « Statut de la saisie » remplace « Statut » comme colonne méta (Synthèse, feuilles modules, grille PDF). Un champ de gabarit dont le libellé collide avec une colonne méta reçoit le suffixe « (champ) » (ex. « Statut (champ) »).
+- PDF : grille d'informations à colonnes de largeur fixe dans la marge utile avec retour à la ligne ; nombres integer/decimal formatés via `fmtNumber` (espace ordinaire) et alignés à droite.
+- Excel : largeur de colonne = contenu max + 2, bornée [12, 45], `wrapText` ; `pageSetup` { orientation: 'landscape', fitToPage: true, fitToWidth: 1, fitToHeight: 0 } sur chaque feuille, répétition de l'en-tête (`printTitlesRow`). Vérifié en rechargeant le fichier : `ws.pageSetup.fitToPage === true`.
+- Tests ajoutés : X9 (1 saisie = 1 page, « Page 1 / 1 »), X10 (heure Madagascar dans Excel), X11 (Statut de la saisie distinct du champ Statut), X12 (fitToPage actif, largeurs au contenu). Aucun test existant modifié. Nouvelle dépendance : aucune.
+
+## Step 12.2 – PDF (dates des tableaux, titre, tableaux larges) et feuilles Excel sans champ simple
+
+- PDF : toute valeur Date dans les tableaux est formatée via `formatPdfCell` (exportModel.js) qui appelle `fmtDate` (date seule, jj/mm/aaaa) ou `fmtDateTime` (date-heure) selon le type du champ. Plus de `String(Date)` brut ni de « GMT » dans le texte extrait.
+- PDF : titre « Collecte des données » écrit en x = marge gauche (42 pt) avec `width = largeur utile`, puis `doc.y` déplacé sous le titre avant les lignes « Date d'export », « Régions », « Modules », « Nombre de saisies » (une chacune, alignées à gauche sur la marge). `doc.x` rétabli à la marge après chaque `text` absolu.
+- PDF : colonnes « Structure » et « Période / Événement » supprimées des tableaux (déjà dans le bloc d'informations de la saisie). Largeurs calculées par `computeTableColumnWidths` (pure, exportée) : mini-largeur = largeur du mot le plus long (en-tête + cellules, police 8 pt) + padding, reste réparti selon la longueur moyenne. Taille 8 pt (7,5 si nécessaire). En-tête de tableau calculé via `heightOfString` pour que les libellés soient entièrement visibles. Aucun mot coupé en deux.
+- PDF : si la somme des largeurs minimales dépasse la largeur utile, le tableau est affiché en « fiches » : une mini-grille à deux colonnes (libellé gris / valeur) par ligne du tableau, avec un petit titre « Ligne 1 », « Ligne 2 »… au lieu d'un tableau. Règle de repli consignée ici.
+- Excel : quand un module n'a aucun champ scalaire (seulement des tableaux), la feuille « <code> » n'est pas créée (elle ne ferait que reprendre les colonnes méta déjà dans « Synthèse »). Seules les feuilles « <code> – <tableau> » sont créées. Les modules avec champs scalaires gardent leur feuille.
+- Tests ajoutés : X13 (dates tableaux PDF en jj/mm/aaaa, pas de GMT), X14 (tableau 11 colonnes ne dépasse pas la marge), X15 (module table-only sans feuille Excel meta). Aucun test existant modifié. Nouvelle dépendance : aucune.
+
+## Step 12.3 – Dernières corrections du PDF et du nom des feuilles Excel
+
+- PDF : plus de pages blanches en fin de document. Les pieds de page sont écrits après tout le contenu, en une seule passe, sur chaque page de `bufferedPageRange()` : `switchToPage(i)`, `margins.bottom = 0`, textes en coordonnées absolues à `y = PAGE_HEIGHT - 30` avec `lineBreak: false`, puis restauration de la marge. `flushPages()` est appelé avant `doc.end()`. Le total « Y » de « Page X / Y » = `bufferedPageRange().count` calculé avant d'écrire les pieds, égal au nombre de pages du fichier final. `renderPdf` retourne ce total.
+- PDF : hauteur des lignes libellé/valeur calculée par la fonction pure exportée `rowHeight(doc, label, value, labelW, valueW, size, padding)` = `max(heightOfString(label), heightOfString(value)) + padding`. Le libellé long sur plusieurs lignes est entièrement couvert.
+- PDF : titre au-dessus de chaque champ de type table (Helvetica-Bold 9 pt, #0B2A4A), avec 4 pt d'espace avant le tableau. Le titre n'est jamais laissé seul en bas de page : si l'espace restant < titre + en-tête de tableau + une ligne, nouvelle page avant d'écrire le titre.
+- PDF : avant le bloc d'une saisie, vérification que l'espace restant ≥ titre bloc + grille d'informations + première ligne de contenu, sinon nouvelle page. La grille d'informations n'est jamais seule en bas de page.
+- Excel : noms de feuilles nettoyés par la fonction pure exportée `cleanSheetNameBase(name)` : suppression des caractères interdits `[]:*?/\`, coupe au dernier espace avant 31 caractères (jamais au milieu d'un mot), retrait de la ponctuation de fin `[ ,;:.–-]`, valeur de repli `Feuil1`. L'unicité est garantie par `uniqueSheetName` avec suffixes `(2)`, `(3)`.
+- Tests ajoutés : X16 (PDF 60 saisies : pages == total annoncé, pas de page vide), X17 (rowHeight couvre le libellé multi-lignes), X18 (noms de feuilles coupés proprement, uniques). Aucun test existant modifié. Nouvelle dépendance : aucune.
+
+## Step 13 – T-07 documentation
+
+- T-07 (RECETTE.md) cite désormais, sous "Tests automatiques", les tests de backend/tests/export-format.test.js qui vérifient le classeur généré (X4, X5, X6, X8, X10, X11, X12, X15 : feuille Synthèse, une feuille par module, noms valides/uniques, cellules typées, en-tête figé/filtré, fitToPage) et le PDF généré (X7, X9, X16, X21, X23 : pages, en-tête, pied de page, pas de page vide) avec des données générées. Aucun code applicatif ni test modifié.
+- Ajout d'une phrase "Limite" : ces tests automatisés vérifient la structure des fichiers générés, pas le contenu visuel contre les données validées réelles ; celle-ci reste la procédure manuelle ci-dessous. État conservé : "Automatisé".
