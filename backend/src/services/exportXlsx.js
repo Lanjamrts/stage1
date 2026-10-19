@@ -7,6 +7,7 @@ import {
   toMadagascarDateOnly,
   fieldHeaderLabel,
   META_LABELS,
+  isPlainNumberField,
 } from './exportModel.js';
 
 const HEADER_BG = 'FF0B2A4A';
@@ -112,7 +113,7 @@ function clampWidth(w) {
 }
 
 // Écrit une valeur typée dans une cellule Excel.
-function writeValue(cell, value, kind) {
+function writeValue(cell, value, kind, field) {
   baseCellStyle(cell);
   if (value === null || value === undefined || value === '') {
     cell.value = '';
@@ -134,8 +135,9 @@ function writeValue(cell, value, kind) {
   }
   if (kind === 'integer' || kind === 'decimal') {
     cell.value = typeof value === 'number' ? value : Number(value) || 0;
-    cell.numFmt = kind === 'decimal' ? '#,##0.00' : '#,##0';
-    cell.alignment = { vertical: 'center', horizontal: 'right' };
+    const plain = isPlainNumberField(field);
+    cell.numFmt = plain ? '0' : (kind === 'decimal' ? '#,##0.00' : '#,##0');
+    cell.alignment = { vertical: 'center', horizontal: plain ? 'left' : 'right' };
     return;
   }
   cell.value = String(value);
@@ -289,7 +291,7 @@ export function buildWorkbook(model) {
       writeValue(sheet.getCell(r, 3), s.statut, 'text');
       writeValue(sheet.getCell(r, 4), s.auteur, 'text');
       mod.fields.forEach((f, ci) => {
-        writeValue(sheet.getCell(r, 5 + ci), s.scalars[f.key], f.type);
+        writeValue(sheet.getCell(r, 5 + ci), s.scalars[f.key], f.type, f);
       });
       r += 1;
     }
@@ -335,7 +337,7 @@ export function buildWorkbook(model) {
         for (const row of rows) {
           writeValue(sheet.getCell(r, 1), s.structure, 'text');
           writeValue(sheet.getCell(r, 2), s.periode, 'text');
-          table.fields.forEach((f, ci) => writeValue(sheet.getCell(r, 3 + ci), row[f.key], f.type));
+          table.fields.forEach((f, ci) => writeValue(sheet.getCell(r, 3 + ci), row[f.key], f.type, f));
           r += 1;
         }
       }

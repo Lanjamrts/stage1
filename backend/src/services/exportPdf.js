@@ -9,6 +9,7 @@ import {
   fieldHeaderLabel,
   formatPdfCell,
   computeTableColumnWidths,
+  isPlainNumberField,
 } from './exportModel.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -351,8 +352,9 @@ function drawScalarFields(doc, mod, s) {
     const textY = ry + (needed - size * 1.2) / 2; // centrage vertical approximatif
     doc.font('Helvetica-Bold').fontSize(size).fillColor(COLOR_GRAY).text(label, PAGE_MARGIN + padding, textY, { width: labelColW - 2 * padding, lineBreak: true });
     const isNumber = f.type === 'integer' || f.type === 'decimal';
-    const numText = isNumber ? fmtNumber(display) : display;
-    const valAlign = isNumber ? 'right' : 'left';
+    const plain = isNumber && isPlainNumberField(f);
+    const numText = plain ? String(display) : (isNumber ? fmtNumber(display) : display);
+    const valAlign = plain ? 'left' : (isNumber ? 'right' : 'left');
     doc.font('Helvetica').fontSize(size).fillColor(COLOR_BODY).text(numText, PAGE_MARGIN + labelColW + padding, textY, { width: valColW - 2 * padding, align: valAlign, lineBreak: true });
     doc.y = ry + needed;
     rowIdx += 1;

@@ -47,6 +47,26 @@ export function fmtNumber(n) {
   return numberFmt.format(num).replace(/[\u202f\u00a0]/g, ' ');
 }
 
+function stripAccents(s) {
+  return String(s || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
+
+// Liste fermée des champs numériques "bruts" : jamais de séparateur de milliers,
+// alignement à gauche (année, code, numéro, immatriculation, téléphone, id).
+export function isPlainNumberField(field) {
+  if (!field) return false;
+  const key = stripAccents(field.key || '');
+  const label = stripAccents(field.label || '');
+  const PLAIN_KEYS = ['annee', 'an', 'year', 'millesime'];
+  if (PLAIN_KEYS.includes(key)) return true;
+  if (/\bannee\b/.test(label)) return true;
+  if (/code|numero|immatriculation|telephone|tel|id/.test(key)) return true;
+  return false;
+}
+
 // Composantes calendaires/horaires d'un instant dans le fuseau de Madagascar.
 export function madagascarComponents(d) {
   const date = new Date(d);

@@ -1,6 +1,6 @@
 "use strict";
 import { describe, it, expect } from 'vitest';
-import { buildExportModel, fmtDate, fmtDateTime, formatPdfCell, computeTableColumnWidths } from '../src/services/exportModel.js';
+import { buildExportModel, fmtDate, fmtDateTime, formatPdfCell, computeTableColumnWidths, isPlainNumberField } from '../src/services/exportModel.js';
 import { buildWorkbook, cleanSheetNameBase } from '../src/services/exportXlsx.js';
 import { renderPdf, rowHeight } from '../src/services/exportPdf.js';
 import ExcelJS from 'exceljs';
@@ -582,6 +582,65 @@ describe('Rendu des formats d\'export (collecte)', () => {
           expect(pages).toBeGreaterThanOrEqual(1);
           // Le libellé long de la saisie 1 doit apparaître en entier.
           expect(pdfText.includes('Besoins en personnel et en formation')).toBe(true);
+          resolve();
+        } catch (err) {
+          reject(err);
+        }
+      });
+      doc.on('error', reject);
+      renderPdf(model, doc);
+      doc.end();
+    });
+  });
+
+  it('X24 : isPlainNumberField vrai pour annee, immatriculation, code_poste ; faux pour effectif et montant', () => {
+    expect(isPlainNumberField({ key: 'annee' })).toBe(true);
+    expect(isPlainNumberField({ key: 'immatriculation' })).toBe(true);
+    expect(isPlainNumberField({ key: 'code_poste' })).toBe(true);
+    expect(isPlainNumberField({ key: 'effectif' })).toBe(false);
+    expect(isPlainNumberField({ key: 'montant' })).toBe(false);
+  });
+
+  it('X25 : la cellule Annee (2004) a le format 0 ; effectif (12345) garde #,##0', async () => {
+    const ANNEE_MODULE = {
+      code: 'RM',
+      label: 'Recensement matériels roulants',
+      fields: [
+        { key: 'annee', label: 'Année', type: 'integer' },
+        { key: 'effectif', label: 'Effectif', type: 'integer' },
+      ],
+    };
+    const wb = await writtenWorkbook([row(ANNEE_MODULE, { annee: 2004, effectif: 12345 })], { regions: [], modules: [] });
+    const sheet = wb.getWorksheet('RM');
+    const headers = [];
+    sheet.getRow(1).eachCell((cell) => headers.push(String(cell.value || '')));
+    const anneeCol = headers.indexOf('Année') + 1;
+    const effCol = headers.indexOf('Effectif') + 1;
+    expect(anneeCol).toBeGreaterThan(0);
+    expect(effCol).toBeGreaterThan(0);
+    expect(sheet.getCell(2, anneeCol).numFmt).toBe('0');
+    expect(sheet.getCell(2, effCol).numFmt).toBe('#,##0');
+  });
+
+  it('X26 : le PDF affiche 2004 sans séparateur de milliers pour le champ Annee', () => {
+    const ANNEE_MODULE = {
+      code: 'RM',
+      label: 'Recensement matériels roulants',
+      fields: [
+        { key: 'annee', label: 'Année', type: 'integer' },
+      ],
+    };
+    const model = buildExportModel([row(ANNEE_MODULE, { annee: 2004 })], { filters: { regions: [], modules: [] } });
+    const doc = new PDFDocument({ margin: 42, size: 'A4', bufferPages: true });
+    const chunks = [];
+    return new Promise((resolve, reject) => {
+      doc.on('data', (chunk) => chunks.push(chunk));
+      doc.on('end', () => {
+        try {
+          const buffer = Buffer.concat(chunks);
+          const pdfText = extractPdfText(buffer);
+          expect(pdfText.includes('2004')).toBe(true);
+          expect(pdfText).not.toContain('2 004');
           resolve();
         } catch (err) {
           reject(err);
