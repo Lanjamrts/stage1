@@ -230,3 +230,8 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 - PDF : avant le bloc d'une saisie, vérification que l'espace restant ≥ titre bloc + grille d'informations + première ligne de contenu, sinon nouvelle page. La grille d'informations n'est jamais seule en bas de page.
 - Excel : noms de feuilles nettoyés par la fonction pure exportée `cleanSheetNameBase(name)` : suppression des caractères interdits `[]:*?/\`, coupe au dernier espace avant 31 caractères (jamais au milieu d'un mot), retrait de la ponctuation de fin `[ ,;:.–-]`, valeur de repli `Feuil1`. L'unicité est garantie par `uniqueSheetName` avec suffixes `(2)`, `(3)`.
 - Tests ajoutés : X16 (PDF 60 saisies : pages == total annoncé, pas de page vide), X17 (rowHeight couvre le libellé multi-lignes), X18 (noms de feuilles coupés proprement, uniques). Aucun test existant modifié. Nouvelle dépendance : aucune.
+
+## Step 13 – T-07 documentation
+
+- T-07 (RECETTE.md) cite désormais, sous "Tests automatiques", les tests de backend/tests/export-format.test.js qui vérifient le classeur généré (X4, X5, X6, X8, X10, X11, X12, X15 : feuille Synthèse, une feuille par module, noms valides/uniques, cellules typées, en-tête figé/filtré, fitToPage) et le PDF généré (X7, X9, X16, X21, X23 : pages, en-tête, pied de page, pas de page vide) avec des données générées. Aucun code applicatif ni test modifié.
+- Ajout d'une phrase "Limite" : ces tests automatisés vérifient la structure des fichiers générés, pas le contenu visuel contre les données validées réelles ; celle-ci reste la procédure manuelle ci-dessous. État conservé : "Automatisé".

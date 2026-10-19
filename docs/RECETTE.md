@@ -171,6 +171,21 @@ Aucun test automatique.
 - backend/tests/rbac.test.js :: admin2 : consulte sa région (liste, collecte, export) et envoie une remarque (API uniquement)
 - backend/tests/rbac.test.js :: admin1 : tableau de bord, collecte, historique, export, audit, remarques (API uniquement)
 - backend/tests/rbac.test.js :: consultant : consultation, rapport exporté et tableau de bord (lecture seule) (API uniquement)
+- backend/tests/export-format.test.js :: X4 : le classeur contient Synthese, une feuille par module et des noms de feuille valides et uniques
+- backend/tests/export-format.test.js :: X5 : les cellules numeriques et dates sont de vrais nombres et de vraies dates avec format
+- backend/tests/export-format.test.js :: X6 : l en-tete est fige, filtre et les colonnes de dates sont assez larges
+- backend/tests/export-format.test.js :: X7 : le PDF est genere sur plusieurs pages avec en-tete et pied de page sans erreur
+- backend/tests/export-format.test.js :: X8 : un export vide produit un message clair dans l Excel
+- backend/tests/export-format.test.js :: X9 : un export d une saisie produit exactement une page PDF avec Page 1 / 1
+- backend/tests/export-format.test.js :: X10 : les heures ecrites dans l Excel sont celles de Madagascar (instant 2026-10-16T07:14:04Z → cellule 10:14)
+- backend/tests/export-format.test.js :: X11 : le libelle Statut de la saisie est distinct du champ Statut
+- backend/tests/export-format.test.js :: X12 : fitToPage est actif et la largeur des colonnes suit le contenu
+- backend/tests/export-format.test.js :: X15 : un module qui n a que des tableaux ne cree pas de feuille Excel vide de champs
+- backend/tests/export-format.test.js :: X16 : le PDF de 60 saisies a autant de pages que le total affiche dans le pied de page et aucune page vide
+- backend/tests/export-format.test.js :: X21 : le nombre de pages du PDF reste égal au total affiché dans les pieds de page, aucune page vide
+- backend/tests/export-format.test.js :: X23 : export de 3 saisies RH (comme dans la demo) produit un PDF sans page vide et pieds coherents
+
+**Limite :** Les tests automatiques vérifient la structure du fichier Excel (feuille Synthèse, une feuille par module, noms de feuille valides et uniques) et du PDF (pages, en-tête, pied de page, pas de page vide) avec des données générées ; ils ne remplacent pas la vérification visuelle manuelle contre les données validées réales, qui est la procédure manuelle ci-dessous.
 
 **Procédure manuelle :**
 1. Se connecter en admin1 (`120344` / `Test@2026`), aller dans « Collecte et téléchargement »
