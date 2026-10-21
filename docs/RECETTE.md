@@ -58,7 +58,7 @@ Aucun test automatique.
 **Procédure manuelle :**
 1. Se connecter en admin1 (`120344` / `Test@2026`)
 2. Cliquer sur « Utilisateurs » dans le menu latéral
-3. Cliquer sur « Nouvel utilisateur »
+3. Cliquer sur « Ajouter un utilisateur »
 4. Remplir : IM `991000`, Nom `Rakoto`, Prénom `Phase Sept`, Direction `Direction des Régions Budget et des Finances`, Service `Service des rapports`, Rôle `client`, Structure `SRB – Analamanga`
 5. Cliquer sur « Créer » → message de succès, mot de passe provisoire affiché (format `Xxx-Xxx-Xxx`)
 6. Rechercher `991000` dans la barre de recherche → l'utilisateur apparaît dans la liste
@@ -187,13 +187,15 @@ Aucun test automatique.
 
 **Limite :** Les tests automatiques vérifient la structure du fichier Excel (feuille Synthèse, une feuille par module, noms de feuille valides et uniques) et du PDF (pages, en-tête, pied de page, pas de page vide) avec des données générées ; ils ne remplacent pas la vérification visuelle manuelle contre les données validées réales, qui est la procédure manuelle ci-dessous.
 
+**Limite :** les tests automatiques vérifient que l'export répond 200 et qu'il est réservé aux bons rôles ; ils ne vérifient pas le contenu des fichiers. La conformité du contenu (colonnes, valeurs, une fiche par saisie) se contrôle avec la procédure manuelle ci-dessous.
+
 **Procédure manuelle :**
 1. Se connecter en admin1 (`120344` / `Test@2026`), aller dans « Collecte et téléchargement »
 2. Sélectionner Régions : `Analamanga`, Modules : `RA`, Période : `Septembre 2026`
-3. Cliquer « Exporter Excel » → téléchargement fichier `.xlsx` (2 feuilles : métadonnées + valeurs aplaties)
-4. Cliquer « Exporter PDF » → téléchargement fichier `.pdf` (une fiche par saisie)
+3. Cliquer « Télécharger en Excel (.xlsx) » → téléchargement fichier `.xlsx` (2 feuilles : métadonnées + valeurs aplaties)
+4. Cliquer « Télécharger en PDF » → téléchargement fichier `.pdf` (une fiche par saisie)
 5. Se connecter en admin2 (`108231`), aller dans « Consultation et téléchargement »
-6. Même sélection → Exporter Excel et PDF (admin2 ne voit que sa région Analamanga)
+6. Même sélection → Télécharger en Excel (.xlsx) et en PDF (admin2 ne voit que sa région Analamanga)
 7. Se connecter en consultant (`121775`), aller dans « Consultation des données »
 8. Vérifier qu'il n'y a AUCUN bouton de téléchargement (le consultant n'a pas le droit de télécharger)
 9. Ouvrir le fichier `.xlsx` : vérifier que la première feuille est intitulée « Synthèse » (titre, sous-titres « Ministère de l'Économie et des Finances — DGBF / SSEBF », date d'export, régions, modules, nombre de saisies), puis qu'il existe une feuille par module exporté (ex. « RA », « RH ») avec des colonnes lisibles (« Structure », « Période / Événement », « Auteur », « Statut », champs du gabarit) et les nombres alignés à droite. Pour un module à tableau (ex. « RH »), vérifier la présence d'une feuille de tableau par tableau de saisie avec une ligne par ligne de saisie.
@@ -280,6 +282,8 @@ Aucun test automatique.
 - backend/tests/backup.test.js :: B4 : backup:verify confirme la restauration et supprime la base temporaire (API uniquement)
 - backend/tests/backup.test.js :: B5 : restore est refuse en production sans --allow-production (API uniquement)
 - backend/tests/backup.test.js :: B6 : backup:verify detecte un ecart quand la base a change apres la sauvegarde (API uniquement)
+
+**Limite :** les tests B1 à B6 sont automatiquement ignorés si l'outil `mongodump` n'est pas installé (c'est le cas de la CI GitHub). Ils s'exécutent sur une machine où `mongodump` et `mongorestore` sont disponibles. Résultat constaté à renseigner dans la section 4.
 
 **Procédure manuelle :**
 1. Créer une sauvegarde : `npm run backup --prefix backend`
