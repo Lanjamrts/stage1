@@ -8,10 +8,11 @@ const variants = {
   primary: 'bg-[#1F5FA8] hover:bg-[#174C87] text-white',
   secondary: 'border border-[#D6DCE5] bg-white text-[#1A2433] hover:bg-[#F5F7FA]',
   danger: 'border border-[#F6C7C3] bg-white text-[#B42318] hover:bg-[#FEF3F2]',
+  dangerSolid: 'bg-[#B42318] hover:bg-[#9B1E14] text-white',
 };
 
 const sizes = {
-  md: 'h-[36px] px-5 text-sm',
+  md: 'h-[40px] px-5 text-sm',
   sm: 'h-[32px] px-3 text-[13px]',
   lg: 'h-[44px] px-5 text-[15px]',
 };

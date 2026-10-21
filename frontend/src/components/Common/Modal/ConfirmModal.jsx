@@ -1,4 +1,5 @@
 import React from 'react';
+import Button from '../Button.jsx';
 
 // Modale de confirmation générique (design SIGBD)
 export default function ConfirmModal({
@@ -22,24 +23,22 @@ export default function ConfirmModal({
         {message && <p className="text-[15px] text-[#5B6778] leading-relaxed">{message}</p>}
         {extra}
         <div className="flex justify-end gap-3 mt-6">
-          <button
+          <Button
             type="button"
+            variant="secondary"
             onClick={onCancel}
             disabled={busy}
-            className="h-[40px] px-4 rounded-lg border border-[#E3E8EF] text-[#1A2433] text-sm font-medium hover:bg-[#F5F7FA] disabled:opacity-50"
           >
             {cancelLabel}
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            variant={danger ? 'dangerSolid' : 'primary'}
             onClick={onConfirm}
             disabled={busy}
-            className={`h-[40px] px-5 rounded-lg text-white text-sm font-semibold disabled:opacity-60 ${
-              danger ? 'bg-[#B42318] hover:bg-[#9B1E14]' : 'bg-[#1F5FA8] hover:bg-[#174C87]'
-            }`}
           >
             {busy ? 'Veuillez patienter…' : confirmLabel}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
