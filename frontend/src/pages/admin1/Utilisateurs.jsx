@@ -252,7 +252,7 @@ export default function Utilisateurs() {
                 <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Profil</th>
                 <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Structure</th>
                 <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Statut</th>
-                <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Actions</th>
+                <th className="px-5 py-3 font-semibold text-[#0B2A4A] min-w-[240px]">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -273,12 +273,12 @@ export default function Utilisateurs() {
               {!loading &&
                 users.map((u) => (
                   <tr key={u.id} className="border-t border-[#E3E8EF]">
-                    <td className="px-5 py-3 font-mono text-[#0B2A4A]">{u.im}</td>
-                    <td className="px-5 py-3 text-[#1A2433]">{u.nom}</td>
-                    <td className="px-5 py-3 text-[#1A2433]">{u.prenom}</td>
-                    <td className="px-5 py-3 text-[#5B6778]">{u.direction || '—'}</td>
-                    <td className="px-5 py-3 text-[#5B6778]">{u.service || '—'}</td>
-                    <td className="px-5 py-3">
+                    <td className="px-5 py-3 align-top font-mono text-[#0B2A4A]">{u.im}</td>
+                    <td className="px-5 py-3 align-top text-[#1A2433]">{u.nom}</td>
+                    <td className="px-5 py-3 align-top text-[#1A2433]">{u.prenom}</td>
+                    <td className="px-5 py-3 align-top text-[#5B6778]">{u.direction || '—'}</td>
+                    <td className="px-5 py-3 align-top text-[#5B6778]">{u.service || '—'}</td>
+                    <td className="px-5 py-3 align-top">
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full border text-xs font-semibold ${
                           roleBadge[u.role] || roleBadge.client
@@ -287,8 +287,8 @@ export default function Utilisateurs() {
                         {ROLE_LABELS[u.role] || u.role}
                       </span>
                     </td>
-                    <td className="px-5 py-3 text-[#5B6778]">{u.structureLabel || '—'}</td>
-                    <td className="px-5 py-3">
+                    <td className="px-5 py-3 align-top text-[#5B6778]">{u.structureLabel || '—'}</td>
+                    <td className="px-5 py-3 align-top">
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full border text-xs font-semibold ${
                           u.status === 'actif'
@@ -299,25 +299,25 @@ export default function Utilisateurs() {
                         {u.status === 'actif' ? 'Actif' : 'Désactivé'}
                       </span>
                     </td>
-                    <td className="px-5 py-3">
-                      <div className="flex flex-wrap gap-2">
+                    <td className="px-5 py-3 align-top">
+                      <div className="flex flex-col items-stretch gap-1.5 w-[210px]">
                         <button
                           onClick={() => openEdit(u)}
-                          className="h-[30px] px-3 rounded-lg border border-[#D6DCE5] text-xs font-semibold text-[#1F5FA8] hover:bg-[#EBF3FC]"
+                          className="w-full whitespace-nowrap text-center h-[30px] px-3 rounded-lg border border-[#D6DCE5] text-xs font-semibold text-[#1F5FA8] hover:bg-[#EBF3FC]"
                         >
                           Modifier le profil
                         </button>
                         {u.status === 'actif' && (
                           <button
                             onClick={() => setConfirm({ type: 'desactiver', user: u })}
-                            className="h-[30px] px-3 rounded-lg border border-[#F6C7C3] text-xs font-semibold text-[#B42318] hover:bg-[#FEF3F2]"
+                            className="w-full whitespace-nowrap text-center h-[30px] px-3 rounded-lg border border-[#F6C7C3] text-xs font-semibold text-[#B42318] hover:bg-[#FEF3F2]"
                           >
                             Désactiver
                           </button>
                         )}
                         <button
                           onClick={() => setConfirm({ type: 'reset', user: u })}
-                          className="h-[30px] px-3 rounded-lg border border-[#D6DCE5] text-xs font-semibold text-[#0B2A4A] hover:bg-[#F5F7FA]"
+                          className="w-full whitespace-nowrap text-center h-[30px] px-3 rounded-lg border border-[#D6DCE5] text-xs font-semibold text-[#0B2A4A] hover:bg-[#F5F7FA]"
                         >
                           Réinitialiser le mot de passe
                         </button>
