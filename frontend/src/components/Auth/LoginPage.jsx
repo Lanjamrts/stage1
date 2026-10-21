@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LANDING_BY_ROLE } from '../../menus.js';
 import Logo from '../Common/Logo.jsx';
+import Button from '../Common/Button.jsx';
 
 export default function LoginPage() {
   const [im, setIm] = useState('');
@@ -133,6 +134,7 @@ export default function LoginPage() {
                   </div>
                   <input
                     id="im"
+                    name="im"
                     type="text"
                     value={im}
                     onChange={(e) => setIm(e.target.value)}
@@ -140,6 +142,9 @@ export default function LoginPage() {
                     className={fieldClass(true)}
                     disabled={blocked}
                     required
+                    autoComplete="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
                   />
                 </div>
               </div>
@@ -157,6 +162,7 @@ export default function LoginPage() {
                   </div>
                   <input
                     id="password"
+                    name="password"
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -164,6 +170,7 @@ export default function LoginPage() {
                     className={fieldClass(true)}
                     disabled={blocked}
                     required
+                    autoComplete="new-password"
                   />
                   <button
                     type="button"
@@ -181,13 +188,14 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              <button
+              <Button
                 type="submit"
+                size="lg"
+                className="w-full"
                 disabled={loading || blocked}
-                className="w-full h-[44px] bg-[#1F5FA8] hover:bg-[#174C87] disabled:bg-[#E3E8EF] disabled:text-[#8A94A6] text-white text-[15px] font-semibold rounded-[8px] transition-colors flex items-center justify-center"
               >
                 {loading ? 'Connexion en cours...' : 'Se connecter'}
-              </button>
+              </Button>
             </form>
 
             <div className="mt-6 pt-5 border-t border-[#E3E8EF] flex items-start gap-2 text-[12px] text-[#5B6778]">
