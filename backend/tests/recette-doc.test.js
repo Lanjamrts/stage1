@@ -1,7 +1,7 @@
 "use strict";
 
 import { describe, it, expect } from 'vitest';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -78,5 +78,51 @@ describe('Dossier de recette — vérifications automatiques', () => {
       expect(summaryEtat).toBeDefined();
       expect(summaryEtat).toBe(etat);
     }
+  });
+
+  it('R4 : les libelles entre guillemets du dossier de recette existent dans l application', () => {
+    const doc = readFileSync(DOC_PATH, 'utf8');
+
+    const labels = [...doc.matchAll(/«\s*([^»]{2,80}?)\s*»/g)].map((m) => m[1]);
+
+    const normalize = (s) => s.replace(/’/g, "'").replace(/\u00A0/g, ' ');
+
+    // Ces libelles figurent dans le PDF exporte (en-tete/pied de page / grille d'informations),
+    // pas dans l'interface utilisateur ; ils ne sont donc pas presents dans frontend/src ni backend/src.
+    const ALLOWLIST = [
+      'Démarrage rapide',
+      'Fast 3G',
+      'Slow 3G',
+      'Ministère de l\'Économie et des Finances — DGBF / SSEBF',
+      'Page X / Y',
+      'Document généré par SIGBD le …',
+      '<code> — <libellé du module>',
+    ];
+
+    const collect = (dir) => {
+      let hay = '';
+      for (const entry of readdirSync(dir, { withFileTypes: true, recursive: true })) {
+        if (entry.isFile() && (entry.name.endsWith('.js') || entry.name.endsWith('.jsx'))) {
+          hay += readFileSync(join(entry.path, entry.name), 'utf8') + '\n';
+        }
+      }
+      return hay;
+    };
+
+    const haystack = normalize(
+      collect(join(ROOT, 'frontend', 'src')) + collect(join(ROOT, 'backend', 'src'))
+    );
+
+    const missing = [];
+    for (const label of labels) {
+      const norm = normalize(label);
+      if (ALLOWLIST.includes(norm)) {
+        continue;
+      }
+      if (!haystack.includes(norm)) {
+        missing.push(label);
+      }
+    }
+    expect(missing).toEqual([]);
   });
 });

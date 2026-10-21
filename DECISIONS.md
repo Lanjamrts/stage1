@@ -202,6 +202,13 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 - DEMO.md corrigé : conflit brouillon Octobre 2026 dans le seed → passage à Septembre 2026 pour l'étape 1 et toutes les étapes suivantes ; libellés d'actions d'audit alignés sur l'affichage réel (ex. saisie_reject → « Rejet de saisie ») ; motif de rejet aligné sur les champs RA réels (« Indicateurs de performance ») ; références de code déplacées en commentaires HTML invisibles.
 - DEMO.md : filtre Période inexistant retiré, libellés de confirmation corrigés, références en commentaires HTML.
 
+## Step 11 – Final documentation fixes
+
+- Libellés RECETTE.md corrigés : « Ajouter un utilisateur », « Télécharger en Excel (.xlsx) », « Télécharger en PDF » (vérifiés par grep dans frontend/src).
+- Limites T-07 et T-10 écrites honnêtement (État "Automatisé" conservé, aucune citation retirée).
+- README : "81 tests" → "91 tests, dont 6 tests de sauvegarde ignorés si mongodump est absent".
+- R4 ajouté dans backend/tests/recette-doc.test.js : vérifie que tout libellé « » de RECETTE.md existe dans frontend/src + backend/src ; allowlist ['Démarrage rapide', 'Fast 3G', 'Slow 3G'].
+
 ## Step 12.1 – Corrections des exports Excel/PDF
 
 - PDF : plus de page blanche en fin d'export. Le pied de page est écrit après le contenu sur chaque page via `bufferedPageRange()` / `switchToPage(i)`, avec `doc.page.margins.bottom` temporairement à 0 et `lineBreak: false`, puis restauré. « Page X / Y » utilise le nombre réel de pages. Un export d'une saisie = exactement 1 page.
