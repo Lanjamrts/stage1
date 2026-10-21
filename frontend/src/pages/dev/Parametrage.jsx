@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../api.js';
 import { useToast } from '../../components/Common/Toast/Toast.jsx';
+import Button from '../../components/Common/Button.jsx';
 
 const PERIODICITY_LABELS = { monthly: 'Mensuelle', quarterly: 'Trimestrielle' };
 const KIND_LABELS = { periodic: 'Périodique', event: 'Événement' };
@@ -135,19 +136,21 @@ function ReferenceCard({ list, onChanged }) {
                     value={editing.value}
                     onChange={(e) => setEditing({ index: i, value: e.target.value })}
                   />
-                  <button
+                  <Button
+                    variant="primary"
+                    size="sm"
                     onClick={rename}
                     disabled={busy}
-                    className="h-[30px] px-3 rounded-lg bg-[#1F5FA8] text-white text-xs font-semibold disabled:opacity-60"
                   >
                     OK
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
                     onClick={() => setEditing(null)}
-                    className="h-[30px] px-3 rounded-lg border border-[#E3E8EF] text-xs font-medium"
                   >
                     Annuler
-                  </button>
+                  </Button>
                 </div>
               ) : (
                 <>
@@ -179,13 +182,14 @@ function ReferenceCard({ list, onChanged }) {
               if (e.key === 'Enter') add();
             }}
           />
-          <button
+          <Button
+            variant="primary"
+            className="shrink-0"
             onClick={add}
             disabled={busy || !newValue.trim()}
-            className="h-[36px] px-4 rounded-lg bg-[#1F5FA8] hover:bg-[#174C87] text-white text-sm font-semibold disabled:opacity-60 shrink-0"
           >
             Ajouter
-          </button>
+          </Button>
         </div>
       )}
       {!list.editable && (
@@ -331,18 +335,20 @@ export default function Parametrage() {
                       </td>
                       <td className="px-5 py-3">
                         <div className="flex flex-wrap gap-2">
-                          <button
+                          <Button
+                            variant="secondary"
+                            size="sm"
                             onClick={() => navigate(`/parametrage/${m.id}`)}
-                            className="h-[30px] px-3 rounded-lg border border-[#D6DCE5] text-xs font-semibold text-[#1F5FA8] hover:bg-[#EBF3FC]"
                           >
                             Configurer
-                          </button>
-                          <button
+                          </Button>
+                          <Button
+                            variant="secondary"
+                            size="sm"
                             onClick={() => toggleActive(m)}
-                            className="h-[30px] px-3 rounded-lg border border-[#D6DCE5] text-xs font-semibold text-[#0B2A4A] hover:bg-[#F5F7FA]"
                           >
                             {m.active ? 'Désactiver' : 'Activer'}
-                          </button>
+                          </Button>
                         </div>
                       </td>
                     </tr>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { api, formatDate, formatTime } from '../../api.js';
+import Button from '../../components/Common/Button.jsx';
 
 // Tableau de bord Admin 1 (SPEC §4) : taux par région, retards,
 // taux de rejet, structures en retard. Aucun bouton d'action.
@@ -125,12 +126,12 @@ export default function Admin1Dashboard({ readOnly = false }) {
           ))}
         </select>
         {(filters.module || filters.periode) && (
-          <button
+          <Button
+            variant="secondary"
             onClick={() => setFilters({ module: '', periode: '' })}
-            className="h-[40px] px-4 rounded-lg border border-[#E3E8EF] text-sm font-medium hover:bg-[#F5F7FA]"
           >
             <span aria-hidden="true">↺</span> Réinitialiser les filtres
-          </button>
+          </Button>
         )}
       </div>
 
