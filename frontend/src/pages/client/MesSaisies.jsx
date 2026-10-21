@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api, formatDateTime, formatTime } from '../../api.js';
 import StatusBadge from '../../components/Common/StatusBadge.jsx';
+import Button from '../../components/Common/Button.jsx';
 
 const STATUS_OPTIONS = [
   ['', 'Tous les statuts'],
@@ -159,12 +160,12 @@ export default function MesSaisies() {
           ))}
         </select>
         {hasFilters && (
-          <button
+          <Button
+            variant="secondary"
             onClick={() => setSearchParams({})}
-            className="h-[40px] px-4 rounded-lg border border-[#E3E8EF] text-sm font-medium hover:bg-[#F5F7FA]"
           >
             Réinitialiser les filtres
-          </button>
+          </Button>
         )}
       </div>
 
@@ -227,18 +228,18 @@ export default function MesSaisies() {
                           Modifiez ou réinitialisez les filtres pour afficher vos saisies.
                         </p>
                         <div className="mt-4 flex flex-wrap justify-center gap-3">
-                          <button
+                          <Button
+                            variant="secondary"
                             onClick={() => setSearchParams({})}
-                            className="h-[40px] px-5 rounded-lg border border-[#E3E8EF] text-sm font-semibold hover:bg-[#F5F7FA]"
                           >
                             Réinitialiser les filtres
-                          </button>
-                          <button
+                          </Button>
+                          <Button
+                            variant="primary"
                             onClick={() => navigate('/')}
-                            className="h-[40px] px-5 rounded-lg bg-[#1F5FA8] hover:bg-[#174C87] text-white text-sm font-semibold"
                           >
                             Créer une nouvelle saisie
-                          </button>
+                          </Button>
                         </div>
                       </>
                     ) : (
@@ -250,12 +251,13 @@ export default function MesSaisies() {
                           Vos saisies apparaîtront ici dès que vous aurez commencé un module
                           budgétaire ou complété un bordereau régional.
                         </p>
-                        <button
+                        <Button
+                          variant="primary"
+                          className="mt-4"
                           onClick={() => navigate('/')}
-                          className="mt-4 h-[40px] px-5 rounded-lg bg-[#1F5FA8] hover:bg-[#174C87] text-white text-sm font-semibold"
                         >
                           Aller au tableau de bord
-                        </button>
+                        </Button>
                         <p className="text-[13px] text-[#8A94A6] mt-5">
                           <span className="font-semibold text-[#5B6778]">Aide à la complétion</span>{' '}
                           — Besoin d'accompagnement pour démarrer une saisie de dotation ?
@@ -282,12 +284,13 @@ export default function MesSaisies() {
                     </td>
                     <td className="px-5 py-3 text-[#5B6778]">{formatDateTime(s.updatedAt)}</td>
                     <td className="px-5 py-3">
-                      <button
+                      <Button
+                        variant="secondary"
+                        size="sm"
                         onClick={() => navigate(`/mes-saisies/${s.id}`)}
-                        className="h-[32px] px-3 rounded-lg border border-[#D6DCE5] text-[13px] font-semibold text-[#1A2433] hover:bg-[#F5F7FA]"
                       >
                         {actionLabel(s.status)}
-                      </button>
+                      </Button>
                     </td>
                   </tr>
                 ))}

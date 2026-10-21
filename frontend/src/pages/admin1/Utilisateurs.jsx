@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { api } from '../../api.js';
 import { useToast } from '../../components/Common/Toast/Toast.jsx';
 import Drawer from '../../components/Common/Drawer.jsx';
+import Button from '../../components/Common/Button.jsx';
 import ConfirmModal from '../../components/Common/Modal/ConfirmModal.jsx';
 import { ROLE_LABELS } from '../../menus.js';
 
@@ -175,12 +176,12 @@ export default function Utilisateurs() {
             Gérez les comptes des agents autorisés à utiliser SIGBD.
           </p>
         </div>
-        <button
+        <Button
+          variant="primary"
           onClick={openAdd}
-          className="inline-flex items-center h-[40px] px-5 rounded-lg bg-[#1F5FA8] hover:bg-[#174C87] text-white text-sm font-semibold"
         >
           Ajouter un utilisateur
-        </button>
+        </Button>
       </div>
       <div className="flex flex-wrap items-center gap-3 text-sm text-[#5B6778]">
         <span>
@@ -223,12 +224,12 @@ export default function Utilisateurs() {
           onChange={(e) => setFilter('q', e.target.value)}
         />
         {(filters.role || filters.status || filters.q) && (
-          <button
+          <Button
+            variant="secondary"
             onClick={() => applyFilters({ role: '', status: '', q: '' })}
-            className="h-[40px] px-4 rounded-lg border border-[#E3E8EF] text-sm font-medium hover:bg-[#F5F7FA]"
           >
             <span aria-hidden="true">↺</span> Réinitialiser les filtres
-          </button>
+          </Button>
         )}
       </div>
 
@@ -301,26 +302,32 @@ export default function Utilisateurs() {
                     </td>
                     <td className="px-5 py-3 align-top">
                       <div className="flex flex-col items-stretch gap-1.5 w-[210px]">
-                        <button
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          className="w-full"
                           onClick={() => openEdit(u)}
-                          className="w-full whitespace-nowrap text-center h-[30px] px-3 rounded-lg border border-[#D6DCE5] text-xs font-semibold text-[#1F5FA8] hover:bg-[#EBF3FC]"
                         >
                           Modifier le profil
-                        </button>
+                        </Button>
                         {u.status === 'actif' && (
-                          <button
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            className="w-full"
                             onClick={() => setConfirm({ type: 'desactiver', user: u })}
-                            className="w-full whitespace-nowrap text-center h-[30px] px-3 rounded-lg border border-[#F6C7C3] text-xs font-semibold text-[#B42318] hover:bg-[#FEF3F2]"
                           >
                             Désactiver
-                          </button>
+                          </Button>
                         )}
-                        <button
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          className="w-full"
                           onClick={() => setConfirm({ type: 'reset', user: u })}
-                          className="w-full whitespace-nowrap text-center h-[30px] px-3 rounded-lg border border-[#D6DCE5] text-xs font-semibold text-[#0B2A4A] hover:bg-[#F5F7FA]"
                         >
                           Réinitialiser le mot de passe
-                        </button>
+                        </Button>
                       </div>
                     </td>
                   </tr>
@@ -338,22 +345,22 @@ export default function Utilisateurs() {
         busy={busy}
         footer={
           <div className="flex justify-end gap-3">
-            <button
-              type="button"
-              onClick={closeDrawer}
-              disabled={busy}
-              className="h-[40px] px-4 rounded-lg border border-[#E3E8EF] text-sm font-medium hover:bg-[#F5F7FA] disabled:opacity-50"
-            >
-              Annuler
-            </button>
-            <button
-              type="button"
-              onClick={submitForm}
-              disabled={busy}
-              className="h-[40px] px-5 rounded-lg bg-[#1F5FA8] hover:bg-[#174C87] text-white text-sm font-semibold disabled:opacity-60"
-            >
-              {busy ? 'Veuillez patienter…' : drawer && drawer.mode === 'add' ? 'Créer' : 'Enregistrer'}
-            </button>
+        <Button
+          variant="secondary"
+          type="button"
+          onClick={closeDrawer}
+          disabled={busy}
+        >
+          Annuler
+        </Button>
+        <Button
+          variant="primary"
+          type="button"
+          onClick={submitForm}
+          disabled={busy}
+        >
+          {busy ? 'Veuillez patienter…' : drawer && drawer.mode === 'add' ? 'Créer' : 'Enregistrer'}
+        </Button>
           </div>
         }
       >
@@ -541,13 +548,13 @@ export default function Utilisateurs() {
               canal sûr. Il devra le remplacer à sa première connexion.
             </p>
             <div className="flex justify-end mt-6">
-              <button
+              <Button
+                variant="primary"
                 type="button"
                 onClick={() => setPasswordModal(null)}
-                className="h-[40px] px-5 rounded-lg bg-[#1F5FA8] hover:bg-[#174C87] text-white text-sm font-semibold"
               >
                 Terminer
-              </button>
+              </Button>
             </div>
           </div>
         </div>
