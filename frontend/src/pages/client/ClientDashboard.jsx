@@ -244,6 +244,14 @@ export default function ClientDashboard() {
                     <td className="px-5 py-3">
                       <span className="font-semibold text-[#0B2A4A]">{r.module.code}</span>{' '}
                       <span className="text-[#1A2433]">{r.module.label}</span>
+                      {r.isEvent && r.saisie && (
+                        <p className="text-[12px] text-[#5B6778] mt-0.5">
+                          {saisies.filter((s) => s.moduleId === r.module.id).length} saisie
+                          {saisies.filter((s) => s.moduleId === r.module.id).length > 1 ? 's' : ''}
+                          enregistr
+                          {saisies.filter((s) => s.moduleId === r.module.id).length > 1 ? 'ées' : 'ée'}
+                        </p>
+                      )}
                     </td>
                     <td className="px-5 py-3 text-[#5B6778]">
                       {r.isEvent
@@ -274,18 +282,35 @@ export default function ClientDashboard() {
                       )}
                     </td>
                     <td className="px-5 py-3">
-                      <button
-                        onClick={() =>
-                          r.saisie ? openSaisie(r.saisie.id) : setModalModule(r.module)
-                        }
-                        className={`h-[32px] px-3 rounded-lg text-[13px] font-semibold ${
-                          action.primary
-                            ? 'bg-[#1F5FA8] hover:bg-[#174C87] text-white'
-                            : 'border border-[#D6DCE5] text-[#1A2433] hover:bg-[#F5F7FA]'
-                        }`}
-                      >
-                        {action.label}
-                      </button>
+                      {r.isEvent && r.saisie ? (
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => openSaisie(r.saisie.id)}
+                            className="h-[32px] px-3 rounded-lg text-[13px] font-semibold border border-[#D6DCE5] text-[#1A2433] hover:bg-[#F5F7FA]"
+                          >
+                            {action.label}
+                          </button>
+                          <button
+                            onClick={() => setModalModule(r.module)}
+                            className="h-[32px] px-3 rounded-lg text-[13px] font-semibold bg-[#1F5FA8] hover:bg-[#174C87] text-white"
+                          >
+                            Nouvelle saisie
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() =>
+                            r.saisie ? openSaisie(r.saisie.id) : setModalModule(r.module)
+                          }
+                          className={`h-[32px] px-3 rounded-lg text-[13px] font-semibold ${
+                            action.primary
+                              ? 'bg-[#1F5FA8] hover:bg-[#174C87] text-white'
+                              : 'border border-[#D6DCE5] text-[#1A2433] hover:bg-[#F5F7FA]'
+                          }`}
+                        >
+                          {action.label}
+                        </button>
+                      )}
                     </td>
                   </tr>
                 );

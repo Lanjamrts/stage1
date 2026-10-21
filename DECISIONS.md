@@ -242,3 +242,9 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 
 - T-07 (RECETTE.md) cite désormais, sous "Tests automatiques", les tests de backend/tests/export-format.test.js qui vérifient le classeur généré (X4, X5, X6, X8, X10, X11, X12, X15 : feuille Synthèse, une feuille par module, noms valides/uniques, cellules typées, en-tête figé/filtré, fitToPage) et le PDF généré (X7, X9, X16, X21, X23 : pages, en-tête, pied de page, pas de page vide) avec des données générées. Aucun code applicatif ni test modifié.
 - Ajout d'une phrase "Limite" : ces tests automatisés vérifient la structure des fichiers générés, pas le contenu visuel contre les données validées réelles ; celle-ci reste la procédure manuelle ci-dessous. État conservé : "Automatisé".
+
+## Step 15 – event modules: new saisie
+
+- ClientDashboard.jsx : pour les modules d'événement (isEvent) ayant déjà une saisie, la cellule Action rend deux boutons côte à côte (gap-2) : le bouton existant Consulter/Continuer/Corriger (style secondaire, clic ouvre la saisie) et un bouton primaire « Nouvelle saisie » (setModalModule). Sans saisie existante, le bouton unique « Nouvelle saisie » est conservé. Les modules periodic ne changent pas.
+- Sous le nom du module, une légende 12 px secondaire « n saisie enregistrée » / « n saisies enregistrées » s'affiche quand l'événement a déjà des saisies (compté depuis saisies par moduleId), rien quand n = 0.
+- Aucun fichier backend, NouvelleSaisieModal.jsx, MesSaisies.jsx ou test modifié.
