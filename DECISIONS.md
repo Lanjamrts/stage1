@@ -262,3 +262,14 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 - ClientDashboard.jsx : cellule Action — Consulter/Continuer/Corriger = secondary size="sm", « Nouvelle saisie » = primary size="sm", bouton unique conditionnel `variant={action.primary ? 'primary' : 'secondary'} size="sm"`. Conteneur `flex flex-nowrap items-center gap-2` conservé. Import Button ajouté.
 - MesSaisies.jsx : « Réinitialiser les filtres » (secondary, x2), « Créer une nouvelle saisie » (primary), « Aller au tableau de bord » (primary `className="mt-4"`), bouton de ligne Actions (secondary size="sm"). Import Button ajouté.
 - Boutons <button> laissés tels quels : Utilisateurs.jsx « Copier » (h-[44px] collé au champ mot de passe), ClientDashboard.jsx « Corriger » (lien souligné, pas un bouton), MesSaisies.jsx pastille « × » (filtre).
+
+## Step 20 – Button dans admin2, consultant et détail de saisie
+
+- Button.jsx : variante `success` (`bg-[#1E7B4F] hover:bg-[#186540] text-white`) ajoutée.
+- DonneesSaisies.jsx : Examiner (primary sm), Exporter (success sm), Consulter (secondary sm), « Réinitialiser les filtres » (secondary, className gap-2). Tabs et pagination laissés tels quels.
+- RevueSaisie.jsx : RejectModal Annuler (secondary) / Confirmer le rejet (dangerSolid), loadError retour (secondary), Valider (success), Rejeter (dangerSolid), Exporter vers la base (primary, tous w-full gap-2).
+- Consultation.jsx : « Réinitialiser les filtres » (secondary, gap-2). Liens Télécharger Excel/PDF (<a>) laissés tels quels.
+- ConsultationDonnees.jsx : « Réinitialiser les filtres » (secondary, gap-2), « Consulter » ligne (secondary sm, e.stopPropagation() conservé).
+- ConsultationRapport.jsx : « Retour à la consultation » (secondary). Liens texte « Consultation des données » et « Retour à la liste » laissés tels quels.
+- SaisieDetail.jsx : « Retour à mes saisies » (secondary), « Soumettre » (primary), « Corriger et resoumettre » (dangerSolid, className whitespace-nowrap).
+- Aucun backend, test ou dépendance modifié.

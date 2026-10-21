@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api, formatDateTime } from '../../api.js';
 import StatusBadge from '../../components/Common/StatusBadge.jsx';
+import Button from '../../components/Common/Button.jsx';
 
 const periodCell = (s) => {
   if (s.periodeLabel) return s.periodeLabel;
@@ -125,13 +126,14 @@ export default function ConsultationDonnees() {
           <option value="exportee">Exportée</option>
           <option value="archivee">Archivée</option>
         </select>
-        <button
+        <Button
           type="button"
+          variant="secondary"
+          className="gap-2"
           onClick={() => setFilters({ module: '', periode: '', region: '', statut: '' })}
-          className="h-[40px] px-4 rounded-lg border border-[#E3E8EF] text-sm font-medium hover:bg-[#F5F7FA] inline-flex items-center gap-2"
         >
           <span aria-hidden="true">↺</span> Réinitialiser les filtres
-        </button>
+        </Button>
       </div>
 
       {!loading && !error && (
@@ -199,15 +201,16 @@ export default function ConsultationDonnees() {
                       {formatDateTime(s.dates && s.dates.exported)}
                     </td>
                     <td className="px-5 py-3">
-                      <button
+                      <Button
+                        variant="secondary"
+                        size="sm"
                         onClick={(e) => {
                           e.stopPropagation();
                           navigate(`/consultation-donnees/${s.id}`);
                         }}
-                        className="h-[30px] px-3 rounded-lg border border-[#D6DCE5] text-xs font-semibold text-[#1F5FA8] hover:bg-[#EBF3FC]"
                       >
                         Consulter
-                      </button>
+                      </Button>
                     </td>
                   </tr>
                 ))}

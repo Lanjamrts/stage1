@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { api, formatDate, formatDateTime } from '../../api.js';
 import StatusBadge from '../../components/Common/StatusBadge.jsx';
+import Button from '../../components/Common/Button.jsx';
 import DynamicForm from '../../components/Form/DynamicForm.jsx';
 import { sourcesOf } from '../../lib/sources.js';
 
@@ -66,12 +67,12 @@ export default function ConsultationRapport() {
         <div className="rounded-lg border border-[#F6C7C3] bg-[#FEF3F2] px-4 py-3 text-sm text-[#B42318]">
           {error}
         </div>
-        <button
+        <Button
+          variant="secondary"
           onClick={() => navigate('/consultation-donnees')}
-          className="h-[40px] px-4 rounded-lg border border-[#E3E8EF] text-sm font-medium hover:bg-[#F5F7FA]"
         >
           Retour à la consultation
-        </button>
+        </Button>
       </div>
     );
   }
