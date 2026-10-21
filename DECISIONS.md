@@ -248,3 +248,10 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 - ClientDashboard.jsx : pour les modules d'événement (isEvent) ayant déjà une saisie, la cellule Action rend deux boutons côte à côte (gap-2) : le bouton existant Consulter/Continuer/Corriger (style secondaire, clic ouvre la saisie) et un bouton primaire « Nouvelle saisie » (setModalModule). Sans saisie existante, le bouton unique « Nouvelle saisie » est conservé. Les modules periodic ne changent pas.
 - Sous le nom du module, une légende 12 px secondaire « n saisie enregistrée » / « n saisies enregistrées » s'affiche quand l'événement a déjà des saisies (compté depuis saisies par moduleId), rien quand n = 0.
 - Aucun fichier backend, NouvelleSaisieModal.jsx, MesSaisies.jsx ou test modifié.
+
+## Step 15.1 – event action buttons layout and caption spacing
+
+- ClientDashboard.jsx : légende « n saisie enregistrée » / « n saisies enregistrées » écrite en une seule chaîne JSX sur une ligne, `nbEvent` calculé une seule fois par ligne via `saisies.filter(...)` avant le rendu (plus de calcul répété 4 fois, plus d'espaces perdus par le JSX).
+- Cellule Action : `whitespace-nowrap` sur le <td>, conteneur `flex flex-nowrap items-center gap-2`, `whitespace-nowrap shrink-0` sur les deux boutons (hauteur et couleurs inchangées).
+- En-tête colonne Action : `min-w-[260px]` sur le <th> pour que les deux boutons tiennent sur une ligne.
+- Modules périodiques et lignes sans saisie inchangés.
