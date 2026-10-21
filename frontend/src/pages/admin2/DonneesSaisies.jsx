@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api, formatDate, formatDateTime } from '../../api.js';
 import StatusBadge from '../../components/Common/StatusBadge.jsx';
 import ConfirmModal from '../../components/Common/Modal/ConfirmModal.jsx';
+import Button from '../../components/Common/Button.jsx';
 import { useToast } from '../../components/Common/Toast/Toast.jsx';
 import useMe from '../../lib/useMe.js';
 
@@ -119,31 +120,34 @@ export default function DonneesSaisies() {
   const actionCell = (s) => {
     if (s.status === 'soumise') {
       return (
-        <button
+        <Button
+          variant="primary"
+          size="sm"
           onClick={() => navigate(`/donnees-saisies/${s.id}`)}
-          className="h-[32px] px-3 rounded-lg bg-[#1F5FA8] hover:bg-[#174C87] text-white text-[13px] font-semibold"
         >
           Examiner
-        </button>
+        </Button>
       );
     }
     if (s.status === 'validee') {
       return (
-        <button
+        <Button
+          variant="success"
+          size="sm"
           onClick={() => setExportTarget(s)}
-          className="h-[32px] px-3 rounded-lg bg-[#1E7B4F] hover:bg-[#186641] text-white text-[13px] font-semibold"
         >
           Exporter
-        </button>
+        </Button>
       );
     }
     return (
-      <button
+      <Button
+        variant="secondary"
+        size="sm"
         onClick={() => navigate(`/donnees-saisies/${s.id}`)}
-        className="h-[32px] px-3 rounded-lg border border-[#E3E8EF] text-[#1F5FA8] text-[13px] font-semibold hover:bg-[#F5F7FA]"
       >
         Consulter
-      </button>
+      </Button>
     );
   };
 
@@ -235,13 +239,14 @@ export default function DonneesSaisies() {
             </option>
           ))}
         </select>
-        <button
+        <Button
           type="button"
+          variant="secondary"
+          className="gap-2"
           onClick={() => setFilters({ structure: '', module: '', periode: '' })}
-          className="h-[40px] px-4 rounded-lg border border-[#E3E8EF] text-sm font-medium hover:bg-[#F5F7FA] inline-flex items-center gap-2"
         >
           <span aria-hidden="true">↺</span> Réinitialiser les filtres
-        </button>
+        </Button>
       </div>
 
       {error && (

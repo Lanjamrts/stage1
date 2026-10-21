@@ -4,6 +4,7 @@ import { api, formatDateTime, formatDate } from '../../api.js';
 import StatusBadge from '../../components/Common/StatusBadge.jsx';
 import DynamicForm from '../../components/Form/DynamicForm.jsx';
 import ConfirmModal from '../../components/Common/Modal/ConfirmModal.jsx';
+import Button from '../../components/Common/Button.jsx';
 import { useToast } from '../../components/Common/Toast/Toast.jsx';
 
 const STEP_STYLES = {
@@ -51,22 +52,22 @@ function RejectModal({ isOpen, busy, onCancel, onConfirm }) {
           {motif.length} / 500
         </p>
         <div className="flex justify-end gap-3 mt-4">
-          <button
+          <Button
             type="button"
+            variant="secondary"
             onClick={onCancel}
             disabled={busy}
-            className="h-[40px] px-4 rounded-lg border border-[#E3E8EF] text-sm font-medium hover:bg-[#F5F7FA]"
           >
             Annuler
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            variant="dangerSolid"
             disabled={busy || empty || tooLong}
             onClick={() => onConfirm(motif.trim())}
-            className="h-[40px] px-5 rounded-lg bg-[#B42318] hover:bg-[#9B1E14] text-white text-sm font-semibold disabled:opacity-50"
           >
             {busy ? 'Envoi…' : 'Confirmer le rejet'}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -139,12 +140,12 @@ export default function RevueSaisie() {
         <div className="rounded-lg border border-[#F6C7C3] bg-[#FEF3F2] px-4 py-3 text-sm text-[#B42318]">
           {loadError}
         </div>
-        <button
+        <Button
+          variant="secondary"
           onClick={() => navigate('/donnees-saisies')}
-          className="h-[40px] px-4 rounded-lg border border-[#E3E8EF] text-sm font-medium hover:bg-[#F5F7FA]"
         >
           Retour à « Données saisies »
-        </button>
+        </Button>
       </div>
     );
   }
@@ -280,18 +281,20 @@ export default function RevueSaisie() {
           )}
           {saisie.status === 'soumise' && (
             <div className="space-y-3">
-              <button
+              <Button
+                variant="success"
                 onClick={() => setConfirm('valider')}
-                className="w-full h-[40px] rounded-lg bg-[#1E7B4F] hover:bg-[#186641] text-white text-sm font-semibold inline-flex items-center justify-center gap-2"
+                className="w-full gap-2"
               >
                 <span aria-hidden="true">✓</span> Valider
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="dangerSolid"
                 onClick={() => setRejectOpen(true)}
-                className="w-full h-[40px] rounded-lg bg-[#B42318] hover:bg-[#9B1E14] text-white text-sm font-semibold inline-flex items-center justify-center gap-2"
+                className="w-full gap-2"
               >
                 <span aria-hidden="true">✕</span> Rejeter
-              </button>
+              </Button>
               <p className="text-xs text-[#5B6778]">
                 En cas de rejet, un motif est obligatoire. Il sera visible du service qui a saisi
                 le rapport.
@@ -299,12 +302,13 @@ export default function RevueSaisie() {
             </div>
           )}
           {saisie.status === 'validee' && (
-            <button
+            <Button
+              variant="primary"
               onClick={() => setConfirm('exporter')}
-              className="w-full h-[40px] rounded-lg bg-[#1F5FA8] hover:bg-[#174C87] text-white text-sm font-semibold inline-flex items-center justify-center gap-2"
+              className="w-full gap-2"
             >
               <span aria-hidden="true">⬆</span> Exporter vers la base
-            </button>
+            </Button>
           )}
         </div>
 

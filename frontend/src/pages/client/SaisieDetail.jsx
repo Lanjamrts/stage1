@@ -4,6 +4,7 @@ import { api, formatDateTime, formatDate, formatTime } from '../../api.js';
 import StatusBadge from '../../components/Common/StatusBadge.jsx';
 import DynamicForm from '../../components/Form/DynamicForm.jsx';
 import ConfirmModal from '../../components/Common/Modal/ConfirmModal.jsx';
+import Button from '../../components/Common/Button.jsx';
 import { useToast } from '../../components/Common/Toast/Toast.jsx';
 import { sourcesOf } from '../../lib/sources.js';
 import { validateSubmit } from '../../../../shared/rules.mjs';
@@ -189,12 +190,12 @@ export default function SaisieDetail() {
         <div className="rounded-lg border border-[#F6C7C3] bg-[#FEF3F2] px-4 py-3 text-sm text-[#B42318]">
           {loadError}
         </div>
-        <button
+        <Button
+          variant="secondary"
           onClick={() => navigate('/mes-saisies')}
-          className="h-[40px] px-4 rounded-lg border border-[#E3E8EF] text-sm font-medium hover:bg-[#F5F7FA]"
         >
           Retour à mes saisies
-        </button>
+        </Button>
       </div>
     );
   }
@@ -233,12 +234,12 @@ export default function SaisieDetail() {
         <div className="flex items-center gap-3">
           <StatusBadge status={saisie.status} />
           {canEdit && saisie.status === 'brouillon' && (
-            <button
+            <Button
+              variant="primary"
               onClick={() => setConfirmOpen(true)}
-              className="h-[40px] px-5 rounded-lg bg-[#1F5FA8] hover:bg-[#174C87] text-white text-sm font-semibold"
             >
               Soumettre
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -257,12 +258,13 @@ export default function SaisieDetail() {
               </p>
             </div>
             {canEdit && (
-              <button
+              <Button
+                variant="dangerSolid"
                 onClick={() => setConfirmOpen(true)}
-                className="h-[36px] px-4 rounded-lg bg-[#B42318] hover:bg-[#9B1E14] text-white text-sm font-semibold whitespace-nowrap"
+                className="whitespace-nowrap"
               >
                 Corriger et resoumettre
-              </button>
+              </Button>
             )}
           </div>
         </div>

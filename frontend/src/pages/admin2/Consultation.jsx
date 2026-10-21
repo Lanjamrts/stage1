@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { api, formatDateTime } from '../../api.js';
 import StatusBadge from '../../components/Common/StatusBadge.jsx';
+import Button from '../../components/Common/Button.jsx';
 
 const periodCell = (s) => {
   if (s.periodeLabel) return s.periodeLabel;
@@ -126,13 +127,14 @@ export default function Consultation() {
           <option value="exportee">Exportée</option>
           <option value="archivee">Archivée</option>
         </select>
-        <button
+        <Button
           type="button"
+          variant="secondary"
+          className="gap-2"
           onClick={() => setFilters({ module: '', periode: '', statut: '' })}
-          className="h-[40px] px-4 rounded-lg border border-[#E3E8EF] text-sm font-medium hover:bg-[#F5F7FA] inline-flex items-center gap-2"
         >
           <span aria-hidden="true">↺</span> Réinitialiser les filtres
-        </button>
+        </Button>
       </div>
 
       {!loading && !error && (
