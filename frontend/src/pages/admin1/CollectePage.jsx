@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { api, formatDateTime } from '../../api.js';
 import StatusBadge from '../../components/Common/StatusBadge.jsx';
+import Button from '../../components/Common/Button.jsx';
 
 const periodCell = (s) => {
   if (s.periodeLabel) return s.periodeLabel;
@@ -334,15 +335,17 @@ export default function CollectePage() {
                 .join(', ')}
             </span>
           )}
-          <button
+          <Button
+            variant="secondary"
+            size="sm"
+            className="gap-1.5"
             onClick={() => {
               setRegions([]);
               setSelectedModules([]);
             }}
-            className="h-[32px] px-3 rounded-lg border border-[#E3E8EF] text-xs font-medium hover:bg-[#F5F7FA] inline-flex items-center gap-1.5"
           >
             <span aria-hidden="true">↺</span> Réinitialiser les filtres
-          </button>
+          </Button>
         </div>
       )}
 

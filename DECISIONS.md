@@ -273,3 +273,12 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 - ConsultationRapport.jsx : « Retour à la consultation » (secondary). Liens texte « Consultation des données » et « Retour à la liste » laissés tels quels.
 - SaisieDetail.jsx : « Retour à mes saisies » (secondary), « Soumettre » (primary), « Corriger et resoumettre » (dangerSolid, className whitespace-nowrap).
 - Aucun backend, test ou dépendance modifié.
+
+## Step 21 – Button dans les 5 pages restantes
+
+- Parametrage.jsx : « OK » (primary sm, disabled={busy}), « Annuler » (secondary sm), « Ajouter » (primary, disabled={busy || !newValue.trim()}, className shrink-0), « Configurer » et « Activer/Désactiver » (secondary sm). « Renommer » (texte, pas un bouton) et onglets (border-b-2 -mb-px) laissés tels quels. Import Button ajouté.
+- CollectePage.jsx : « Réinitialiser les filtres » (secondary sm, className gap-1.5). « Tout cocher/Tout décocher » (liens texte) et onglets laissés tels quels. Import Button ajouté.
+- RemarquesPage.jsx : « Réinitialiser les filtres » (secondary, className gap-2), « Envoyer la remarque » (primary, disabled={busy}, libellé dynamique). Onglets laissés tels quels. Import Button ajouté (chemin ../components/Common/Button.jsx).
+- AuditJournal.jsx : « Réinitialiser les filtres » (secondary). Import Button ajouté.
+- Admin1Dashboard.jsx : « Réinitialiser les filtres » (secondary). Import Button ajouté.
+- Aucun backend, test ou dépendance modifié. Button.jsx non touché.

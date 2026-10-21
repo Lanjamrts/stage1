@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { api, formatDateTime } from '../../api.js';
 import { ROLE_LABELS } from '../../menus.js';
+import Button from '../../components/Common/Button.jsx';
 
 const ROLES = ['client', 'admin2', 'admin1', 'developpeur', 'consultant'];
 
@@ -147,12 +148,12 @@ export default function AuditJournal() {
           />
         </label>
         {(filters.action || filters.role || filters.from || filters.to) && (
-          <button
+          <Button
+            variant="secondary"
             onClick={() => setFilters({ action: '', role: '', from: '', to: '' })}
-            className="h-[40px] px-4 rounded-lg border border-[#E3E8EF] text-sm font-medium hover:bg-[#F5F7FA]"
           >
             <span aria-hidden="true">↺</span> Réinitialiser les filtres
-          </button>
+          </Button>
         )}
       </div>
 

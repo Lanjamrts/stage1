@@ -3,6 +3,7 @@ import { api, formatDateTime } from '../api.js';
 import { useToast } from '../components/Common/Toast/Toast.jsx';
 import useMe from '../lib/useMe.js';
 import { ROLE_MENUS, ROLE_LABELS } from '../menus.js';
+import Button from '../components/Common/Button.jsx';
 
 const STATE_BADGE = {
   nouvelle: { cls: 'bg-[#EBF3FC] border-[#B8D2EF] text-[#1F5FA8]', label: 'Nouvelle' },
@@ -151,17 +152,18 @@ function RemarquesInbox() {
           <option value="admin1">Admin 1</option>
           <option value="admin2">Admin 2</option>
         </select>
-        <button
+        <Button
           type="button"
+          variant="secondary"
+          className="gap-2"
           onClick={() => {
             setStateTab('');
             setQ('');
             setRoleFilter('');
           }}
-          className="h-[40px] px-4 rounded-lg border border-[#E3E8EF] text-sm font-medium hover:bg-[#F5F7FA] inline-flex items-center gap-2"
         >
           <span aria-hidden="true">↺</span> Réinitialiser les filtres
-        </button>
+        </Button>
       </div>
 
       <div className="bg-white rounded-xl border border-[#E3E8EF] shadow-sm overflow-hidden">
@@ -351,13 +353,13 @@ export default function RemarquesPage() {
             Transmis directement à la cellule informatique DGBF.
           </div>
           <div className="flex justify-end">
-            <button
+            <Button
+              variant="primary"
               onClick={submit}
               disabled={busy}
-              className="h-[40px] px-5 rounded-lg bg-[#1F5FA8] hover:bg-[#174C87] text-white text-sm font-semibold disabled:opacity-60"
             >
               {busy ? 'Envoi…' : 'Envoyer la remarque'}
-            </button>
+            </Button>
           </div>
         </div>
       </div>
