@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { api, formatDate } from '../../api.js';
 import StatusBadge from '../../components/Common/StatusBadge.jsx';
 import NouvelleSaisieModal from '../../components/Form/NouvelleSaisieModal.jsx';
+import Button from '../../components/Common/Button.jsx';
 
 const PERIODICITY_LABELS = {
   monthly: 'Mensuelle',
@@ -282,32 +283,31 @@ export default function ClientDashboard() {
                     <td className="px-5 py-3 whitespace-nowrap">
                       {r.isEvent && r.saisie ? (
                         <div className="flex flex-nowrap items-center gap-2">
-                          <button
+                          <Button
+                            variant="secondary"
+                            size="sm"
                             onClick={() => openSaisie(r.saisie.id)}
-                            className="h-[32px] px-3 rounded-lg text-[13px] font-semibold whitespace-nowrap shrink-0 border border-[#D6DCE5] text-[#1A2433] hover:bg-[#F5F7FA]"
                           >
                             {action.label}
-                          </button>
-                          <button
+                          </Button>
+                          <Button
+                            variant="primary"
+                            size="sm"
                             onClick={() => setModalModule(r.module)}
-                            className="h-[32px] px-3 rounded-lg text-[13px] font-semibold whitespace-nowrap shrink-0 bg-[#1F5FA8] hover:bg-[#174C87] text-white"
                           >
                             Nouvelle saisie
-                          </button>
+                          </Button>
                         </div>
                       ) : (
-                        <button
+                        <Button
+                          variant={action.primary ? 'primary' : 'secondary'}
+                          size="sm"
                           onClick={() =>
                             r.saisie ? openSaisie(r.saisie.id) : setModalModule(r.module)
                           }
-                          className={`h-[32px] px-3 rounded-lg text-[13px] font-semibold ${
-                            action.primary
-                              ? 'bg-[#1F5FA8] hover:bg-[#174C87] text-white'
-                              : 'border border-[#D6DCE5] text-[#1A2433] hover:bg-[#F5F7FA]'
-                          }`}
                         >
                           {action.label}
-                        </button>
+                        </Button>
                       )}
                     </td>
                   </tr>

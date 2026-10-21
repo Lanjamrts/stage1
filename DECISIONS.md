@@ -255,3 +255,10 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 - Cellule Action : `whitespace-nowrap` sur le <td>, conteneur `flex flex-nowrap items-center gap-2`, `whitespace-nowrap shrink-0` sur les deux boutons (hauteur et couleurs inchangées).
 - En-tête colonne Action : `min-w-[260px]` sur le <th> pour que les deux boutons tiennent sur une ligne.
 - Modules périodiques et lignes sans saisie inchangés.
+
+## Step 19 – Button dans les pages
+
+- Utilisateurs.jsx : « Ajouter un utilisateur » (primary), « Réinitialiser les filtres » (secondary), boutons Actions (Modifier le profil = secondary size="sm", Désactiver = danger size="sm", Réinitialiser le mot de passe = secondary size="sm", tous `className="w-full"`), tiroir (Annuler = secondary, Créer/Enregistrer = primary), « Terminer » (primary). Import Button ajouté.
+- ClientDashboard.jsx : cellule Action — Consulter/Continuer/Corriger = secondary size="sm", « Nouvelle saisie » = primary size="sm", bouton unique conditionnel `variant={action.primary ? 'primary' : 'secondary'} size="sm"`. Conteneur `flex flex-nowrap items-center gap-2` conservé. Import Button ajouté.
+- MesSaisies.jsx : « Réinitialiser les filtres » (secondary, x2), « Créer une nouvelle saisie » (primary), « Aller au tableau de bord » (primary `className="mt-4"`), bouton de ligne Actions (secondary size="sm"). Import Button ajouté.
+- Boutons <button> laissés tels quels : Utilisateurs.jsx « Copier » (h-[44px] collé au champ mot de passe), ClientDashboard.jsx « Corriger » (lien souligné, pas un bouton), MesSaisies.jsx pastille « × » (filtre).
