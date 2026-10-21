@@ -2,29 +2,29 @@
 
 export const ROLE_MENUS = {
   client: [
-    { label: 'Tableau de bord', path: '/', icon: '📊' },
-    { label: 'Mes saisies', path: '/mes-saisies', icon: '📝' },
+    { label: 'Tableau de bord', path: '/', icon: 'dashboard' },
+    { label: 'Mes saisies', path: '/mes-saisies', icon: 'edit' },
   ],
   admin2: [
-    { label: 'Données saisies', path: '/donnees-saisies', icon: '📂' },
-    { label: 'Consultation et téléchargement', path: '/consultation', icon: '🔍' },
-    { label: 'Remarques', path: '/remarques', icon: '💬' },
+    { label: 'Données saisies', path: '/donnees-saisies', icon: 'folder' },
+    { label: 'Consultation et téléchargement', path: '/consultation', icon: 'search' },
+    { label: 'Remarques', path: '/remarques', icon: 'chat' },
   ],
   admin1: [
-    { label: 'Tableau de bord', path: '/', icon: '📊' },
-    { label: 'Utilisateurs', path: '/utilisateurs', icon: '👥' },
-    { label: 'Collecte et téléchargement', path: '/collecte', icon: '📈' },
-    { label: "Journal d'audit", path: '/audit', icon: '📋' },
-    { label: 'Remarques', path: '/remarques', icon: '💬' },
+    { label: 'Tableau de bord', path: '/', icon: 'dashboard' },
+    { label: 'Utilisateurs', path: '/utilisateurs', icon: 'users' },
+    { label: 'Collecte et téléchargement', path: '/collecte', icon: 'chart' },
+    { label: "Journal d'audit", path: '/audit', icon: 'clipboard' },
+    { label: 'Remarques', path: '/remarques', icon: 'chat' },
   ],
   developpeur: [
-    { label: 'Paramétrage', path: '/parametrage', icon: '⚙️' },
-    { label: 'Remarques', path: '/remarques', icon: '💬' },
-    { label: "Journal d'audit", path: '/audit', icon: '📋' },
+    { label: 'Paramétrage', path: '/parametrage', icon: 'settings' },
+    { label: 'Remarques', path: '/remarques', icon: 'chat' },
+    { label: "Journal d'audit", path: '/audit', icon: 'clipboard' },
   ],
   consultant: [
-    { label: 'Tableau de bord', path: '/', icon: '📊' },
-    { label: 'Consultation des données', path: '/consultation-donnees', icon: '📊' },
+    { label: 'Tableau de bord', path: '/', icon: 'dashboard' },
+    { label: 'Consultation des données', path: '/consultation-donnees', icon: 'chart' },
   ],
 };
 
