@@ -190,6 +190,7 @@ export default function LoginPage() {
 
               <Button
                 type="submit"
+                size="lg"
                 className="w-full"
                 disabled={loading || blocked}
               >

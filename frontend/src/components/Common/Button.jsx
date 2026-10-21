@@ -13,6 +13,7 @@ const variants = {
 const sizes = {
   md: 'h-[36px] px-5 text-sm',
   sm: 'h-[32px] px-3 text-[13px]',
+  lg: 'h-[44px] px-5 text-[15px]',
 };
 
 export default function Button({
