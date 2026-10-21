@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import Button from '../Button.jsx';
 
 export default function ExpiryWarningModal({ isOpen, onConfirm, onExpire, onCancel, timeLeft }) {
   const [count, setCount] = useState(timeLeft);
@@ -59,19 +60,13 @@ export default function ExpiryWarningModal({ isOpen, onConfirm, onExpire, onCanc
               Vos brouillons enregistrés ne seront pas perdus.
             </p>
             <div className="mt-4 flex justify-end gap-2">
-              <button
-                onClick={onConfirm}
-                className="h-9 px-4 rounded-lg bg-[#1F5FA8] text-white font-medium text-xs hover:bg-[#174C87]"
-              >
-                Rester connecté
-              </button>
-              <button
-                onClick={onCancel}
-                className="h-9 px-4 rounded-lg bg-white border border-[#E3E8EF] text-[#1A2433] font-medium text-xs hover:bg-[#F5F7FA]"
-              >
-                Se déconnecter
-              </button>
-            </div>
+                <Button variant="primary" onClick={onConfirm}>
+                  Rester connecté
+                </Button>
+                <Button variant="secondary" onClick={onCancel}>
+                  Se déconnecter
+                </Button>
+              </div>
           </div>
         </div>
       </div>

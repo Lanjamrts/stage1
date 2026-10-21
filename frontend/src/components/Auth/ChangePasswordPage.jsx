@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LANDING_BY_ROLE } from '../../menus.js';
 import Logo from '../Common/Logo.jsx';
+import Button from '../Common/Button.jsx';
 
 export default function ChangePasswordPage() {
   const [current, setCurrent] = useState('');
@@ -128,17 +129,19 @@ export default function ChangePasswordPage() {
             Votre nouveau mot de passe est enregistré. Vous pouvez maintenant accéder à votre
             espace.
           </p>
-          <button
+          <Button
             type="button"
+            size="lg"
+            variant="primary"
+            className="mt-7 w-full gap-2"
             onClick={goToSpace}
-            className="mt-7 w-full h-[44px] bg-[#1F5FA8] hover:bg-[#174C87] text-white text-[15px] font-semibold rounded-[8px] transition-colors flex items-center justify-center gap-2"
           >
             Accéder à mon espace
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="5" y1="12" x2="19" y2="12"></line>
               <polyline points="12 5 19 12 12 19"></polyline>
             </svg>
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -243,10 +246,12 @@ export default function ChangePasswordPage() {
               </div>
             )}
 
-            <button
+            <Button
               type="submit"
+              size="lg"
+              variant="primary"
+              className="w-full gap-2"
               disabled={loading || !allOk}
-              className="w-full h-[44px] bg-[#1F5FA8] hover:bg-[#174C87] disabled:bg-[#E3E8EF] disabled:text-[#8A94A6] text-white text-[15px] font-semibold rounded-[8px] transition-colors flex items-center justify-center gap-2"
             >
               {loading ? 'Changement en cours...' : 'Enregistrer et continuer'}
               {!loading && (
@@ -255,15 +260,17 @@ export default function ChangePasswordPage() {
                   <polyline points="12 5 19 12 12 19"></polyline>
                 </svg>
               )}
-            </button>
+            </Button>
 
-            <button
+            <Button
               type="button"
+              size="lg"
+              variant="secondary"
+              className="w-full"
               onClick={logout}
-              className="w-full h-[44px] border border-[#E3E8EF] bg-white hover:bg-[#F5F7FA] text-[#1A2433] text-[14px] font-semibold rounded-[8px] transition-colors"
             >
               Annuler et se déconnecter
-            </button>
+            </Button>
           </form>
         </div>
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../../api.js';
 import { STATUS_LABELS } from '../../../../shared/rules.mjs';
+import Button from '../Common/Button.jsx';
 
 const PERIODICITY_HINTS = {
   monthly: 'Périodicité : mensuelle.',
@@ -168,31 +169,31 @@ export default function NouvelleSaisieModal({ module, periodes, isOpen, onClose,
         )}
 
         <div className="flex justify-end gap-3">
-          <button
+          <Button
             type="button"
+            variant="secondary"
             onClick={onClose}
             disabled={busy}
-            className="h-[40px] px-4 rounded-lg border border-[#E3E8EF] text-sm font-medium hover:bg-[#F5F7FA]"
           >
             Annuler
-          </button>
+          </Button>
           {existing ? (
-            <button
+            <Button
               type="button"
+              variant="primary"
               onClick={() => onCreated(existing.id)}
-              className="h-[40px] px-5 rounded-lg bg-[#1F5FA8] hover:bg-[#174C87] text-white text-sm font-semibold"
             >
               Continuer la saisie existante
-            </button>
+            </Button>
           ) : (
-            <button
+            <Button
               type="button"
+              variant="primary"
               onClick={submit}
               disabled={busy}
-              className="h-[40px] px-5 rounded-lg bg-[#1F5FA8] hover:bg-[#174C87] text-white text-sm font-semibold disabled:opacity-60"
             >
               {busy ? 'Initialisation...' : 'Commencer la saisie'}
-            </button>
+            </Button>
           )}
         </div>
       </div>
