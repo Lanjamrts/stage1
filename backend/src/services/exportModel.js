@@ -255,7 +255,7 @@ export function computeTableColumnWidths(doc, labels, rows, contentW, size = 8) 
 }
 
 // Construit le modèle d'export à partir de lignes sérialisées (serializeSaisie avec withFields).
-export function buildExportModel(rows, { filters = {}, generatedAt = new Date() } = {}) {
+export function buildExportModel(rows, { filters = {}, generatedAt = new Date(), epnDict = {} } = {}) {
   const modulesMap = new Map();
   const regionsPresent = new Set();
   const modulesPresent = new Set();
@@ -332,5 +332,6 @@ export function buildExportModel(rows, { filters = {}, generatedAt = new Date() 
     modulesPresent: [...modulesPresent],
     count,
     modules,
+    epnDict,
   };
 }

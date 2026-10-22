@@ -63,6 +63,15 @@ const TSE_MODULE = {
   ],
 };
 
+const NCA_MODULE = {
+  code: 'NCA',
+  label: "Nomination membres du Conseil d'Administration EPN",
+  fields: [
+    { key: 'epn', label: 'EPN', type: 'select', source: 'epn' },
+    { key: 'ref_arrete', label: "Référence de l'arrêté", type: 'text' },
+  ],
+};
+
 const RH_MODULE = {
   code: 'RH',
   label: 'Ressources humaines',
@@ -175,8 +184,8 @@ describe('Rendu des formats d\'export (collecte)', () => {
     expect(saisie.autresChamps).toEqual([{ cle: 'inconnu', valeur: 'ignor\u00e9' }]);
   });
 
-  async function writtenWorkbook(rows, filters = { regions: [], modules: [] }) {
-    const model = buildExportModel(rows, { filters, generatedAt: new Date('2026-10-16T12:00:00Z') });
+  async function writtenWorkbook(rows, filters = { regions: [], modules: [] }, epnDict = {}) {
+    const model = buildExportModel(rows, { filters, generatedAt: new Date('2026-10-16T12:00:00Z'), epnDict });
     const wb = buildWorkbook(model);
     const buffer = await wb.xlsx.writeBuffer();
     const wb2 = new ExcelJS.Workbook();
@@ -756,6 +765,120 @@ describe('Rendu des formats d\'export (collecte)', () => {
           expect(pages).toBeGreaterThanOrEqual(1);
           // Aucune page vide : chaque page contient du texte ou un dessin.
           expect(pdfText.includes('Collecte des données')).toBe(true);
+          resolve();
+        } catch (err) {
+          reject(err);
+        }
+      });
+      doc.on('error', reject);
+      renderPdf(model, doc);
+      doc.end();
+    });
+  });
+
+  it('X30 : export NCA — colonnes Ministère de tutelle et Régime juste après EPN', async () => {
+    const epnDict = {
+      'Economic Development Board of Madagascar': { ministere: 'Présidence de la République', regime: 'EPIC' },
+    };
+    const wb = await writtenWorkbook(
+      [row(NCA_MODULE, { epn: 'Economic Development Board of Madagascar', ref_arrete: 'Décret n° 1' })],
+      { regions: [], modules: [] },
+      epnDict
+    );
+    const nca = wb.getWorksheet('NCA');
+    const headers = [];
+    nca.getRow(1).eachCell((cell) => headers.push(String(cell.value || '')));
+    const epnIdx = headers.indexOf('EPN');
+    expect(epnIdx).toBeGreaterThanOrEqual(0);
+    expect(headers[epnIdx + 1]).toBe('Ministère de tutelle');
+    expect(headers[epnIdx + 2]).toBe('Régime');
+    expect(String(nca.getCell(2, epnIdx + 1).value || '')).toBe('Economic Development Board of Madagascar');
+    expect(String(nca.getCell(2, epnIdx + 2).value || '')).toBe('Présidence de la République');
+    expect(String(nca.getCell(2, epnIdx + 3).value || '')).toBe('EPIC');
+  });
+
+  it('X31 : EPN absent du référentiel — cellules vides, pas de undefined ni null', async () => {
+    const wb = await writtenWorkbook(
+      [row(NCA_MODULE, { epn: 'EPN Inconnu du Référentiel', ref_arrete: 'Décret n° 2' })],
+      { regions: [], modules: [] },
+      {}
+    );
+    const nca = wb.getWorksheet('NCA');
+    const headers = [];
+    nca.getRow(1).eachCell((cell) => headers.push(String(cell.value || '')));
+    const epnIdx = headers.indexOf('EPN');
+    expect(headers[epnIdx + 1]).toBe('Ministère de tutelle');
+    expect(headers[epnIdx + 2]).toBe('Régime');
+    expect(String(nca.getCell(2, epnIdx + 1).value || '')).toBe('EPN Inconnu du Référentiel');
+    expect(String(nca.getCell(2, epnIdx + 2).value || '')).toBe('');
+    expect(String(nca.getCell(2, epnIdx + 3).value || '')).toBe('');
+    let interdit = false;
+    nca.getRow(2).eachCell((cell) => {
+      const v = String(cell.value || '');
+      if (v === 'undefined' || v === 'null') interdit = true;
+    });
+    expect(interdit).toBe(false);
+  });
+
+  it('X32 : module sans champ EPN — aucune colonne supplémentaire', async () => {
+    const wb = await writtenWorkbook([
+      row(RA_MODULE, { activites: [], indicateurs: [], difficultes: '', perspectives: '' }),
+    ], { regions: [], modules: [] });
+    const ra = wb.getWorksheet('RA');
+    const headers = [];
+    ra.getRow(1).eachCell((cell) => headers.push(String(cell.value || '')));
+    expect(headers).not.toContain('Ministère de tutelle');
+    expect(headers).not.toContain('Régime');
+    expect(headers).toContain('Difficultés rencontrées et solutions');
+  });
+
+  it('X33 : le PDF d un NCA affiche Ministère de tutelle et Régime après l EPN', () => {
+    const epnDict = {
+      'Economic Development Board of Madagascar': { ministere: 'Présidence de la République', regime: 'EPIC' },
+    };
+    const model = buildExportModel(
+      [row(NCA_MODULE, { epn: 'Economic Development Board of Madagascar', ref_arrete: 'Décret n° 1' })],
+      { filters: { regions: [], modules: [] }, epnDict }
+    );
+    const doc = new PDFDocument({ margin: 42, size: 'A4', bufferPages: true });
+    const chunks = [];
+    return new Promise((resolve, reject) => {
+      doc.on('data', (chunk) => chunks.push(chunk));
+      doc.on('end', () => {
+        try {
+          const buffer = Buffer.concat(chunks);
+          expect(buffer.slice(0, 5).toString('ascii')).toBe('%PDF-');
+          const pdfText = extractPdfText(buffer);
+          expect(pdfText.includes('Ministère de tutelle')).toBe(true);
+          expect(pdfText.includes('Régime')).toBe(true);
+          expect(pdfText.includes('Présidence de la République')).toBe(true);
+          expect(pdfText.includes('EPIC')).toBe(true);
+          resolve();
+        } catch (err) {
+          reject(err);
+        }
+      });
+      doc.on('error', reject);
+      renderPdf(model, doc);
+      doc.end();
+    });
+  });
+
+  it('X34 : le PDF d un EPN absent du référentiel ne contient ni undefined ni null', () => {
+    const model = buildExportModel(
+      [row(NCA_MODULE, { epn: 'EPN Inconnu', ref_arrete: 'Décret n° 2' })],
+      { filters: { regions: [], modules: [] } }
+    );
+    const doc = new PDFDocument({ margin: 42, size: 'A4', bufferPages: true });
+    const chunks = [];
+    return new Promise((resolve, reject) => {
+      doc.on('data', (chunk) => chunks.push(chunk));
+      doc.on('end', () => {
+        try {
+          const buffer = Buffer.concat(chunks);
+          const pdfText = extractPdfText(buffer);
+          expect(pdfText).not.toContain('undefined');
+          expect(pdfText).not.toContain('null');
           resolve();
         } catch (err) {
           reject(err);

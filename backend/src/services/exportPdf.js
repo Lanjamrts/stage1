@@ -247,7 +247,7 @@ function drawTableGrid(doc, table, rows, s, startY, size) {
 
 // Calcule la hauteur nécessaire pour le titre + grille d'infos + champs scalaires
 // d'une saisie, avec les mêmes fonctions que le rendu (rowHeight / heightOfString).
-export function saisieBlockHeight(doc, mod, s) {
+export function saisieBlockHeight(doc, mod, s, epnDict = {}) {
   let h = 0;
   // titre du bloc (fontSize 11 + moveDown 0.2)
   h += 14;
@@ -267,7 +267,8 @@ export function saisieBlockHeight(doc, mod, s) {
     h += Math.max(hh, 16) + 4;
   });
   h += 4; // doc.y = gy + 4
-  // champs scalaires
+  // champs scalaires (y compris les deux lignes « Ministère de tutelle » / « Régime »
+  // ajoutées après chaque champ EPN)
   const labelColW = Math.floor(CONTENT_W * 0.38);
   const valColW = CONTENT_W - labelColW;
   const size = 8.5;
@@ -278,6 +279,17 @@ export function saisieBlockHeight(doc, mod, s) {
     const hLabel = doc.heightOfString(sanitize(f.label), { font: 'Helvetica', size, width: labelColW - 2 * padding });
     const hValue = doc.heightOfString(sanitize(display), { font: 'Helvetica', size, width: valColW - 2 * padding });
     h += Math.max(hLabel, hValue) + 2 * padding;
+    if (f.source === 'epn') {
+      const info = epnDict[raw] || {};
+      for (const [label, value] of [
+        ['Ministère de tutelle', info.ministere || ''],
+        ['Régime', info.regime || ''],
+      ]) {
+        const h2 = doc.heightOfString(label, { font: 'Helvetica', size, width: labelColW - 2 * padding });
+        const h3 = doc.heightOfString(sanitize(value), { font: 'Helvetica', size, width: valColW - 2 * padding });
+        h += Math.max(h2, h3) + 2 * padding;
+      }
+    }
   });
   h += 12; // espace final moveDown
   return h;
@@ -324,7 +336,7 @@ export function renderPdf(model, doc) {
       // ---------- T4 : ne pas séparer une saisie de son contenu ----------
       // Si le bloc (titre + grille + champs scalaires) ne tient pas dans l'espace restant,
       // sauter de page AVANT le titre du bloc.
-      const blockNeeded = saisieBlockHeight(doc, mod, s);
+      const blockNeeded = saisieBlockHeight(doc, mod, s, model.epnDict || {});
       if (ensureSpace(doc, blockNeeded)) {
         // nouvelle page déjà dotée de l'en-tête compact via pageAdded
       }
@@ -336,7 +348,7 @@ export function renderPdf(model, doc) {
       drawInfoGrid(doc, s);
 
       // ---------- champs scalaires ----------
-      drawScalarFields(doc, mod, s);
+      drawScalarFields(doc, mod, s, model.epnDict || {});
       doc.moveDown(0.15); // espace vertical ≥ 10 pt avant le titre de tableau
 
       // ---------- champs de type table ----------
@@ -364,7 +376,7 @@ export function renderPdf(model, doc) {
   return total;
 }
 
-function drawScalarFields(doc, mod, s) {
+function drawScalarFields(doc, mod, s, epnDict = {}) {
   const scalarFields = mod.fields;
   const labelColW = Math.floor(CONTENT_W * 0.38); // 38 % de la largeur utile pour le libellé
   const valColW = CONTENT_W - labelColW;
@@ -375,37 +387,48 @@ function drawScalarFields(doc, mod, s) {
   for (const f of scalarFields) {
     const raw = s.scalars[f.key];
     const display = raw === '' ? '—' : raw instanceof Date ? fmtDate(raw) : String(raw);
-    const label = sanitize(f.label);
-    const value = sanitize(display);
-    // Hauteur de ligne = max(hauteur libellé, hauteur valeur) + 2 * padding
-    doc.font('Helvetica-Bold').fontSize(size);
-    const hLabel = doc.heightOfString(label, { width: labelColW - 2 * padding });
-    doc.font('Helvetica').fontSize(size);
-    const hValue = doc.heightOfString(value, { width: valColW - 2 * padding });
-    const needed = Math.max(hLabel, hValue) + 2 * padding;
-    const remaining = doc.page.height - doc.page.margins.bottom - doc.y;
-    if (remaining < needed && drewAny) {
-      // couper entre deux champs et répéter le titre du bloc en (suite)
-      doc.addPage();
-      drawBlockTitle(doc, mod, true);
-      drewAny = false;
+    // Une entrée par ligne à dessiner : le champ lui-même, puis, pour un champ EPN,
+    // « Ministère de tutelle » et « Régime » juste après.
+    const entries = [
+      { label: sanitize(f.label), value: sanitize(display) },
+    ];
+    if (f.source === 'epn') {
+      const info = epnDict[raw] || {};
+      entries.push({ label: 'Ministère de tutelle', value: sanitize(info.ministere || '') });
+      entries.push({ label: 'Régime', value: sanitize(info.regime || '') });
     }
-    const ry = doc.y;
-    if (rowIdx % 2 === 1) {
-      doc.rect(PAGE_MARGIN, ry, CONTENT_W, needed).fill(COLOR_ALT).stroke(COLOR_BORDER);
-    } else {
-      doc.rect(PAGE_MARGIN, ry, CONTENT_W, needed).stroke(COLOR_BORDER);
+    for (const e of entries) {
+      const label = e.label;
+      const value = e.value;
+      doc.font('Helvetica-Bold').fontSize(size);
+      const hLabel = doc.heightOfString(label, { width: labelColW - 2 * padding });
+      doc.font('Helvetica').fontSize(size);
+      const hValue = doc.heightOfString(value, { width: valColW - 2 * padding });
+      const needed = Math.max(hLabel, hValue) + 2 * padding;
+      const remaining = doc.page.height - doc.page.margins.bottom - doc.y;
+      if (remaining < needed && drewAny) {
+        // couper entre deux champs et répéter le titre du bloc en (suite)
+        doc.addPage();
+        drawBlockTitle(doc, mod, true);
+        drewAny = false;
+      }
+      const ry = doc.y;
+      if (rowIdx % 2 === 1) {
+        doc.rect(PAGE_MARGIN, ry, CONTENT_W, needed).fill(COLOR_ALT).stroke(COLOR_BORDER);
+      } else {
+        doc.rect(PAGE_MARGIN, ry, CONTENT_W, needed).stroke(COLOR_BORDER);
+      }
+      const textY = ry + (needed - size * 1.2) / 2; // centrage vertical approximatif
+      doc.font('Helvetica-Bold').fontSize(size).fillColor(COLOR_GRAY).text(label, PAGE_MARGIN + padding, textY, { width: labelColW - 2 * padding, lineBreak: true });
+      const isNumber = f.type === 'integer' || f.type === 'decimal';
+      const plain = isNumber && isPlainNumberField(f);
+      const numText = plain ? String(display) : (isNumber ? fmtNumber(display) : value);
+      const valAlign = plain ? 'left' : (isNumber ? 'right' : 'left');
+      doc.font('Helvetica').fontSize(size).fillColor(COLOR_BODY).text(numText, PAGE_MARGIN + labelColW + padding, textY, { width: valColW - 2 * padding, align: valAlign, lineBreak: true });
+      doc.y = ry + needed;
+      rowIdx += 1;
+      drewAny = true;
     }
-    const textY = ry + (needed - size * 1.2) / 2; // centrage vertical approximatif
-    doc.font('Helvetica-Bold').fontSize(size).fillColor(COLOR_GRAY).text(label, PAGE_MARGIN + padding, textY, { width: labelColW - 2 * padding, lineBreak: true });
-    const isNumber = f.type === 'integer' || f.type === 'decimal';
-    const plain = isNumber && isPlainNumberField(f);
-    const numText = plain ? String(display) : (isNumber ? fmtNumber(display) : display);
-    const valAlign = plain ? 'left' : (isNumber ? 'right' : 'left');
-    doc.font('Helvetica').fontSize(size).fillColor(COLOR_BODY).text(numText, PAGE_MARGIN + labelColW + padding, textY, { width: valColW - 2 * padding, align: valAlign, lineBreak: true });
-    doc.y = ry + needed;
-    rowIdx += 1;
-    drewAny = true;
   }
   doc.moveDown(12 / 7.2); // 12 pt d'espace avant le titre du tableau suivant
 }
