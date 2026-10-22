@@ -29,6 +29,7 @@ export default function SaisieDetail() {
   const [saisie, setSaisie] = useState(null);
   const [steps, setSteps] = useState([]);
   const [options, setOptions] = useState({});
+  const [epnItems, setEpnItems] = useState([]);
   const [priorExports, setPriorExports] = useState([]);
   const [values, setValues] = useState({});
   const [errors, setErrors] = useState({});
@@ -65,8 +66,14 @@ export default function SaisieDetail() {
           map[src] = lists[i].values;
         });
         setOptions(map);
+        // EPN : conserve les objets complets (ministere/regime/acronyme) pour le sélecteur 2 niveaux.
+        if (sources.includes('epn')) {
+          const epnList = lists[sources.indexOf('epn')];
+          setEpnItems(Array.isArray(epnList.items) ? epnList.items : []);
+        }
       } else {
         setOptions({});
+        setEpnItems([]);
       }
 
       // Carte « Historique des changements » (nominations)
@@ -325,6 +332,7 @@ export default function SaisieDetail() {
               onChange={onChangeValues}
               disabled={!canEdit}
               options={options}
+              epnItems={epnItems}
               autoCtx={autoCtx}
             />
           </div>

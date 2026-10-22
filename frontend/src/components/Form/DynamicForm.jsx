@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { computeAutos } from '../../../../shared/rules.mjs';
 
 // Moteur de gabarits : tous les formulaires sont générés depuis modules.fields
@@ -25,6 +25,117 @@ function FieldError({ message }) {
   return <p className="text-xs text-[#B42318] mt-1 font-medium">{message}</p>;
 }
 
+// Sélecteur EPN en deux niveaux : « Ministère de tutelle » puis « EPN ».
+// Le ministère est un état purement local (pas un champ du module) : il n'est
+// ni enregistré, ni validé, ni envoyé à l'API. Seule la valeur `value` (nom
+// de l'EPN) est transmise via onChange.
+function EpnSelect({ field, value, onChange, disabled, epnItems = [], err }) {
+  const [ministry, setMinistry] = useState(''); // '' = « Tous les ministères »
+
+  // Ministères qui possèdent au moins un EPN, triés par ordre alphabétique.
+  const ministries = useMemo(() => {
+    const set = new Set();
+    for (const it of epnItems || []) {
+      if (it.ministere) set.add(it.ministere);
+    }
+    return [...set].sort((a, b) => a.localeCompare(b));
+  }, [epnItems]);
+
+  // EPN du ministère choisi (ou tous si « Tous les ministères »), triés par nom.
+  let filtered = ministry
+    ? (epnItems || []).filter((it) => it.ministere === ministry)
+    : epnItems || [];
+  filtered = [...filtered].sort((a, b) => (a.value || '').localeCompare(b.value || ''));
+
+  // Si la valeur courante n'est plus dans la liste filtrée (changement de
+  // ministère), on remet le champ à vide. Sinon on la conserve affichée.
+  useEffect(() => {
+    if (value && !filtered.some((it) => it.value === value)) {
+      onChange('');
+    }
+  }, [ministry, value, filtered, onChange]);
+
+  const isCurrentValid = !value || filtered.some((it) => it.value === value);
+  const displayValue = isCurrentValid ? value : '';
+
+  const labelOf = (it) => {
+    const parts = [(it && it.value) || '', (it && it.ministere) || '', (it && it.regime) || ''].filter(Boolean);
+    return parts.length ? parts.join(' / ') : '';
+  };
+
+  const fieldId = `epn-${field.key}`;
+  const ministryId = `ministere-${field.key}`;
+
+  // Pas de donnée EPN utilisable → retombe sur un select simple (comportement précédent).
+  if (!epnItems || epnItems.length === 0) {
+    const opts = field.options || [];
+    return (
+      <div key={field.key}>
+        <FieldLabel field={field} />
+        <select
+          className={`${INPUT} ${err ? INPUT_ERR : ''}`}
+          value={displayValue}
+          disabled={disabled}
+          onChange={(e) => onChange(e.target.value)}
+        >
+          <option value="">-- Sélectionner --</option>
+          {opts.map((o) => (
+            <option key={o} value={o}>{o}</option>
+          ))}
+        </select>
+        <FieldError message={err} />
+      </div>
+    );
+  }
+
+  return (
+    <div key={field.key} className="space-y-2">
+      {/* Ministère de tutelle (sélecteur auxiliaire, non enregistré) */}
+      <div>
+        <label htmlFor={ministryId} className="block text-[13px] font-semibold text-[#0B2A4A] mb-1.5">
+          Ministère de tutelle
+        </label>
+        <select
+          id={ministryId}
+          className={`${INPUT} ${err ? INPUT_ERR : ''}`}
+          value={ministry}
+          disabled={disabled}
+          onChange={(e) => setMinistry(e.target.value)}
+        >
+          <option value="">Tous les ministères</option>
+          {ministries.map((m) => (
+            <option key={m} value={m}>{m}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* EPN (champ du formulaire ; sa valeur est le nom de l'EPN) */}
+      <label htmlFor={fieldId} className="block text-[13px] font-semibold text-[#0B2A4A] mb-1.5">
+        {field.label}
+        {field.required && <span className="text-[#B42318]"> *</span>}
+      </label>
+      <select
+        id={fieldId}
+        className={`${INPUT} ${err ? INPUT_ERR : ''}`}
+        value={displayValue}
+        disabled={disabled}
+        onChange={(e) => onChange(e.target.value)}
+      >
+        <option value="">-- Sélectionner --</option>
+        {filtered.map((it) => (
+          <option key={it.value} value={it.value}>
+            {labelOf(it)}
+          </option>
+        ))}
+      </select>
+      {field.required && !displayValue && (
+        <p className="text-xs text-[#B42318] mt-1 font-medium">Ce champ est obligatoire.</p>
+      )}
+      <FieldError message={err} />
+    </div>
+  );
+}
+
 export default function DynamicForm({
   fields,
   values,
@@ -33,6 +144,7 @@ export default function DynamicForm({
   disabled = false,
   options = {},
   autoCtx = {},
+  epnItems = [],
 }) {
   const val = values || {};
 
@@ -45,6 +157,22 @@ export default function DynamicForm({
     const raw = val[f.key];
 
     if (f.type === 'select') {
+      // Sélecteur EPN en deux niveaux (ministère puis EPN).
+      // Le ministère n'est PAS un champ du module : non enregistré, non validé, non envoyé.
+      if (f.source === 'epn') {
+        return (
+          <EpnSelect
+            key={f.key}
+            field={f}
+            value={raw ?? ''}
+            onChange={(v) => setValue(f.key, v)}
+            disabled={disabled}
+            epnItems={epnItems}
+            err={err}
+          />
+        );
+      }
+
       const opts = f.options || (f.source ? options[f.source] || [] : []);
       return (
         <div key={f.key}>

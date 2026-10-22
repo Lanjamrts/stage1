@@ -371,6 +371,7 @@ export default function GabaritEditeur() {
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
   const [options, setOptions] = useState({});
+  const [epnItems, setEpnItems] = useState([]);
 
   const sources = useMemo(() => sourcesOf(fields), [fields]);
 
@@ -419,6 +420,10 @@ export default function GabaritEditeur() {
           map[src] = lists[i].values;
         });
         setOptions(map);
+        if (sources.includes('epn')) {
+          const epnList = lists[sources.indexOf('epn')];
+          setEpnItems(Array.isArray(epnList.items) ? epnList.items : []);
+        }
       }
     );
     return () => {
@@ -710,6 +715,7 @@ export default function GabaritEditeur() {
           onChange={() => {}}
           disabled
           options={options}
+          epnItems={epnItems}
           autoCtx={{}}
         />
       </div>
