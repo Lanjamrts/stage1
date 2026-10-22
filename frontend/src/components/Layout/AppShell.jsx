@@ -5,6 +5,7 @@ import { useToast } from '../Common/Toast/Toast.jsx';
 import ExpiryWarningModal from '../Common/Modal/ExpiryWarningModal.jsx';
 import { ROLE_MENUS, ROLE_LABELS } from '../../menus.js';
 import Logo from '../Common/Logo.jsx';
+import Icon from '../Common/Icon.jsx';
 
 export default function AppShell({ children }) {
   const [user, setUser] = useState(null);
@@ -145,7 +146,7 @@ export default function AppShell({ children }) {
                   }`
                 }
               >
-                <span className="text-lg">{item.icon}</span>
+                <Icon name={item.icon} className="w-5 h-5 shrink-0" />
                 <span>{item.label}</span>
               </NavLink>
             ))}

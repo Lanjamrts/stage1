@@ -282,3 +282,10 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 - AuditJournal.jsx : « Réinitialiser les filtres » (secondary). Import Button ajouté.
 - Admin1Dashboard.jsx : « Réinitialiser les filtres » (secondary). Import Button ajouté.
 - Aucun backend, test ou dépendance modifié. Button.jsx non touché.
+
+## Step 22 – Icônes vectorielles du menu
+
+- Icon.jsx (nouveau) : composant `Icon({ name, className })` rendant un SVG stroke-based (viewBox 0 0 24 24, stroke currentColor, strokeWidth 1.8, linecap/join round, aria-hidden). Icônes : dashboard (4 carrés 2×2), edit (document + crayon), folder, search (loupe), chat (bulle), users (2 silhouettes), chart (barres montantes), clipboard, settings (engrenage). Nom inconnu → petit cercle (jamais d'erreur).
+- menus.js : 15 émojis remplacés par des clés (dashboard, edit, folder, search, chat, users, chart, clipboard, settings). Libellés, paths et ordres inchangés. Consultant « Consultation des données » → 'chart' (distingue du 'dashboard').
+- AppShell.jsx : `<span className="text-lg">{item.icon}</span>` remplacé par `<Icon name={item.icon} className="w-5 h-5 shrink-0" />`. Import Icon ajouté. Rien d'autre modifié.
+- Aucune nouvelle dépendance. Pas de backend, pas de test, pas de changement de libellé/chemin/ordre.
