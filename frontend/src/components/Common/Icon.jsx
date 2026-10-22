@@ -32,11 +32,10 @@ function drawIcon(name) {
     case 'edit':
       return (
         <>
-          <rect x="8" y="2" width="12" height="18" rx="2" ry="2" fill="none" />
-          <path d="M21 6l-3 3m-3 3L8 2" fill="none" />
-          <line x1="12" y1="6" x2="12" y2="2" fill="none" />
-          <line x1="12" y1="10" x2="16" y2="10" fill="none" />
-          <line x1="12" y1="14" x2="18" y2="14" fill="none" />
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+          <polyline points="14 2 14 8 20 8" />
+          <line x1="8" y1="13" x2="16" y2="13" />
+          <line x1="8" y1="17" x2="16" y2="17" />
         </>
       );
     case 'folder':
@@ -66,34 +65,32 @@ function drawIcon(name) {
     case 'chart':
       return (
         <>
-          <line x1="4" y1="20" x2="4" y2="18" fill="none" />
-          <line x1="8" y1="20" x2="8" y2="16" fill="none" />
-          <line x1="12" y1="20" x2="12" y2="12" fill="none" />
-          <line x1="16" y1="20" x2="16" y2="6" fill="none" />
-          <line x1="20" y1="20" x2="20" y2="8" fill="none" />
+          <rect x="3" y="12" width="4" height="9" rx="1" />
+          <rect x="10" y="3" width="4" height="18" rx="1" />
+          <rect x="17" y="8" width="4" height="13" rx="1" />
         </>
       );
     case 'clipboard':
       return (
         <>
-          <rect x="8" y="2" width="8" height="4" fill="none" />
-          <path d="M8 6h8v14a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2V6z" fill="none" />
-          <line x1="12" y1="8" x2="12" y2="16" fill="none" />
-          <line x1="16" y1="8" x2="16" y2="12" fill="none" />
+          <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+          <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+          <line x1="8" y1="12" x2="16" y2="12" />
+          <line x1="8" y1="16" x2="14" y2="16" />
         </>
       );
     case 'settings':
       return (
         <>
-          <circle cx="12" cy="12" r="3" fill="none" />
-          <line x1="12" y1="3" x2="12" y2="5" fill="none" />
-          <line x1="12" y1="19" x2="12" y2="21" fill="none" />
-          <line x1="3" y1="12" x2="5" y2="12" fill="none" />
-          <line x1="19" y1="12" x2="21" y2="12" fill="none" />
-          <line x1="4.93" y1="4.93" x2="6.34" y2="6.34" fill="none" />
-          <line x1="17.66" y1="17.66" x2="19.07" y2="19.07" fill="none" />
-          <line x1="4.93" y1="19.07" x2="6.34" y2="17.66" fill="none" />
-          <line x1="17.66" y1="6.34" x2="19.07" y2="4.93" fill="none" />
+          <line x1="4" y1="21" x2="4" y2="14" />
+          <line x1="4" y1="10" x2="4" y2="3" />
+          <line x1="12" y1="21" x2="12" y2="12" />
+          <line x1="12" y1="8" x2="12" y2="3" />
+          <line x1="20" y1="21" x2="20" y2="16" />
+          <line x1="20" y1="12" x2="20" y2="3" />
+          <line x1="1" y1="14" x2="7" y2="14" />
+          <line x1="9" y1="8" x2="15" y2="8" />
+          <line x1="17" y1="16" x2="23" y2="16" />
         </>
       );
     default:
