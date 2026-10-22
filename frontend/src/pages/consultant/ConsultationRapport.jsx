@@ -21,6 +21,7 @@ export default function ConsultationRapport() {
   const [saisie, setSaisie] = useState(null);
   const [steps, setSteps] = useState([]);
   const [options, setOptions] = useState({});
+  const [epnItems, setEpnItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -46,6 +47,10 @@ export default function ConsultationRapport() {
             map[src] = lists[i].values;
           });
           setOptions(map);
+          if (sources.includes('epn')) {
+            const epnList = lists[sources.indexOf('epn')];
+            setEpnItems(Array.isArray(epnList.items) ? epnList.items : []);
+          }
         }
         setError(null);
       } catch (err) {
@@ -163,6 +168,7 @@ export default function ConsultationRapport() {
           onChange={() => {}}
           disabled
           options={options}
+          epnItems={epnItems}
           autoCtx={{
             region: '',
             structure: saisie.structureLabel || '',

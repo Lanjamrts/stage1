@@ -45,10 +45,26 @@ const inputCls =
 function ReferenceCard({ list, onChanged }) {
   const { addToast } = useToast();
   const [values, setValues] = useState([]);
+  const [epnItems, setEpnItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newValue, setNewValue] = useState('');
   const [editing, setEditing] = useState(null); // {index, value}
   const [busy, setBusy] = useState(false);
+
+  const epnByValue = useMemo(() => {
+    const map = {};
+    for (const it of epnItems || []) {
+      if (it.value) map[it.value] = it;
+    }
+    return map;
+  }, [epnItems]);
+
+  const epnSecondary = (v) => {
+    const it = epnByValue[v];
+    if (!it) return '';
+    const parts = [it.ministere, it.regime, it.acronyme].filter(Boolean);
+    return parts.length ? parts.join(' / ') : '';
+  };
 
   const load = async () => {
     try {
@@ -61,6 +77,9 @@ function ReferenceCard({ list, onChanged }) {
       } else {
         const d = await api(`/referentiels/${list.key}`);
         setValues(d.values || []);
+        if (list.key === 'epn') {
+          setEpnItems(Array.isArray(d.items) ? d.items : []);
+        }
       }
     } catch {
       setValues([]);
@@ -154,7 +173,14 @@ function ReferenceCard({ list, onChanged }) {
                 </div>
               ) : (
                 <>
-                  <span className="text-[#1A2433] truncate">{v}</span>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-[#1A2433] truncate">{v}</span>
+                    {list.key === 'epn' && (
+                      <span className="text-xs text-[#5B6778] truncate">
+                        {epnSecondary(v)}
+                      </span>
+                    )}
+                  </div>
                   {list.editable && (
                     <button
                       onClick={() => setEditing({ index: i, value: v })}
