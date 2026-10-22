@@ -13,7 +13,7 @@ const router = express.Router();
 // 'structures' et 'regions' sont des cas particuliers (collections dédiées,
 // lecture seule ici) ; 'structures' avec ?full=1 renvoie {id,label,type,region}
 // (tiroir Utilisateurs, cases régions/types de la page Collecte — Phase 5).
-const REFERENTIAL_TYPES = ['directions', 'services', 'grades', 'epn', 'std', 'structures', 'regions'];
+const REFERENTIAL_TYPES = ['directions', 'services', 'grades', 'epn', 'std', 'ministeres', 'structures', 'regions'];
 
 // Types modifiables par le developpeur (SPEC §8 : POST|PUT|PATCH).
 // Régions, Structures et Périodes n'ont pas d'API d'écriture → lecture seule.
@@ -70,6 +70,18 @@ router.get(
       return res.status(200).json({ type, values: rows.map((r) => r.name) });
     }
     const rows = await Referentiel.find({ type }).sort({ value: 1 }).lean();
+    if (type === 'epn') {
+      return res.status(200).json({
+        type,
+        values: rows.map((r) => r.value),
+        items: rows.map((r) => ({
+          value: r.value,
+          ministere: r.ministere || '',
+          regime: r.regime || '',
+          acronyme: r.acronyme || '',
+        })),
+      });
+    }
     return res.status(200).json({ type, values: rows.map((r) => r.value) });
   })
 );
