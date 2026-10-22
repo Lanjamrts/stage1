@@ -12,6 +12,7 @@
     "seed:demo": "node src/seed/demo.js",
     "seed:ref": "node src/seed/reference.js",
     "init:structures": "node src/scripts/init-structures.js",
+    "init:epn": "node src/scripts/init-epn.js",
     "init:periodes": "node src/scripts/init-periodes.js",
     "archive": "node src/scripts/archive.js",
     "create-admin": "node src/scripts/create-admin.js",
