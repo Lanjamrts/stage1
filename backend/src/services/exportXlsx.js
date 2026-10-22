@@ -112,6 +112,33 @@ function clampWidth(w) {
   return Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, w));
 }
 
+// Déclare les colonnes d'une feuille module : un champ dont source === 'epn'
+// s'étend sur trois colonnes (nom de l'EPN, puis Ministère de tutelle et Régime).
+function expandColumns(fields) {
+  const cols = [];
+  for (const f of fields || []) {
+    cols.push({ field: f, kind: 'main' });
+    if (f && f.source === 'epn') {
+      cols.push({ field: f, kind: 'ministere' });
+      cols.push({ field: f, kind: 'regime' });
+    }
+  }
+  return cols;
+}
+
+function headerForColumn(c) {
+  if (c.kind === 'main') return fieldHeaderLabel(c.field.label);
+  if (c.kind === 'ministere') return 'Ministère de tutelle';
+  return 'Régime';
+}
+
+function cellForColumn(c, s, epnDict) {
+  const epnValue = s.scalars[c.field.key] || '';
+  if (c.kind === 'main') return { text: epnValue === '' ? '' : String(epnValue), kind: c.field.type };
+  if (c.kind === 'ministere') return { text: (epnDict[epnValue] || {}).ministere || '', kind: 'text' };
+  return { text: (epnDict[epnValue] || {}).regime || '', kind: 'text' };
+}
+
 // Écrit une valeur typée dans une cellule Excel.
 function writeValue(cell, value, kind, field) {
   baseCellStyle(cell);
@@ -258,7 +285,9 @@ export function buildWorkbook(model) {
     setupPage(sheet);
 
     const metaHeaders = ['Structure', 'Période / Événement', 'Statut de la saisie', 'Auteur'];
-    const fieldHeaders = mod.fields.map((f) => fieldHeaderLabel(f.label));
+    const epnDict = model.epnDict || {};
+    const expCols = expandColumns(mod.fields);
+    const fieldHeaders = expCols.map((c) => headerForColumn(c));
     const headers = [...metaHeaders, ...fieldHeaders];
     const colCount = headers.length;
 
@@ -271,9 +300,8 @@ export function buildWorkbook(model) {
         { text: s.statut, kind: 'text' },
         { text: s.auteur, kind: 'text' },
       ];
-      mod.fields.forEach((f) => {
-        const raw = s.scalars[f.key];
-        cells.push({ text: raw === '' ? '' : raw instanceof Date ? fmtDate(raw) : String(raw), kind: f.type });
+      expCols.forEach((c) => {
+        cells.push(cellForColumn(c, s, epnDict));
       });
       dataRows.push(cells);
     }
@@ -290,8 +318,12 @@ export function buildWorkbook(model) {
       writeValue(sheet.getCell(r, 2), s.periode, 'text');
       writeValue(sheet.getCell(r, 3), s.statut, 'text');
       writeValue(sheet.getCell(r, 4), s.auteur, 'text');
-      mod.fields.forEach((f, ci) => {
-        writeValue(sheet.getCell(r, 5 + ci), s.scalars[f.key], f.type, f);
+      let ci = 4;
+      expCols.forEach((c) => {
+        ci += 1;
+        const cell = cellForColumn(c, s, epnDict);
+        const field = c.kind === 'main' ? c.field : { type: 'text' };
+        writeValue(sheet.getCell(r, ci), cell.text, cell.kind, field);
       });
       r += 1;
     }
