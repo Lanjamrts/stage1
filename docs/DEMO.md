@@ -96,10 +96,11 @@ Ouvrir http://localhost:5173
 - **Actions** :
   - Onglet « Résultats » <!-- frontend/src/pages/admin1/CollectePage.jsx:238 --> → cocher « Régions » : `Analamanga` <!-- frontend/src/pages/admin1/CollectePage.jsx:273-284 -->
   - Cocher « Modules » : `Rapport d'activités` <!-- frontend/src/pages/admin1/CollectePage.jsx:306-316 -->
-  - Cliquer « Télécharger en Excel (.xlsx) » <!-- frontend/src/pages/admin1/CollectePage.jsx:223 -->
-  - Cliquer « Télécharger en PDF » <!-- frontend/src/pages/admin1/CollectePage.jsx:229 -->
+  - Cocher une ou deux lignes du tableau : case d'en-tête « Tout sélectionner », lien « Tout désélectionner » au-dessus du tableau <!-- frontend/src/pages/admin1/CollectePage.jsx:211,186 -->
+  - Cliquer sur le bouton de téléchargement Excel (libellé dynamique selon la sélection) <!-- frontend/src/pages/admin1/CollectePage.jsx:125-143 -->
+  - Cliquer sur le bouton de téléchargement PDF (id.) <!-- frontend/src/pages/admin1/CollectePage.jsx:125-143 -->
   - (Optionnel) Onglet « Historique des soumissions » <!-- frontend/src/pages/admin1/CollectePage.jsx:239 --> pour voir l'historique complet
-- **Résultat attendu** : Fichiers .xlsx (2 feuilles : « Données » + « Valeurs ») <!-- backend/src/controllers/collecteController.js:214,241 --> et .pdf téléchargés ; boutons de téléchargement visibles uniquement sur l'onglet « Résultats »
+- **Résultat attendu** : Fichiers .xlsx (2 feuilles : « Données » + « Valeurs ») <!-- backend/src/controllers/collecteController.js:214,241 --> et .pdf téléchargés ; le fichier .xlsx ne contient que les saisies sélectionnées quand une sélection est active ; boutons de téléchargement visibles uniquement sur l'onglet « Résultats »
 - **Ce qu'on dit** : « L'admin central télécharge les exports consolidés de toutes les régions, avec deux feuilles Excel (métadonnées + valeurs aplaties). Les filtres sont des cases à cocher Régions et Modules, pas de filtre Période. »
 
 ---

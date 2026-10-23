@@ -192,10 +192,10 @@ Aucun test automatique.
 **Procédure manuelle :**
 1. Se connecter en admin1 (`120344` / `Test@2026`), aller dans « Collecte et téléchargement »
 2. Sélectionner Régions : `Analamanga`, Modules : `RA`, Période : `Septembre 2026`
-3. Cliquer « Télécharger en Excel (.xlsx) » → téléchargement fichier `.xlsx` (2 feuilles : métadonnées + valeurs aplaties)
-4. Cliquer « Télécharger en PDF » → téléchargement fichier `.pdf` (une fiche par saisie)
+3. Cocher une ou deux lignes du tableau : un compteur de sélection et un lien « Tout désélectionner » s'affichent au-dessus du tableau, et la case d'en-tête « Tout sélectionner » permet de tout cocher d'un seul clic.
+4. Cliquer sur le bouton de téléchargement Excel → le fichier `.xlsx` ne contient que les saisies sélectionnées (ou tout ce qui est affiché si aucune case n'est cochée) ; idem pour le bouton PDF.
 5. Se connecter en admin2 (`108231`), aller dans « Consultation et téléchargement »
-6. Même sélection → Télécharger en Excel (.xlsx) et en PDF (admin2 ne voit que sa région Analamanga)
+6. Même sélection → télécharger en Excel et en PDF (admin2 ne voit que sa région Analamanga)
 7. Se connecter en consultant (`121775`), aller dans « Consultation des données »
 8. Vérifier qu'il n'y a AUCUN bouton de téléchargement (le consultant n'a pas le droit de télécharger)
 9. Ouvrir le fichier `.xlsx` : vérifier que la première feuille est intitulée « Synthèse » (titre, sous-titres « Ministère de l'Économie et des Finances — DGBF / SSEBF », date d'export, régions, modules, nombre de saisies), puis qu'il existe une feuille par module exporté (ex. « RA », « RH ») avec des colonnes lisibles (« Structure », « Période / Événement », « Auteur », « Statut », champs du gabarit) et les nombres alignés à droite. Pour un module à tableau (ex. « RH »), vérifier la présence d'une feuille de tableau par tableau de saisie avec une ligne par ligne de saisie.
