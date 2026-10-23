@@ -3,8 +3,10 @@ import express from 'express';
 import { z } from 'zod';
 
 import Module from '../models/Module.js';
+import Saisie from '../models/Saisie.js';
 import { requireRole, logAudit } from '../middleware/auth.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
+import { MODULES } from '../seed/modules.js';
 
 const OBJECT_ID = /^[0-9a-fA-F]{24}$/;
 const NOT_FOUND = 'Ressource introuvable.';
@@ -23,6 +25,7 @@ const FIELD_TYPES = [
 const PERIODICITIES = ['monthly', 'quarterly'];
 const KINDS = ['periodic', 'event'];
 const STRUCTURE_TYPES = ['SRB', 'SRSP', 'SRPE', 'CIRBF', 'DRBF', 'SSEBF', 'DGBF', 'CELLULE_INFO'];
+const BUILTIN_CODES = new Set(MODULES.map((m) => m.code));
 
 // Contrôle récursif de la structure des champs (types connus).
 function findFieldIssue(fields) {
@@ -160,6 +163,40 @@ router.patch(
     const doc = await Module.findByIdAndUpdate(id, { active }, { new: true });
     if (!doc) return res.status(404).json({ message: NOT_FOUND });
     return res.status(200).json({ id: String(doc._id), active: doc.active });
+  })
+);
+
+// DELETE /api/config/modules/:id — suppression définitive, developpeur uniquement
+router.delete(
+  '/:id',
+  asyncHandler(async (req, res) => {
+    const id = req.params.id;
+    if (!OBJECT_ID.test(id)) return res.status(404).json({ message: NOT_FOUND });
+    const doc = await Module.findById(id);
+    if (!doc) return res.status(404).json({ message: NOT_FOUND });
+
+    // c) rapport de départ : on ne le supprime pas, on le désactive
+    if (BUILTIN_CODES.has(doc.code)) {
+      return res.status(403).json({
+        message: 'Ce rapport fait partie des rapports de départ : désactivez-le plutôt.',
+      });
+    }
+
+    // d) une saisie y fait référence : blocage
+    const hasSaisie = await Saisie.exists({ moduleId: doc._id });
+    if (hasSaisie) {
+      return res.status(409).json({ message: 'Ce rapport contient des saisies : désactivez-le plutôt.' });
+    }
+
+    // e) confirmation par recopiage du code
+    const { confirmCode } = req.body || {};
+    if (!confirmCode || confirmCode !== doc.code) {
+      return res.status(400).json({ message: 'Le code saisi ne correspond pas.' });
+    }
+
+    await Module.findByIdAndDelete(doc._id);
+    await logAudit(req.user._id, 'module_delete', `module:${doc._id}`, req.ip);
+    return res.status(200).json({ id: String(doc._id), code: doc.code });
   })
 );
 

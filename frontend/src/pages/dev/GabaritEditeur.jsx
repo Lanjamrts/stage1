@@ -359,6 +359,7 @@ function FieldCard({ field, depth, onChange, onRemove }) {
 // aperçu avec le moteur de gabarits, et publication d'une nouvelle version.
 export default function GabaritEditeur() {
   const { id } = useParams();
+  const isCreation = !id || id === 'nouveau';
   const navigate = useNavigate();
   const { addToast } = useToast();
 
@@ -372,10 +373,27 @@ export default function GabaritEditeur() {
   const [busy, setBusy] = useState(false);
   const [options, setOptions] = useState({});
   const [epnItems, setEpnItems] = useState([]);
+  const [codeError, setCodeError] = useState(null);
 
   const sources = useMemo(() => sourcesOf(fields), [fields]);
 
   useEffect(() => {
+    if (isCreation) {
+      setMeta({
+        code: '',
+        label: '',
+        periodicity: 'monthly',
+        kind: 'event',
+        structureTypes: [],
+        active: true,
+      });
+      setFields([]);
+      setInitialFields([]);
+      setVersion(null);
+      setLoading(false);
+      setError(null);
+      return;
+    }
     let cancelled = false;
     setLoading(true);
     api(`/modules/${id}`)
@@ -445,6 +463,12 @@ export default function GabaritEditeur() {
     ]);
 
   const validateDraft = () => {
+    if (isCreation) {
+      if (!meta.code || !String(meta.code).trim()) return 'Le code du rapport est obligatoire.';
+      if (!KEY_RE.test(String(meta.code).trim()))
+        return 'Code de gabarit invalide (lettres, chiffres et _ ; doit commencer par une lettre).';
+      if (String(meta.code).trim().length > 16) return 'Le code est trop long (16 caractères maximum).';
+    }
     if (!meta || !meta.label.trim()) return 'Le libellé du gabarit est obligatoire.';
     if (fields.length === 0) return 'Le gabarit doit contenir au moins un champ.';
     const seen = new Set();
@@ -479,7 +503,39 @@ export default function GabaritEditeur() {
       addToast(issue, 'error');
       return;
     }
+    if (isCreation) {
+      await createModule();
+      return;
+    }
     setConfirmOpen(true);
+  };
+
+  const createModule = async () => {
+    setBusy(true);
+    setCodeError(null);
+    try {
+      const res = await api('/config/modules', {
+        method: 'POST',
+        body: {
+          code: String(meta.code).trim(),
+          label: meta.label,
+          periodicity: meta.periodicity,
+          kind: meta.kind,
+          structureTypes: meta.structureTypes,
+          fields,
+        },
+      });
+      addToast(`Rapport « ${res.code} » créé.`, 'success');
+      navigate('/parametrage');
+    } catch (err) {
+      if (err.status === 409) {
+        setCodeError(err.message || 'Ce code de gabarit existe déjà.');
+      } else {
+        addToast(err.message, 'error');
+      }
+    } finally {
+      setBusy(false);
+    }
   };
 
   const confirmPublish = async () => {
@@ -555,7 +611,7 @@ export default function GabaritEditeur() {
             >
               Paramétrage
             </button>{' '}
-            / {meta.label}
+            / {meta.label || (isCreation ? 'Nouveau rapport' : '')}
           </p>
           <button
             onClick={() => navigate('/parametrage')}
@@ -564,10 +620,14 @@ export default function GabaritEditeur() {
             <span aria-hidden="true">←</span> Retour à la liste
           </button>
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-[24px] font-semibold text-[#0B2A4A]">{meta.label}</h1>
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full border border-[#B8D2EF] bg-[#EBF3FC] text-xs font-semibold text-[#1F5FA8]">
-              Version {version}
-            </span>
+            <h1 className="text-[24px] font-semibold text-[#0B2A4A]">
+              {meta.label || (isCreation ? 'Nouveau rapport' : '')}
+            </h1>
+            {!isCreation && (
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full border border-[#B8D2EF] bg-[#EBF3FC] text-xs font-semibold text-[#1F5FA8]">
+                Version {version}
+              </span>
+            )}
             <span
               className={`inline-flex items-center px-2.5 py-0.5 rounded-full border text-xs font-semibold ${
                 meta.active
@@ -588,10 +648,35 @@ export default function GabaritEditeur() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-[13px] font-semibold text-[#0B2A4A] mb-1.5">
-              Code identifiant
+              Code identifiant <span className="text-[#B42318]">*</span>
             </label>
-            <input type="text" className={inputCls} value={meta.code} disabled />
-            <p className="text-xs text-[#8A94A6] mt-1">Identifiant pérenne généré par le système.</p>
+            <input
+              type="text"
+              className={inputCls}
+              value={meta ? meta.code : ''}
+              disabled={!isCreation}
+              maxLength={16}
+              onChange={(e) => {
+                setMetaField('code', e.target.value);
+                setCodeError(null);
+              }}
+            />
+            {codeError && (
+              <p className="text-xs text-[#B42318] mt-1">{codeError}</p>
+            )}
+            {!isCreation && meta && !KEY_RE.test(meta.code) && (
+              <p className="text-xs text-[#B42318] mt-1">
+                Lettres, chiffres et _ ; doit commencer par une lettre.
+              </p>
+            )}
+            {!isCreation && (
+              <p className="text-xs text-[#8A94A6] mt-1">Identifiant pérenne, non modifiable après création.</p>
+            )}
+            {isCreation && (
+              <p className="text-xs text-[#8A94A6] mt-1">
+                Identifiant pérenne du rapport ; ne peut plus être modifié après création.
+              </p>
+            )}
           </div>
           <div>
             <label className="block text-[13px] font-semibold text-[#0B2A4A] mb-1.5">
@@ -720,12 +805,13 @@ export default function GabaritEditeur() {
         />
       </div>
 
-      {/* Actions de publication */}
+      {/* Actions de publication / création */}
       <div className="flex flex-wrap items-center justify-end gap-3">
         <button
           onClick={() => {
             setFields(initialFields);
-            addToast('Modifications annulées.', 'success');
+            setMeta((m) => ({ ...m, label: '', code: isCreation ? m.code : m.code }));
+            addToast(isCreation ? 'Saisie annulée.' : 'Modifications annulées.', 'success');
           }}
           disabled={busy}
           className="h-[40px] px-4 rounded-lg border border-[#E3E8EF] text-sm font-medium hover:bg-[#F5F7FA] disabled:opacity-50"
@@ -737,7 +823,7 @@ export default function GabaritEditeur() {
           disabled={busy}
           className="h-[40px] px-5 rounded-lg bg-[#1F5FA8] hover:bg-[#174C87] text-white text-sm font-semibold disabled:opacity-60"
         >
-          {busy ? 'Publication…' : `Publier la version ${version + 1}`}
+          {busy ? (isCreation ? 'Création…' : 'Publication…') : isCreation ? 'Créer le rapport' : `Publier la version ${version + 1}`}
         </button>
       </div>
 

@@ -42,6 +42,7 @@ export const ROUTE_ROLES = {
   '/utilisateurs': ['admin1'],
   '/parametrage': ['developpeur'],
   '/parametrage/:id': ['developpeur'],
+  '/parametrage/nouveau': ['developpeur'],
   '/consultation-donnees': ['consultant'],
   '/consultation-donnees/:id': ['consultant'],
 };
