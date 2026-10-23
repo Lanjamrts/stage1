@@ -205,6 +205,27 @@ describe("ETAPE 30 — aperçu de l'export (POST /api/config/modules/preview-exp
     expect(res.status).toBe(400);
   });
 
+  it('code absent ou vide → 200 (code d’exemple utilisé pour l’aperçu)', async () => {
+    for (const format of ['pdf', 'sheets']) {
+      const res = await agents.dev.post('/api/config/modules/preview-export').send({
+        gabarit: {
+          code: '',
+          label: 'Sans code',
+          periodicity: 'monthly',
+          kind: 'event',
+          structureTypes: ['SRB'],
+          fields: [{ key: 'champ', label: 'Champ', type: 'text' }],
+        },
+        format,
+      });
+      expect(res.status).toBe(200, `${format} avec code vide`);
+      if (format === 'sheets') {
+        expect(res.body.sheets).toBeInstanceOf(Array);
+        expect(res.body.sheets.length).toBeGreaterThan(0);
+      }
+    }
+  });
+
   it('autres rôles ne peuvent pas prévisualiser : 403', async () => {
     const gabarit = modulePayload(raModule);
     for (const [role, agent] of Object.entries(agents)) {

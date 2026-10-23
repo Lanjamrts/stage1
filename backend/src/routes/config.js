@@ -135,7 +135,13 @@ router.post(
     if (!['pdf', 'sheets'].includes(format)) {
       return res.status(400).json({ message: 'Format requis : pdf ou sheets' });
     }
-    const parsed = createSchema.safeParse(gabarit || {});
+    // L'aperçu fonctionne avant la création du rapport : le code n'est pas
+    // obligatoire et n'a pas à être unique. S'il est absent ou vide, on utilise
+    // un code d'exemple. Toutes les autres validations (libellé, types de
+    // structure, champs) restent exigées.
+    const gabaritIn = gabarit || {};
+    const code = String(gabaritIn.code || '').trim() || 'APERCU';
+    const parsed = createSchema.safeParse({ ...gabaritIn, code });
     if (!parsed.success) return res.status(400).json({ message: firstIssue(parsed) });
     const data = parsed.data;
     const fieldIssue = findFieldIssue(data.fields);
@@ -156,6 +162,7 @@ router.post(
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', 'inline; filename="aperçu-export.pdf"');
       // Autoriser l'affichage dans un cadre (iframe) : aucun téléchargement, aucun fichier sur disque.
+      // Seul l'en-tête X-Frame-Options de cette route est levé ; le reste de l'API reste protégé.
       res.removeHeader('x-frame-options');
       const chunks = [];
       const doc = new PDFDocument({ margin: 42, size: 'A4', bufferPages: true });
