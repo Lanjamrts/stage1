@@ -237,6 +237,14 @@ export default function Parametrage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Modale de suppression (recopiage du code, comme GitHub)
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
+  const [deleteCode, setDeleteCode] = useState('');
+  const [deleteInput, setDeleteInput] = useState('');
+  const [deleteError, setDeleteError] = useState(null);
+  const [deleteBusy, setDeleteBusy] = useState(false);
+
   const load = async () => {
     setLoading(true);
     try {
@@ -267,6 +275,34 @@ export default function Parametrage() {
       await load();
     } catch (err) {
       addToast(err.message, 'error');
+    }
+  };
+
+  const deleteModule = (id, code) => {
+    setDeleteId(id);
+    setDeleteCode(code);
+    setDeleteInput('');
+    setDeleteError(null);
+    setDeleteOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    setDeleteBusy(true);
+    setDeleteError(null);
+    try {
+      await api(`/config/modules/${deleteId}`, {
+        method: 'DELETE',
+        body: { confirmCode: deleteInput },
+      });
+      addToast(`Rapport ${deleteCode} supprimé.`, 'success');
+      setDeleteOpen(false);
+      setDeleteId(null);
+      setDeleteCode('');
+      await load();
+    } catch (err) {
+      setDeleteError(err.message || 'Échec de la suppression.');
+    } finally {
+      setDeleteBusy(false);
     }
   };
 
@@ -316,6 +352,11 @@ export default function Parametrage() {
 
       {tab === 'gabarits' && (
         <>
+        <div className="flex items-center justify-between">
+          <Button variant="primary" onClick={() => navigate('/parametrage/nouveau')}>
+            Nouveau rapport
+          </Button>
+        </div>
         <div className="bg-white rounded-xl border border-[#E3E8EF] shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -375,6 +416,15 @@ export default function Parametrage() {
                           >
                             {m.active ? 'Désactiver' : 'Activer'}
                           </Button>
+                          {!m.builtin && (
+                            <Button
+                              variant="danger"
+                              size="sm"
+                              onClick={() => deleteModule(m.id, m.code)}
+                            >
+                              Supprimer
+                            </Button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -390,6 +440,57 @@ export default function Parametrage() {
           Une modification de canevas crée une nouvelle version. Les saisies déjà enregistrées
           gardent la version avec laquelle elles ont été créées.
         </div>
+
+        {/* Modale de suppression — recopiage du code (SPEC, confirmation explicite) */}
+        {deleteOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+            <div
+              className="absolute inset-0 bg-[#0B2A4A]/40"
+              onClick={deleteBusy ? undefined : () => setDeleteOpen(false)}
+            />
+            <div className="relative w-full max-w-[440px] bg-white rounded-xl border border-[#E3E8EF] shadow-card p-6">
+              <h2 className="text-[18px] font-semibold text-[#0B2A4A] mb-2">Supprimer le rapport</h2>
+              <p className="text-[15px] text-[#5B6778] leading-relaxed mb-4">
+                Cette action est définitive. Pour confirmer, recopiez le code du rapport :{' '}
+                <span className="font-semibold text-[#0B2A4A]">{deleteCode}</span>
+              </p>
+              {deleteError && (
+                <div className="rounded-lg border border-[#F6C7C3] bg-[#FEF3F2] px-4 py-3 text-sm text-[#B42318] mb-4">
+                  {deleteError}
+                </div>
+              )}
+              <input
+                type="text"
+                className={inputCls}
+                placeholder="Recopiez le code"
+                value={deleteInput}
+                onChange={(e) => setDeleteInput(e.target.value)}
+                maxLength={16}
+              />
+              <p className="text-xs text-[#5B6778] mt-2">
+                Le bouton est activé uniquement quand le code saisi correspond exactement.
+              </p>
+              <div className="flex justify-end gap-3 mt-6">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => setDeleteOpen(false)}
+                  disabled={deleteBusy}
+                >
+                  Annuler
+                </Button>
+                <Button
+                  type="button"
+                  variant="dangerSolid"
+                  onClick={confirmDelete}
+                  disabled={deleteBusy || deleteInput !== deleteCode}
+                >
+                  {deleteBusy ? 'Suppression…' : 'Supprimer définitivement'}
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
         </>
       )}
 

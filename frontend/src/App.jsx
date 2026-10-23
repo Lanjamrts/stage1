@@ -39,6 +39,7 @@ const PROTECTED_ROUTES = [
   { path: '/audit', element: <AuditJournal /> },
   { path: '/utilisateurs', element: <Utilisateurs /> },
   { path: '/parametrage', element: <Parametrage /> },
+  { path: '/parametrage/nouveau', element: <GabaritEditeur /> },
   { path: '/parametrage/:id', element: <GabaritEditeur /> },
   { path: '/consultation-donnees', element: <ConsultationDonnees /> },
   { path: '/consultation-donnees/:id', element: <ConsultationRapport /> },

@@ -289,3 +289,14 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 - menus.js : 15 émojis remplacés par des clés (dashboard, edit, folder, search, chat, users, chart, clipboard, settings). Libellés, paths et ordres inchangés. Consultant « Consultation des données » → 'chart' (distingue du 'dashboard').
 - AppShell.jsx : `<span className="text-lg">{item.icon}</span>` remplacé par `<Icon name={item.icon} className="w-5 h-5 shrink-0" />`. Import Icon ajouté. Rien d'autre modifié.
 - Aucune nouvelle dépendance. Pas de backend, pas de test, pas de changement de libellé/chemin/ordre.
+
+## Step 29 – Développeur : créer et supprimer un rapport (gabarit)
+
+- Backend `routes/config.js` : nouvelle route `DELETE /api/config/modules/:id`, réservée au développeur (requireRole). Règles dans l'ordre : id invalide → 404 ; module absent → 404 « Ressource introuvable. » ; code dans la liste `MODULES` de `seed/modules.js` (rapport de départ, pas de nouvelle colonne) → 403 « Ce rapport fait partie des rapports de départ : désactivez-le plutôt. » ; au moins une saisie référence le module (`Saisie.moduleId`) → 409 « Ce rapport contient des saisies : désactivez-le plutôt. » ; `confirmCode` absent ou différent du code exact (casse sensible) → 400 « Le code saisi ne correspond pas. » ; sinon suppression définitive → 200 `{ id, code }`.
+- Backend `routes/modules.js` : `GET /api/modules` et `GET /api/modules/:id` renvoient un booléen `builtin` calculé côté serveur à partir de la liste `MODULES` (indique les rapports de départ). Le POST création existe déjà (version 1, actif par défaut) et journalise `module_publish`.
+- Audit : une ligne `module_delete` est écrite à la suppression (qui, quel code, quand). La création journalise déjà `module_publish`. Liste des actions d'audit fermée en SPEC §8 : une seule action ajoutée (`module_delete`) — le strict minimum.
+- Frontend `App.jsx` + `menus.js` : route `/parametrage/nouveau` (rôle developpeur) réutilisant `GabaritEditeur.jsx`.
+- Frontend `GabaritEditeur.jsx` : mode création quand `id === 'nouveau'` (code éditable, `POST /api/config/modules`, bouton « Créer le rapport », erreur 409 affichée près du champ code) ; mode édition inchangé (code non modifiable, `PUT`, « Publier la version N »).
+- Frontend `Parametrage.jsx` : bouton « Nouveau rapport » ; bouton « Supprimer » par ligne, visible uniquement si `!m.builtin` ; modale de suppression « Supprimer le rapport » avec recopiage exact du code (bouton « Supprimer définitivement » en `dangerSolid` grisé tant que `deleteInput !== deleteCode`), message serveur affiché en cas de 403/409 sans fermer la modale, toast « Rapport <CODE> supprimé. » en succès.
+- `Button.jsx` : variante `dangerSolid` déjà existante, réutilisée. Aucune nouvelle dépendance.
+- Rapport de test créé manuellement dans `sigbd` puis supprimé ; aucun résidu.

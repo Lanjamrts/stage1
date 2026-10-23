@@ -2,8 +2,11 @@ import express from 'express';
 
 import Module from '../models/Module.js';
 import Structure from '../models/Structure.js';
+import { MODULES } from '../seed/modules.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { acceptedPeriodicities } from '../utils/periodicity.js';
+
+const BUILTIN_CODES = new Set(MODULES.map((m) => m.code));
 
 const router = express.Router();
 
@@ -42,6 +45,7 @@ router.get(
         structureTypes: m.structureTypes,
         version: m.version,
         active: m.active,
+        builtin: BUILTIN_CODES.has(m.code),
         ...(withFields ? { fields: m.fields } : {}),
       }))
     );
@@ -80,6 +84,7 @@ router.get(
       structureTypes: m.structureTypes,
       version: m.version,
       active: m.active,
+      builtin: BUILTIN_CODES.has(m.code),
       fields: m.fields,
     });
   })
