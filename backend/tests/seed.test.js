@@ -10,6 +10,8 @@ import JournalAudit from '../src/models/JournalAudit.js';
 import Utilisateur from '../src/models/Utilisateur.js';
 import Module from '../src/models/Module.js';
 import Profil from '../src/models/Profil.js';
+import Referentiel from '../src/models/Referentiel.js';
+import Saisie from '../src/models/Saisie.js';
 
 const URI = 'mongodb://127.0.0.1:27017/sigbd_seedcheck';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -53,9 +55,52 @@ describe('Seed split (reference vs demo)', { timeout: 120000 }, () => {
     expect(r2.status).toBe(0);
     const profils = await Profil.countDocuments();
     const modules = await Module.countDocuments();
+    const ministeres = await Referentiel.countDocuments({ type: 'ministeres' });
+    const epns = await Referentiel.countDocuments({ type: 'epn' });
     expect(profils).toBe(5);
     expect(modules).toBe(13);
-    expect(r2.stdout).toContain('0 crees');
+    expect(ministeres).toBe(32);
+    expect(epns).toBe(223);
+    expect(r1.stdout).toContain('Ministères : 32 créés, 0 déjà présents');
+    expect(r1.stdout).toContain('EPN : 223 créés, 0 déjà présents');
+    expect(r2.stdout).toContain('Ministères : 0 créés, 32 déjà présents');
+    expect(r2.stdout).toContain('EPN : 0 créés, 223 déjà présents');
+  });
+
+  it('S10 seed:ref : tous les EPN ont un ministere non vide', async () => {
+    await run('src/seed/reference.js');
+    const sansMinistere = await Referentiel.countDocuments({
+      type: 'epn',
+      $or: [{ ministere: { $in: [null, undefined] } }, { ministere: '' }],
+    });
+    expect(sansMinistere).toBe(0);
+  });
+
+  it('S11 seed:ref relance ne crée aucun doublon', async () => {
+    await run('src/seed/reference.js');
+    await run('src/seed/reference.js');
+    await run('src/seed/reference.js');
+    expect(await Referentiel.countDocuments({ type: 'ministeres' })).toBe(32);
+    expect(await Referentiel.countDocuments({ type: 'epn' })).toBe(223);
+  });
+
+  it('S12 seed:demo : aucune saisie ne référence un EPN absent du référentiel', async () => {
+    await run('src/seed/demo.js', ['--yes']);
+    const ncaModule = await Module.findOne({ code: 'NCA' });
+    const tseModule = await Module.findOne({ code: 'TSE' });
+    expect(ncaModule).not.toBeNull();
+    expect(tseModule).not.toBeNull();
+    const saisies = await Saisie.find({
+      moduleId: { $in: [ncaModule._id, tseModule._id] },
+    }).lean();
+    const epnReferentiel = await Referentiel.find({ type: 'epn' }).lean();
+    const epnValues = new Set(epnReferentiel.map((e) => e.value));
+    for (const s of saisies) {
+      const epn = s.values && s.values.epn;
+      if (epn) {
+        expect(epnValues.has(epn)).toBe(true);
+      }
+    }
   });
 
   it("S2 seed:ref n'ecrase pas un gabarit modifie", async () => {

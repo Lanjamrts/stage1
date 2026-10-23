@@ -20,7 +20,7 @@ import SaisieModel from '../models/Saisie.js';
 import RemarqueModel from '../models/Remarque.js';
 import { MODULES } from './modules.js';
 import { buildSaisies } from './saisies.js';
-import { ensureProfils, ensureModules } from './common.js';
+import { ensureProfils, ensureModules, ensureEpnReference } from './common.js';
 
 dotenv.config();
 const config = loadConfig();
@@ -54,11 +54,6 @@ const DIRECTIONS = [
 ];
 const SERVICES = ['Service des rapports', 'Service des ressources humaines', 'Service informatique'];
 const GRADES = ["Attache d'administration", 'Secretaire de bureau', "Agent d'execution"];
-const EPNS = [
-  'Centre de formation professionnelle d\'Analamanga',
-  'Centre de formation professionnelle d\'Atsinanana',
-  'Centre de formation professionnelle de Diana',
-];
 const STDS = [
   'Direction Regionale de l\'Education Nationale – Analamanga',
   'Direction Regionale de l\'Education Nationale – Atsinanana',
@@ -151,11 +146,17 @@ async function seed() {
   console.log(`${structureDocs.length} structures creees`);
 
   // 4. Referentiels
+  // Chargement des référentiels de référence : ministères et EPN (depuis data/init)
+  const epnRef = await ensureEpnReference({ apply: true });
+  if (!epnRef.success) {
+    console.error('Echec du chargement des référentiels ministères/EPN.');
+    process.exit(1);
+  }
+
   const referentiels = [];
   for (const d of DIRECTIONS) referentiels.push({ type: 'directions', value: d });
   for (const s of SERVICES) referentiels.push({ type: 'services', value: s });
   for (const g of GRADES) referentiels.push({ type: 'grades', value: g });
-  for (const e of EPNS) referentiels.push({ type: 'epn', value: e });
   for (const st of STDS) referentiels.push({ type: 'std', value: st });
   await ReferentielModel.insertMany(referentiels);
   console.log(`${referentiels.length} referentiels crees`);

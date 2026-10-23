@@ -11,6 +11,8 @@ Ouvrir http://localhost:5173
 
 **Avertissement** : le seed réinitialise les données de démo (toutes les saisies, utilisateurs, etc. sont recréées).
 
+Les saisies de démonstration (modules NCA et TSE) utilisent des EPN réels du référentiel de référence, chargés par `npm run seed:ref` (32 ministères, 223 EPN depuis `backend/data/init/epn.csv`).
+
 **Liste de contrôle** :
 - [ ] MongoDB lancé sur `mongodb://127.0.0.1:27017`
 - [ ] Ports 4000 (API) et 5173 (frontend) libres
