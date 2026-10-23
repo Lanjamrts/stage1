@@ -127,15 +127,33 @@ export async function listHistorique(req, res) {
 
 // ------------------------------------------------------------------ helpers export
 
+const MAX_EXPORT_IDS = 300;
+
 // Collecte la liste à exporter : uniquement exportee et archivee (SPEC §8),
 // avec les mêmes filtres que la liste (hors statut, forcé ci-dessous).
+// Si query.ids est fourni, l'export est restreint aux saisies dont l'id figure
+// dans la liste (périmètre rôle, statut, filtres régions/modules toujours
+// appliqués ; ids hors périmètre ou mauvais statut ignorés silencieusement).
 async function loadExportRows(user, query) {
   const filter = await buildFilter(user, query || {}, { ignoreStatut: true });
   if (filter === null || filter === 'invalid') return filter;
   const clauses = filter && filter.$and ? [...filter.$and] : [];
-  clauses.push({ status: { $in: ['exportee', 'archivee'] } });
+  let idsRestriction = false;
+  if (query.ids !== undefined) {
+    const ids = parseIdList(query.ids);
+    if (!ids) return 'invalid';
+    if (ids.length > MAX_EXPORT_IDS) return 'too_many';
+    clauses.push({ _id: { $in: ids } });
+    idsRestriction = true;
+  } else {
+    clauses.push({ status: { $in: ['exportee', 'archivee'] } });
+  }
   const finalFilter = { $and: clauses };
-  return populateAll(Saisie.find(finalFilter)).sort({ structureId: 1, updatedAt: 1 }).limit(5000);
+  const docs = await populateAll(Saisie.find(finalFilter))
+    .sort({ structureId: 1, updatedAt: 1 })
+    .limit(5000);
+  if (idsRestriction && docs.length === 0) return 'none_selected';
+  return docs;
 }
 
 // GET /api/collecte/export?format=xlsx|pdf
@@ -155,6 +173,12 @@ export async function exportCollecte(req, res) {
   }
   if (loaded === 'invalid') {
     return res.status(400).json({ message: 'Filtre invalide.' });
+  }
+  if (loaded === 'too_many') {
+    return res.status(400).json({ message: '300 saisies maximum par téléchargement.' });
+  }
+  if (loaded === 'none_selected') {
+    return res.status(400).json({ message: 'Aucune saisie sélectionnée à exporter.' });
   }
   const docs = loaded;
   const rows = docs.map((d) => serializeSaisie(d, user, { withFields: true }));
