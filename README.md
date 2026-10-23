@@ -84,7 +84,7 @@ Variables frontend (`.env`) :
 cd backend && npm run seed:ref
 ```
 
-Crée les profils et les 13 gabarits s'ils n'existent pas. Sûr en production. Ne supprime jamais rien.
+Crée les profils, les 13 gabarits de modules, les 32 ministères et les 223 EPN s'ils n'existent pas. Sûr en production. Ne supprime jamais rien. Un deuxième lancement ne crée aucun doublon.
 
 ```bash
 cd backend && npm run seed:demo
@@ -100,9 +100,12 @@ Après un seed:demo il faut se reconnecter.
 
 ### Mise en service (production)
 
-1. `npm run seed:ref`
-2. `npm run create-admin`
-3. Les référentiels réels seront importés à l'étape suivante du projet.
+1. `npm run seed:ref` — crée les profils, les 13 gabarits de modules, les 32 ministères et les 223 EPN (données de référence, idempotent, ne supprime rien).
+2. `npm run init:structures` — importe les régions et les structures (depuis `data/init/regions.csv` et `data/init/structures.csv`).
+3. `npm run init:periodes` — génère les périodes de collecte.
+4. `npm run create-admin` — crée le premier administrateur (production).
+
+Les référentiels de référence (ministères et EPN) sont chargés par `seed:ref` ; il n'est plus nécessaire de lancer `init:epn` manuellement.
 
 Archivage (script système, sans bouton d'interface) :
 
@@ -121,14 +124,14 @@ Le Rapport d'activités accepte une période mensuelle ou trimestrielle ; le tab
 Pour initialiser une base de production (ou de préproduction) avec les structures centrales, les régions et les structures régionales, utilisez une base dédiée (jamais la base de démo `sigbd`).
 
 1. Choisissez la base réelle, par exemple `sigbd_prod` (jamais la base de démo `sigbd`).
-2. `NODE_ENV=production MONGODB_URI=mongodb://127.0.0.1:27017/sigbd_prod npm run seed:ref` (profils et modules).
+2. `NODE_ENV=production MONGODB_URI=mongodb://127.0.0.1:27017/sigbd_prod npm run seed:ref` (profils, modules, 32 ministères et 223 EPN).
 3. Éditez `backend/data/init/regions.csv` et `backend/data/init/structures.csv` ; mettez `valide` à `oui` **uniquement après confirmation par le SSEBF**. Types acceptes dans structures.csv : SRB, SRSP, SRPE, CIRBF, DRBF.
 4. Vérifiez sans écrire : `NODE_ENV=production MONGODB_URI=mongodb://127.0.0.1:27017/sigbd_prod npm run init:structures`
 5. Écrivez : même commande avec `-- --apply` (refusé tant qu'une ligne a `valide=non`).
 6. `NODE_ENV=production MONGODB_URI=mongodb://127.0.0.1:27017/sigbd_prod npm run create-admin` (premier Admin 1, mot de passe provisoire affiché une seule fois).
 7. Connectez-vous en tant qu'Admin 1 et créez les vrais utilisateurs dans l'écran « Utilisateurs ».
 
-Les listes CSV proviennent de sources web non officielles et doivent être confirmées par le SSEBF. Les 3 structures centrales (SSEBF, DGBF, CELLULE_INFO) sont créées par le script. Les périodes seront gérées à l'étape 5. Les utilisateurs ne sont **pas** importés (ils sont saisis dans l'interface).
+Les listes CSV proviennent de sources web non officielles et doivent être confirmées par le SSEBF. Les 3 structures centrales (SSEBF, DGBF, CELLULE_INFO) sont créées par le script. Les périodes sont générées par `init:periodes` (voir « Générer les périodes »). Les utilisateurs ne sont **pas** importés (ils sont saisis dans l'interface).
 
 ## Générer les périodes
 

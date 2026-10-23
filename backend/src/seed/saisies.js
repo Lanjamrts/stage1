@@ -56,6 +56,46 @@ const RMI_VALUES = {
   ],
 };
 
+// NCA et TSE : le champ `epn` (source 'epn') doit contenir un nom exact present dans epn.csv.
+// Les membres des saisies NCA ont un "N° de mandat" valide (entier >= 1).
+const NCA_VALUES_1 = {
+  epn: 'Economic Development Board of Madagascar',
+  membres: [{ nom: 'Rakoto', prenom: 'Hery', qualite: 'Membre', mandat: 1 }],
+  ref_arrete: 'Décret n° 2026-001',
+  date_arrete: '2026-09-15',
+  duree_mandat: 3,
+  statut: 'En fonction',
+};
+
+const NCA_VALUES_2 = {
+  epn: 'Centre Hospitalier Universitaire Joseph Ravoahangy Andrianavalona',
+  membres: [{ nom: 'Randria', prenom: 'Jean', qualite: 'Président', mandat: 2 }],
+  ref_arrete: 'Décret n° 2026-002',
+  date_arrete: '2026-09-20',
+  duree_mandat: 3,
+  statut: 'En fonction',
+};
+
+const TSE_VALUES_1 = {
+  epn: 'Autorité de régulation des marchés publics',
+  date_demande: '2026-10-01',
+  nature: 'Salaires',
+  periode_concernee: 'Septembre 2026',
+  montant: 50000000,
+  statut: 'Effectué',
+  ref_piece: 'PIECE-2026-001',
+};
+
+const TSE_VALUES_2 = {
+  epn: 'Institut national de la statistique',
+  date_demande: '2026-10-02',
+  nature: 'Accessoires',
+  periode_concernee: 'T3 2026',
+  montant: 12000000,
+  statut: 'En cours',
+  ref_piece: 'PIECE-2026-002',
+};
+
 // { code, structure, im, periode, status, values, motif?, dates }
 const PLAN = [
   { code: 'RA', structure: 'SRB-ANL', im: '104562', periode: 'Octobre 2026', status: 'brouillon', values: RA_VALUES, created: late },
@@ -65,6 +105,10 @@ const PLAN = [
   { code: 'RH', structure: 'SRSP-ANL', im: '112470', periode: 'T3 2026', status: 'exportee', values: RH_VALUES, created: earlier, submitted: earlier, validated: late, exported: late },
   { code: 'RMI', structure: 'SRSP-ANL', im: '112470', periode: 'T3 2026', status: 'brouillon', values: { equipements: [RMI_VALUES.equipements[0]] }, created: late },
   { code: 'RH', structure: 'CIRBF-ANL', im: '115908', periode: 'T3 2026', status: 'archivee', values: RH_VALUES, created: earlier, submitted: earlier, validated: late, exported: late },
+  { code: 'NCA', structure: 'SRB-ANL', im: '104562', periode: 'Octobre 2026', status: 'soumise', values: NCA_VALUES_1, created: earlier, submitted: late },
+  { code: 'NCA', structure: 'SRB-ANL', im: '104562', periode: 'T3 2026', status: 'validee', values: NCA_VALUES_2, created: earlier, submitted: earlier, validated: late },
+  { code: 'TSE', structure: 'SRB-ANL', im: '104562', periode: 'Septembre 2026', status: 'brouillon', values: TSE_VALUES_1, created: late },
+  { code: 'TSE', structure: 'SRB-ANL', im: '104562', periode: 'T3 2026', status: 'soumise', values: TSE_VALUES_2, created: earlier, submitted: late },
   // Auteur système (SYS-0000) : régions sans utilisateur client réel
   { code: 'RA', structure: 'SRB-ATS', im: 'SYS-0000', periode: 'Septembre 2026', status: 'exportee', values: RA_VALUES, created: earlier, submitted: earlier, validated: late, exported: late },
   { code: 'RMI', structure: 'SRB-ATS', im: 'SYS-0000', periode: 'T3 2026', status: 'exportee', values: RMI_VALUES, created: earlier, submitted: earlier, validated: late, exported: late },
