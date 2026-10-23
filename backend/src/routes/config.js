@@ -1,12 +1,17 @@
 "use strict";
 import express from 'express';
+import PDFDocument from 'pdfkit';
 import { z } from 'zod';
 
 import Module from '../models/Module.js';
+import Referentiel from '../models/Referentiel.js';
 import Saisie from '../models/Saisie.js';
 import { requireRole, logAudit } from '../middleware/auth.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { MODULES } from '../seed/modules.js';
+import { buildExportModel } from '../services/exportModel.js';
+import { renderPdf } from '../services/exportPdf.js';
+import { buildExampleRow, buildSheets } from '../services/previewExport.js';
 
 const OBJECT_ID = /^[0-9a-fA-F]{24}$/;
 const NOT_FOUND = 'Ressource introuvable.';
@@ -118,6 +123,51 @@ router.post(
     });
     await logAudit(req.user._id, 'module_publish', `module:${doc._id}`, req.ip);
     return res.status(201).json({ id: String(doc._id), code: doc.code, version: doc.version });
+  })
+);
+
+// POST /api/config/modules/preview-export — aperçu de l'export (développeur uniquement)
+// Placé AVANT les routes en /:id pour ne pas être interprété comme un id.
+router.post(
+  '/preview-export',
+  asyncHandler(async (req, res) => {
+    const { gabarit, format } = req.body || {};
+    if (!['pdf', 'sheets'].includes(format)) {
+      return res.status(400).json({ message: 'Format requis : pdf ou sheets' });
+    }
+    const parsed = createSchema.safeParse(gabarit || {});
+    if (!parsed.success) return res.status(400).json({ message: firstIssue(parsed) });
+    const data = parsed.data;
+    const fieldIssue = findFieldIssue(data.fields);
+    if (fieldIssue) return res.status(400).json({ message: fieldIssue });
+
+    const epnDocs = await Referentiel.find({ type: 'epn' }).lean();
+    const epnDict = {};
+    for (const d of epnDocs) epnDict[String(d.value)] = { ministere: d.ministere || '', regime: d.regime || '' };
+    const epnValue = epnDocs.length ? epnDocs[0] : null;
+
+    const model = buildExportModel([buildExampleRow(data, epnValue)], {
+      filters: {},
+      generatedAt: new Date(),
+      epnDict,
+    });
+
+    if (format === 'pdf') {
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'inline; filename="aperçu-export.pdf"');
+      // Autoriser l'affichage dans un cadre (iframe) : aucun téléchargement, aucun fichier sur disque.
+      res.removeHeader('x-frame-options');
+      const chunks = [];
+      const doc = new PDFDocument({ margin: 42, size: 'A4', bufferPages: true });
+      doc.on('data', (c) => chunks.push(c));
+      doc.on('end', () => res.end(Buffer.concat(chunks)));
+      renderPdf(model, doc);
+      doc.end();
+      return;
+    }
+
+    const sheets = buildSheets(model);
+    return res.status(200).json({ sheets });
   })
 );
 

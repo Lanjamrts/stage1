@@ -26,6 +26,9 @@ const COLOR_ALT = '#F2F5F8';
 const COLOR_GRAY = '#555555';
 const COLOR_BODY = '#1A2433';
 
+// Bandeau visible sur chaque page d'aperçu : données d'exemple, rien de réel.
+export const PREVIEW_BANNER = 'APERÇU – DONNÉES D’EXEMPLE';
+
 function sanitize(s) {
   return String(s == null ? '' : s).replace(/[\u202f\u00a0]/g, ' ');
 }
@@ -66,7 +69,7 @@ export function rowHeight(doc, label, value, labelW, valueW, size = 8.5, padding
   return Math.max(h1, h2) + padding;
 }
 
-function drawPage1Header(doc) {
+function drawPage1Header(doc, preview = false) {
   const width = doc.page.width;
   const y0 = doc.y;
   const logoH = 64;
@@ -82,10 +85,15 @@ function drawPage1Header(doc) {
   );
   y += 14;
   doc.lineWidth(0.75).strokeColor(COLOR_HEADER).moveTo(PAGE_MARGIN, y).lineTo(width - PAGE_MARGIN, y).stroke();
-  doc.y = y + 14;
+  if (preview) {
+    doc.font('Helvetica-Bold').fontSize(10).fillColor('#B42318').text(sanitize(PREVIEW_BANNER), 0, y + 8, { width, align: 'center' });
+    doc.y = y + 22;
+  } else {
+    doc.y = y + 14;
+  }
 }
 
-function drawCompactHeader(doc) {
+function drawCompactHeader(doc, preview = false) {
   const width = doc.page.width;
   const x = PAGE_MARGIN;
   const y0 = doc.y;
@@ -98,7 +106,12 @@ function drawCompactHeader(doc) {
   );
   const lineY = y0 + 24 + 6;
   doc.lineWidth(0.75).strokeColor(COLOR_HEADER).moveTo(x, lineY).lineTo(width - x, lineY).stroke();
-  doc.y = lineY + 10;
+  if (preview) {
+    doc.font('Helvetica-Bold').fontSize(7.5).fillColor('#B42318').text(sanitize(PREVIEW_BANNER), x, lineY + 7, { width: width - 2 * x, align: 'center', lineBreak: false });
+    doc.y = lineY + 17;
+  } else {
+    doc.y = lineY + 10;
+  }
 }
 
 function ensureSpace(doc, needed) {
@@ -295,14 +308,14 @@ export function saisieBlockHeight(doc, mod, s, epnDict = {}) {
   return h;
 }
 
-export function renderPdf(model, doc) {
+export function renderPdf(model, doc, { preview = false } = {}) {
   doc.font('Helvetica');
   doc.on('pageAdded', () => {
-    drawCompactHeader(doc);
+    drawCompactHeader(doc, preview);
   });
 
   // ---------- page 1 : en-tête formel centré ----------
-  drawPage1Header(doc);
+  drawPage1Header(doc, preview);
 
   // ---------- sommaire page 1 ----------
   doc.font('Helvetica-Bold').fontSize(16).fillColor(COLOR_BODY)
