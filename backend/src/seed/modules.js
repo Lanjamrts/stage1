@@ -240,6 +240,16 @@ export const MODULES_GROUP_2 = [
           field('nom', 'Nom', 'text', { required: true }),
           field('prenom', 'Prénom', 'text', { required: true }),
           field('qualite', 'Qualité', 'text', { required: true }),
+          field(
+            'mandat',
+            'N° de mandat',
+            'integer',
+            {
+              required: true,
+              min: 1,
+              placeholder: '1 = premier mandat, 2 = deuxième mandat, etc.',
+            },
+          ),
         ],
       },
       field('ref_arrete', "Référence de l'arrêté", 'text', { required: true }),
