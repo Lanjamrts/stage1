@@ -308,3 +308,20 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
   - `sheets` : construit le classeur via `buildSheets` (réutilisant `expandColumns`/`headerForColumn`) et renvoie en JSON `{ sheets: [{ name, columns, rows }] }` (Synthèse + une feuille par module + une feuille par tableau). Mention « APERÇU – DONNÉES D’EXEMPLE » dans la feuille Synthèse.
 - Frontend `GabaritEditeur.jsx` : bouton « Aperçu de l'export » (disponible en création et modification, état courant), ouvre un panneau avec onglets « PDF » et « Excel ». PDF : blob URL en mémoire dans une iframe (aucun téléchargement, `revokeObjectURL` à la fermeture/changement d'onglet). Excel : un tableau HTML par feuille avec sous-onglets, légende « Représentation de la structure de l’Excel (le style exact n’est pas montré) ». Bouton « Actualiser l'aperçu » régénère depuis l'état courant. Erreur affichée en français si le gabarit est invalide.
 - `Button.jsx` : variantes déjà existantes (secondary, dangerSolid), réutilisées. Aucune nouvelle dépendance.
+
+## Step 31 – Nouveau logo
+
+- Fichier maître fourni par l'utilisateur : frontend/public/icone.png (1369x1149, RGB, 1 605 674 octets, non carré) déplacé vers frontend/assets-src/icon-original.png (suivi par git). Proportions conservées, pas de déformation ; complété avec de la transparence pour obtenir des carrés.
+- Fichiers dérivés générés avec Pillow (LANCZOS, fond transparent préservé) :
+  - frontend/public/icon-128.png : 128x128 RGBA, 30 646 octets (Logo 1x)
+  - frontend/public/icon-256.png : 256x256 RGBA, 113 444 octets (Logo 2x et copie backend/assets/icon.png)
+  - frontend/public/favicon.png : 64x64 RGBA, 7 825 octets
+  - frontend/public/apple-touch-icon.png : 180x180 RGBA, 58 972 octets
+  - backend/assets/icon.png : 256x256 RGBA, 113 444 octets (PDF, en-tête height: 64 pt, pied width: 24 pt, proportions préservées)
+- Ancien logo supprimé (git rm) : frontend/public/emblem-128.png, frontend/public/emblem-256.png, backend/assets/emblem.png, frontend/assets-src/emblem-original.png.
+- Plus aucune référence à emblem/emblème dans le code, les tests ni les docs hors historique de DECISIONS.md (pas réécrit).
+- Logo.jsx : src="/icon-128.png", srcSet="/icon-128.png 1x, /icon-256.png 2x", alt inchangé, fallback badge "MEF" conservé.
+- exportPdf.js : EMBLEM_PATH/emblemFile() renommés LOGO_PATH/logoFile() pointant vers backend/assets/icon.png ; message d'erreur mis à jour.
+- index.html : inchangé (mêmes noms /favicon.png et /apple-touch-icon.png).
+- SPEC.md ligne 16 mise à jour (nouveaux fichiers livrés).
+- Aucune nouvelle dépendance npm.
