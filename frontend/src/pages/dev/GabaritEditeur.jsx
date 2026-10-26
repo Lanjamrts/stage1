@@ -1047,7 +1047,6 @@ export default function GabaritEditeur() {
                   title="Aperçu PDF"
                   src={previewPdfUrl}
                   className="w-full h-[600px] rounded-lg border border-[#E3E8EF]"
-                  sandbox="allow-same-origin allow-scripts"
                 />
               )}
               {previewTab === 'sheets' && !previewLoading && !previewError && previewSheets && (
