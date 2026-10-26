@@ -1,7 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { api } from '../../api.js';
 import { useToast } from '../../components/Common/Toast/Toast.jsx';
+import Button from '../../components/Common/Button.jsx';
 import DynamicForm from '../../components/Form/DynamicForm.jsx';
 import { sourcesOf } from '../../lib/sources.js';
 
@@ -373,7 +374,15 @@ export default function GabaritEditeur() {
   const [busy, setBusy] = useState(false);
   const [options, setOptions] = useState({});
   const [epnItems, setEpnItems] = useState([]);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewTab, setPreviewTab] = useState('pdf');
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [previewError, setPreviewError] = useState(null);
+  const [previewPdfUrl, setPreviewPdfUrl] = useState(null);
+  const [previewSheets, setPreviewSheets] = useState(null);
+  const [activeSheetName, setActiveSheetName] = useState(null);
   const [codeError, setCodeError] = useState(null);
+  const previewAbort = useRef(null);
 
   const sources = useMemo(() => sourcesOf(fields), [fields]);
 
@@ -562,6 +571,91 @@ export default function GabaritEditeur() {
       setBusy(false);
     }
   };
+
+  const gabaritPayload = () => ({
+    code: meta ? meta.code : '',
+    label: meta ? meta.label : '',
+    periodicity: meta ? meta.periodicity : 'monthly',
+    kind: meta ? meta.kind : 'event',
+    structureTypes: meta ? meta.structureTypes : [],
+    fields,
+  });
+
+  // Génère l'aperçu pour le format donné. Annule toute requête précédente pour
+  // éviter qu'une réponse périmée écrase l'état quand l'utilisateur change
+  // d'onglet ou clique sur « Actualiser l'aperçu » rapidement.
+  const refreshPreview = async (format) => {
+    if (previewAbort.current) {
+      previewAbort.current.abort();
+    }
+    const controller = new AbortController();
+    previewAbort.current = controller;
+
+    setPreviewLoading(true);
+    setPreviewError(null);
+    try {
+      const res = await fetch('/api/config/modules/preview-export', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        signal: controller.signal,
+        body: JSON.stringify({ gabarit: gabaritPayload(), format }),
+      });
+      if (!res.ok) {
+        let msg = 'Erreur de génération de l’aperçu.';
+        try {
+          const d = await res.json();
+          if (d.message) msg = d.message;
+        } catch {}
+        throw new Error(msg);
+      }
+      if (controller.signal.aborted) return;
+      if (format === 'pdf') {
+        const buf = await res.arrayBuffer();
+        const blob = new Blob([buf], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        setPreviewPdfUrl(url);
+        setPreviewSheets(null);
+      } else {
+        const data = await res.json();
+        if (controller.signal.aborted) return;
+        setPreviewSheets(data.sheets || []);
+        setPreviewPdfUrl(null);
+        if (data.sheets && data.sheets.length && !activeSheetName) {
+          setActiveSheetName(data.sheets[0].name);
+        }
+      }
+    } catch (err) {
+      if (err.name === 'AbortError') return;
+      setPreviewError(err.message || 'Erreur de génération de l’aperçu.');
+      setPreviewPdfUrl(null);
+      setPreviewSheets(null);
+    } finally {
+      if (previewAbort.current === controller) previewAbort.current = null;
+      setPreviewLoading(false);
+    }
+  };
+
+  const openPreview = (format) => {
+    setActiveSheetName(null);
+    setPreviewTab(format);
+    setPreviewOpen(true);
+    refreshPreview(format);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (previewAbort.current) previewAbort.current.abort();
+      if (previewPdfUrl) URL.revokeObjectURL(previewPdfUrl);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!previewOpen && previewPdfUrl) {
+      URL.revokeObjectURL(previewPdfUrl);
+      setPreviewPdfUrl(null);
+    }
+  }, [previewOpen]);
 
   // Diff de publication : champs ajoutés / modifiés / retirés (zip e_publication).
   const publishDiff = (() => {
@@ -786,9 +880,19 @@ export default function GabaritEditeur() {
       <div className="bg-white rounded-xl border border-[#E3E8EF] shadow-sm p-6">
         <div className="flex items-center justify-between mb-1">
           <h2 className="text-[15px] font-semibold text-[#0B2A4A]">Aperçu du formulaire</h2>
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full border border-[#E3E8EF] bg-[#F5F7FA] text-xs font-semibold text-[#5B6778]">
-            Vue usager
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full border border-[#E3E8EF] bg-[#F5F7FA] text-xs font-semibold text-[#5B6778]">
+              Vue usager
+            </span>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => openPreview('pdf')}
+              disabled={previewLoading}
+            >
+              Aperçu de l'export
+            </Button>
+          </div>
         </div>
         <p className="text-xs text-[#5B6778] mb-4">
           L'aperçu se met à jour à chaque modification.
@@ -885,6 +989,137 @@ export default function GabaritEditeur() {
               >
                 {busy ? 'Publication…' : 'Publier'}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Panneau d'aperçu de l'export (PDF / Excel, sans téléchargement) */}
+      {previewOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+          <div
+            className="absolute inset-0 bg-[#0B2A4A]/40"
+            onClick={() => setPreviewOpen(false)}
+          />
+          <div className="relative w-full max-w-[720px] bg-white rounded-xl border border-[#E3E8EF] shadow-card p-6 max-h-[90vh] flex flex-col">
+            <div className="flex items-center justify-between mb-3 shrink-0">
+              <h2 className="text-[18px] font-semibold text-[#0B2A4A]">Aperçu de l'export</h2>
+              <button
+                onClick={() => setPreviewOpen(false)}
+                className="h-[32px] px-3 rounded-lg border border-[#E3E8EF] text-xs font-semibold text-[#1A2433] hover:bg-[#F5F7FA] shrink-0"
+              >
+                Fermer
+              </button>
+            </div>
+            <div className="flex gap-1 shrink-0 border-b border-[#E3E8EF] mb-3">
+              <button
+                onClick={() => openPreview('pdf')}
+                className={`px-4 py-2 text-sm font-semibold border-b-2 ${
+                  previewTab === 'pdf'
+                    ? 'border-[#1F5FA8] text-[#1F5FA8]'
+                    : 'border-transparent text-[#5B6778] hover:text-[#0B2A4A]'
+                } shrink-0`}
+              >
+                PDF
+              </button>
+              <button
+                onClick={() => openPreview('sheets')}
+                className={`px-4 py-2 text-sm font-semibold border-b-2 ${
+                  previewTab === 'sheets'
+                    ? 'border-[#1F5FA8] text-[#1F5FA8]'
+                    : 'border-transparent text-[#5B6778] hover:text-[#0B2A4A]'
+                } shrink-0`}
+              >
+                Excel
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto mb-4 min-h-[300px]">
+              {previewLoading && (
+                <p className="text-[#5B6778] text-sm text-center pt-10">Génération de l’aperçu…</p>
+              )}
+              {previewError && !previewLoading && (
+                <div className="rounded-lg border border-[#F6C7C3] bg-[#FEF3F2] px-4 py-3 text-sm text-[#B42318]">
+                  {previewError}
+                </div>
+              )}
+              {previewTab === 'pdf' && !previewLoading && !previewError && previewPdfUrl && (
+                <iframe
+                  title="Aperçu PDF"
+                  src={previewPdfUrl}
+                  className="w-full h-[600px] rounded-lg border border-[#E3E8EF]"
+                />
+              )}
+              {previewTab === 'sheets' && !previewLoading && !previewError && previewSheets && (
+                <>
+                  {previewSheets.length === 0 && (
+                    <p className="text-[#5B6778] text-sm text-center pt-10">Aucune feuille à afficher.</p>
+                  )}
+                  {previewSheets.length > 0 && (
+                    <div className="space-y-4">
+                      <div className="flex gap-1 overflow-x-auto mb-3 shrink-0">
+                        {previewSheets.map((s) => (
+                          <button
+                            key={s.name}
+                            onClick={() => setActiveSheetName(s.name)}
+                            className={`px-3 py-1.5 text-xs font-semibold border rounded-lg ${
+                              activeSheetName === s.name
+                                ? 'bg-[#EBF3FC] border-[#1F5FA8] text-[#1F5FA8]'
+                                : 'border-[#D6DCE5] bg-white text-[#1A2433] hover:bg-[#F5F7FA]'
+                            } shrink-0`}
+                          >
+                            {s.name}
+                          </button>
+                        ))}
+                      </div>
+                      {activeSheetName && (
+                        <div className="overflow-x-auto border border-[#E3E8EF] rounded-lg">
+                          <table className="w-full text-sm border-collapse">
+                            <thead>
+                              <tr className="bg-[#F5F7FA] text-left">
+                                {(previewSheets.find((s) => s.name === activeSheetName)?.columns || []).map((c) => (
+                                  <th key={c} className="px-3 py-2 font-semibold text-[#0B2A4A] border-b border-[#E3E8EF]">
+                                    {c}
+                                  </th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {(previewSheets.find((s) => s.name === activeSheetName)?.rows || []).map((row, ri) => (
+                                <tr key={ri} className="border-b border-[#E3E8EF]">
+                                  {row.map((cell, ci) => (
+                                    <td key={ci} className="px-3 py-2 border-r border-[#E3E8EF] last:border-0 text-[#1A2433]">
+                                      {cell == null ? '' : cell}
+                                    </td>
+                                  ))}
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                          <p className="text-xs text-[#5B6778] mt-2">
+                            Représentation de la structure de l’Excel (le style exact n’est pas montré).
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </>
+              )}
+              {previewTab === 'pdf' && !previewLoading && !previewError && !previewPdfUrl && (
+                <p className="text-[#5B6778] text-sm text-center pt-10">Aucun aperçu PDF disponible.</p>
+              )}
+              {previewTab === 'sheets' && !previewLoading && !previewError && !previewSheets && (
+                <p className="text-[#5B6778] text-sm text-center pt-10">Aucun aperçu Excel disponible.</p>
+              )}
+            </div>
+            <div className="flex justify-end gap-3 mt-4 shrink-0">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => refreshPreview(previewTab)}
+                disabled={previewLoading}
+              >
+                Actualiser l'aperçu
+              </Button>
             </div>
           </div>
         </div>

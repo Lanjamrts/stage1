@@ -142,6 +142,7 @@ Les saisies de démonstration (modules NCA et TSE) utilisent des EPN réels du r
   - Cliquer sur un module (ex. RA) → éditeur de champs
   - « Annuler les modifications » <!-- frontend/src/pages/dev/GabaritEditeur.jsx:727 -->
   - « Publier la version N+1 » <!-- frontend/src/pages/dev/GabaritEditeur.jsx:734 -->
+  - « Aperçu de l'export » → montre, avec des données d'exemple, à quoi ressembleront l'export PDF et l'export Excel du gabarit en cours (même non publié) ; aucun téléchargement, rien n'est enregistré <!-- frontend/src/pages/dev/GabaritEditeur.jsx -->
   - Un rapport créé par le développeur peut être supprimé (confirmation par recopiage du code) ; les rapports de départ (NCA, RA, …) n'ont pas de bouton « Supprimer », seulement « Activer/Désactiver ».
 - **Résultat attendu** : Version du module incrémentée, champs modifiés publiés
 - **Ce qu'on dit** : « Le développeur gère les gabarits (versions, activation, champs) sans coder. »
