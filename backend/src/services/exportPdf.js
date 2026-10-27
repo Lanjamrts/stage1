@@ -14,7 +14,7 @@ import {
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = join(__filename, '..');
-const EMBLEM_PATH = join(__dirname, '..', '..', 'assets', 'emblem.png');
+const LOGO_PATH = join(__dirname, '..', '..', 'assets', 'icon.png');
 
 const PAGE_WIDTH = 595;
 const PAGE_HEIGHT = 842;
@@ -33,11 +33,11 @@ function sanitize(s) {
   return String(s == null ? '' : s).replace(/[\u202f\u00a0]/g, ' ');
 }
 
-function emblemFile() {
-  if (!existsSync(EMBLEM_PATH)) {
-    throw new Error(`Fichier introuvable : ${EMBLEM_PATH} — copiez frontend/public/emblem-128.png vers backend/assets/emblem.png`);
+function logoFile() {
+  if (!existsSync(LOGO_PATH)) {
+    throw new Error(`Fichier introuvable : ${LOGO_PATH} — copiez frontend/public/icon-256.png vers backend/assets/icon.png`);
   }
-  return EMBLEM_PATH;
+  return LOGO_PATH;
 }
 
 function wrapLines(doc, text, width, size) {
@@ -75,7 +75,7 @@ function drawPage1Header(doc, preview = false) {
   const logoH = 64;
   const logoW = 64;
   const logoX = (width - logoW) / 2;
-  doc.image(emblemFile(), logoX, y0, { height: logoH });
+  doc.image(logoFile(), logoX, y0, { height: logoH });
   let y = y0 + logoH + 10;
   doc.font('Helvetica-Bold').fontSize(20).fillColor(COLOR_HEADER).text('SIGBD', 0, y, { width, align: 'center' });
   y += 26;
@@ -97,7 +97,7 @@ function drawCompactHeader(doc, preview = false) {
   const width = doc.page.width;
   const x = PAGE_MARGIN;
   const y0 = doc.y;
-  doc.image(emblemFile(), x, y0, { width: 24 });
+  doc.image(logoFile(), x, y0, { width: 24 });
   const textX = x + 24 + 10;
   const textY = y0 + (24 - 8) / 2;
   doc.font('Helvetica').fontSize(8).fillColor(COLOR_GRAY).text(

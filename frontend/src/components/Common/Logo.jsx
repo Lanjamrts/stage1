@@ -3,8 +3,9 @@ import React, { useState } from 'react';
 const PRESETS = { sm: 32, md: 48, lg: 64 };
 const TEXT_SIZE = { sm: 'text-base', md: 'text-lg', lg: 'text-[22px]' };
 
-// Official emblem of the Ministry. If the image cannot load, a "MEF" badge is shown
-// instead, so the site never displays a broken image.
+// Logo du Ministère (fichier maître : frontend/assets-src/icon-original.png).
+// Si l'image ne peut pas charger, un badge "MEF" est affiché à la place,
+// pour que le site ne montre jamais d'image cassée.
 export default function Logo({ size = 'md', withText = false, variant = 'dark', className = '' }) {
   const [failed, setFailed] = useState(false);
   const px = typeof size === 'number' ? size : PRESETS[size] || PRESETS.md;
@@ -25,8 +26,8 @@ export default function Logo({ size = 'md', withText = false, variant = 'dark', 
         </div>
       ) : (
         <img
-          src="/emblem-128.png"
-          srcSet="/emblem-128.png 1x, /emblem-256.png 2x"
+          src="/icon-128.png"
+          srcSet="/icon-128.png 1x, /icon-256.png 2x"
           alt={label}
           width={px}
           height={px}
