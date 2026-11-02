@@ -143,7 +143,7 @@ export default function AppShell({ children }) {
                   `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive
                     ? 'bg-[#1F5FA8] text-white shadow-sm'
                     : 'text-white/80 hover:bg-white/10 hover:text-white'
-                  }`
+                }`
                 }
               >
                 <Icon name={item.icon} className="w-5 h-5 shrink-0" />

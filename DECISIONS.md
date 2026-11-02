@@ -325,3 +325,17 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 - index.html : inchangé (mêmes noms /favicon.png et /apple-touch-icon.png).
 - SPEC.md ligne 16 mise à jour (nouveaux fichiers livrés).
 - Aucune nouvelle dépendance npm.
+
+## Step 32 – Modules en menu latéral (client) + tableau de bord institutionnel
+
+- `frontend/src/menus.js` : `ROLE_MENUS.client` = « Tableau de bord » (/), « Modules » (/modules), « Mes saisies » (/mes-saisies) ; `ROUTE_ROLES['/modules'] = ['client']` et `ROUTE_ROLES['/modules/:code'] = ['client']`. Les autres rôles et routes sont inchangés.
+- `frontend/src/components/Layout/AppShell.jsx` : rendu simple de la barre latérale (`menuItems.map(NavLink)`) pour tous les rôles ; pas de groupe déroulant, pas de chargement de modules/périodes/saisies dans la barre latérale, pas de pastilles ni de localStorage (testé à l'étape 32.1 puis abandonné car illisible : noms tronqués, barre de défilement).
+- `frontend/src/lib/clientModules.js` (nouveau) : calculs partagés sans état (période courante, jours de retard, lignes de rapports attendus, action par ligne, 4 compteurs, estRemis) réutilisés par ModulesPage, ModulePage et ClientDashboard.
+- `frontend/src/pages/client/ModulesPage.jsx` (nouveau) : route `/modules`, rôle client uniquement ; tableau « Modules » (code/libellé, périodicité, période et échéance avec badge « En retard de N jours », statut, action Saisir/Continuer/Corriger/Consulter/Nouvelle saisie) + recherche (code/libellé, insensible à la casse et aux accents) + filtres rapides (Tous · À faire · En retard · Rejetés · Remis, nombre entre parenthèses) mémorisés dans l'URL (?filtre=&q=) ; lien du nom du module vers /modules/:code ; message « Aucun module ne correspond à votre recherche. » si vide ; modale NouvelleSaisieModal.
+- `frontend/src/pages/client/ModulePage.jsx` : fil d'Ariane « Modules › CODE » + lien « ← Retour aux modules ».
+- `frontend/src/pages/client/ClientDashboard.jsx` : suppression du bloc « Mes modules » ; bienvenue « Choisissez un module dans le menu Modules pour commencer. » + bouton « Aller aux modules » quand aucune saisie ; alertes (libellés de modules/échéances en liens vers /modules/:code, « Corriger » vers /mes-saisies?statut=rejetee), 4 compteurs ; ajout : « Avancement de la période en cours » (barre progression role progressbar, aria-valuenow), « Prochaines échéances » (lien « Voir tous les modules »), « Activité récente ».
+- Accessibilité : filtres = boutons avec aria-pressed ; champ de recherche avec label ; tableau avec en-têtes.
+- Aucun texte en anglais visible ; aucune donnée inventée ; aucun backend ni schéma modifié (GET /api/modules, /api/periodes, /api/saisies réutilisés).
+- Aucun outil de test frontend ajouté (n'existe pas dans le dépôt).
+- RECETTE.md et docs/DEMO.md mises à jour : parcours client = menu Modules → page Modules → un module → saisie ; tableau de bord = avancement, échéances, activité.
+
