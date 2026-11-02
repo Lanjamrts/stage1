@@ -39,9 +39,10 @@ Les saisies de démonstration (modules NCA et TSE) utilisent des EPN réels du r
 ### 1. Le Client crée une saisie pour Septembre 2026 (2 min)
 
 - **Compte** : Client — `104562`
-- **Écran** : « Tableau de bord », puis menu latéral « Modules » <!-- frontend/src/components/Layout/AppShell.jsx -->
+- **Écran** : « Tableau de bord », puis menu latéral « Modules » <!-- frontend/src/menus.js -->
 - **Actions** :
-  - Cliquer sur « Modules » dans le menu latéral, puis « RA – Rapport d'activités » <!-- frontend/src/components/Layout/AppShell.jsx -->
+  - Cliquer sur « Modules » dans le menu latéral (ouvre la page « Modules » en zone principale) <!-- frontend/src/pages/client/ModulesPage.jsx -->
+  - Cliquer sur « RA – Rapport d'activités » dans le tableau <!-- frontend/src/pages/client/ModulesPage.jsx -->
   - Sur la carte « Période en cours », cliquer « Saisir », Période : « Septembre 2026 » (mensuelle), « Commencer la saisie » <!-- frontend/src/pages/client/ModulePage.jsx -->
   - Remplir quelques champs (ex. « Activités réalisées », « Indicateurs de performance »)
   - Cliquer « Enregistrer » <!-- frontend/src/components/Form/NouvelleSaisieModal.jsx:194 -->

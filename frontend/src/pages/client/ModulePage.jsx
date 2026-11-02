@@ -1,15 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { api, formatDate, formatDateTime } from '../../api.js';
+import { PERIODICITY_LABELS } from '../../lib/clientModules.js';
 import StatusBadge from '../../components/Common/StatusBadge.jsx';
 import NouvelleSaisieModal from '../../components/Form/NouvelleSaisieModal.jsx';
 import Button from '../../components/Common/Button.jsx';
-
-const PERIODICITY_LABELS = {
-  monthly: 'Mensuelle',
-  quarterly: 'Trimestrielle',
-  event: 'Événement',
-};
 
 // Carte « Période en cours » : même logique d'action que le tableau de bord client.
 const actionFor = (saisie, isEvent) => {
@@ -145,8 +140,9 @@ export default function ModulePage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <Link to="/" className="text-sm text-[#1F5FA8] hover:underline">
-            ← Retour au tableau de bord
+          <Link to="/modules" className="text-sm text-[#1F5FA8] hover:underline">Modules</Link>{' › '}
+          <Link to={`/modules/${module.code}`} className="text-sm text-[#5B6778]">
+            {module.code}
           </Link>
           <h1 className="text-[24px] font-semibold text-[#0B2A4A] mt-1">
             {module.code} — {module.label}
@@ -156,9 +152,12 @@ export default function ModulePage() {
             {isEvent ? ' · module d\'événement' : ''}
           </p>
         </div>
-        {saisie && (
-          <StatusBadge status={saisie.status} />
-        )}
+        <div className="flex items-center gap-2">
+          <Link to="/modules" className="text-sm text-[#1F5FA8] hover:underline">
+            ← Retour aux modules
+          </Link>
+          {saisie && <StatusBadge status={saisie.status} />}
+        </div>
       </div>
 
       {/* Carte « Période en cours » (modules périodiques) */}

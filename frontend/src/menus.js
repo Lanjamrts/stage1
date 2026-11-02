@@ -3,7 +3,7 @@
 export const ROLE_MENUS = {
   client: [
     { label: 'Tableau de bord', path: '/', icon: 'dashboard' },
-    { label: 'Modules', type: 'group', icon: 'folder', path: '/modules' },
+    { label: 'Modules', path: '/modules', icon: 'folder' },
     { label: 'Mes saisies', path: '/mes-saisies', icon: 'edit' },
   ],
   admin2: [
@@ -34,6 +34,7 @@ export const ROUTE_ROLES = {
   '/': ['client', 'admin1', 'consultant'],
   '/mes-saisies': ['client'],
   '/mes-saisies/:id': ['client'],
+  '/modules': ['client'],
   '/modules/:code': ['client'],
   '/donnees-saisies': ['admin2'],
   '/donnees-saisies/:id': ['admin2'],

@@ -11,6 +11,7 @@ import AccessDenied from './pages/AccessDenied.jsx';
 import SessionExpired from './pages/SessionExpired.jsx';
 import HomePage from './pages/HomePage.jsx';
 import MesSaisies from './pages/client/MesSaisies.jsx';
+import ModulesPage from './pages/client/ModulesPage.jsx';
 import ModulePage from './pages/client/ModulePage.jsx';
 import SaisieDetail from './pages/client/SaisieDetail.jsx';
 import DonneesSaisies from './pages/admin2/DonneesSaisies.jsx';
@@ -32,6 +33,7 @@ const PROTECTED_ROUTES = [
   { path: '/', element: <HomePage /> },
   { path: '/mes-saisies', element: <MesSaisies /> },
   { path: '/mes-saisies/:id', element: <SaisieDetail /> },
+  { path: '/modules', element: <ModulesPage /> },
   { path: '/modules/:code', element: <ModulePage /> },
   { path: '/donnees-saisies', element: <DonneesSaisies /> },
   { path: '/donnees-saisies/:id', element: <RevueSaisie /> },

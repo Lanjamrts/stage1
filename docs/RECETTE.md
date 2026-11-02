@@ -83,7 +83,7 @@ Aucun test automatique.
 
 **Procédure manuelle :**
 1. Se connecter en client (`104562` / `Test@2026`)
-2. Dans le menu latéral, cliquer sur « Modules », puis sur « RA – Rapport d'activités »
+2. Dans le menu latéral, cliquer sur « Modules », puis sélectionner le module « RA » (Rapport d'activités) dans le tableau
 3. Sur la carte « Période en cours », cliquer « Saisir », choisir Période « Septembre 2026 » (mensuelle), cliquer « Commencer la saisie »
 4. Remplir quelques champs : « Activités réalisées » = `Test activités`, « Indicateurs de performance » = `Test indicateurs`
 5. Cliquer sur « Enregistrer » → message « Brouillon enregistré. »

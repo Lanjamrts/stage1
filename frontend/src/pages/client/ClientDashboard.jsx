@@ -132,6 +132,9 @@ export default function ClientDashboard() {
           <p className="text-sm text-[#5B6778] mt-0.5">
             Vous n'avez encore aucune saisie. Choisissez un module dans le menu Modules pour commencer.
           </p>
+          <Button variant="primary" onClick={() => navigate('/modules')}>
+            Aller aux modules
+          </Button>
         </div>
       )}
 
@@ -198,6 +201,12 @@ export default function ClientDashboard() {
                 <Link to={`/modules/${r.module.code}`}>{r.module.code}</Link>
               </span>
             ))}.
+            <Link
+              to="/modules"
+              className="ml-2 underline underline-offset-4 hover:text-[#174C87]"
+            >
+              Voir tous les modules
+            </Link>
           </div>
         )}
         {rejetees.length === 0 && missing.length === 0 && upcoming.length === 0 && (
