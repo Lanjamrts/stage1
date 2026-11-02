@@ -74,6 +74,19 @@ export default function ModulePage() {
     };
   }, [code]);
 
+  // Tous les hooks doivent être appelés avant tout return conditionnel.
+  // Tolère un module absent (undefined) pendant le chargement.
+  const moduleSaisies = useMemo(
+    () => {
+      const m = modules.find((x) => x.code === code);
+      if (!m) return [];
+      return [...saisies]
+        .filter((s) => s.moduleId === m.id)
+        .sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt));
+    },
+    [saisies, modules, code],
+  );
+
   if (loading) return <div className="text-[#5B6778]">Chargement...</div>;
 
   if (error) {
@@ -116,14 +129,6 @@ export default function ModulePage() {
       : periode
         ? saisies.find((s) => s.moduleId === module.id && s.periodeId === periode.id) || null
         : null;
-
-  const moduleSaisies = useMemo(
-    () =>
-      [...saisies]
-        .filter((s) => s.moduleId === module.id)
-        .sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt)),
-    [saisies, module.id],
-  );
 
   const action = actionFor(saisie, isEvent);
   const late = joursRetard(periode ? periode.deadline : null);

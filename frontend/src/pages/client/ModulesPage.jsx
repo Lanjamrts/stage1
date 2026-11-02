@@ -52,27 +52,12 @@ export default function ModulesPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (loading) {
-    return <div className="text-[#5B6778]">Chargement...</div>;
-  }
-
-  if (error) {
-    return (
-      <div className="space-y-4">
-        <div className="rounded-lg border border-[#F6C7C3] bg-[#FEF3F2] px-4 py-3 text-sm text-[#B42318]">
-          {error}
-        </div>
-        <Button variant="secondary" onClick={() => navigate('/')}>
-          Retour au tableau de bord
-        </Button>
-      </div>
-    );
-  }
+  // Tous les hooks doivent être appelés avant tout return conditionnel.
+  // buildRows accepte des listes vides pendant le chargement.
+  const rows = useMemo(() => buildRows(modules, saisies, periodes, today), [modules, saisies, periodes]);
 
   const filtre = searchParams.get('filtre') || 'tous';
   const q = (searchParams.get('q') || '').trim();
-
-  const rows = useMemo(() => buildRows(modules, saisies, periodes, today), [modules, saisies, periodes]);
 
   const qNorm = stripAccents(q.toLowerCase());
   const filtreRows = useMemo(() => {
@@ -93,6 +78,23 @@ export default function ModulesPage() {
       return true;
     });
   }, [rows, filtre, qNorm, today]);
+
+  if (loading) {
+    return <div className="text-[#5B6778]">Chargement...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-4">
+        <div className="rounded-lg border border-[#F6C7C3] bg-[#FEF3F2] px-4 py-3 text-sm text-[#B42318]">
+          {error}
+        </div>
+        <Button variant="secondary" onClick={() => navigate('/')}>
+          Retour au tableau de bord
+        </Button>
+      </div>
+    );
+  }
 
   const openSaisie = (saisieId) => navigate(`/mes-saisies/${saisieId}`);
   const openModal = (m) => setModalModule(m);
