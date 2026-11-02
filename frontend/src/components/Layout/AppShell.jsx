@@ -1,11 +1,48 @@
 "use client";
-import React, { useState, useEffect, useRef } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useToast } from '../Common/Toast/Toast.jsx';
 import ExpiryWarningModal from '../Common/Modal/ExpiryWarningModal.jsx';
 import { ROLE_MENUS, ROLE_LABELS } from '../../menus.js';
+import { api } from '../../api.js';
 import Logo from '../Common/Logo.jsx';
 import Icon from '../Common/Icon.jsx';
+
+const PERIODICITY_LABELS = {
+  monthly: 'Mensuelle',
+  quarterly: 'Trimestrielle',
+  event: 'Événement',
+};
+
+const STATUS_LABELS = {
+  brouillon: 'Brouillon',
+  soumise: 'Soumise',
+  rejetee: 'Rejetée',
+  validee: 'Validée',
+  exportee: 'Exportée',
+  archivee: 'Archivée',
+};
+
+// Pastille de statut pour une entrée de sous-menu (couleur + libellé textuel, la couleur n'est pas le seul indicateur).
+const puceStatut = (saisie, periode, isEvent, today) => {
+  if (saisie) {
+    if (saisie.status === 'rejetee') {
+      return { label: 'Rejetée', cls: 'border-[#F6C7C3] bg-[#FEF3F2] text-[#B42318]', title: 'Rejetée' };
+    }
+    if (saisie.status === 'brouillon') {
+      return { label: 'Brouillon', cls: 'border-[#E3E8EF] bg-[#F5F7FA] text-[#5B6778]', title: 'Brouillon' };
+    }
+    return {
+      label: STATUS_LABELS[saisie.status] || saisie.status,
+      cls: 'border-[#B7E3C8] bg-[#EBF7EE] text-[#1E7B4F]',
+      title: STATUS_LABELS[saisie.status] || saisie.status,
+    };
+  }
+  if (!isEvent && periode && new Date(periode.deadline) < today) {
+    return { label: 'En retard', cls: 'border-[#F8D7A4] bg-[#FEF6E7] text-[#B7791F]', title: 'En retard' };
+  }
+  return { label: 'Aucune saisie', cls: 'border-[#D6DCE5] bg-[#F5F7FA] text-[#5B6778]', title: 'Aucune saisie' };
+};
 
 export default function AppShell({ children }) {
   const [user, setUser] = useState(null);
@@ -13,6 +50,7 @@ export default function AppShell({ children }) {
   const [timeLeft, setTimeLeft] = useState(60);
   const showExpiryModalRef = useRef(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { addToast } = useToast();
 
   useEffect(() => {
@@ -90,8 +128,182 @@ export default function AppShell({ children }) {
     navigate('/login');
   };
 
+  // Données du menu client (modules, périodes, saisies) pour les pastilles de statut du groupe « Modules ».
+  const [menuModules, setMenuModules] = useState([]);
+  const [menuPeriodes, setMenuPeriodes] = useState([]);
+  const [menuSaisies, setMenuSaisies] = useState([]);
+  const [menuError, setMenuError] = useState(null);
+
+  useEffect(() => {
+    if (user?.role !== 'client') return;
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const [m, p, s] = await Promise.all([
+          api('/modules'),
+          api('/periodes'),
+          api('/saisies'),
+        ]);
+        if (!cancelled) {
+          setMenuModules(m);
+          setMenuPeriodes(p);
+          setMenuSaisies(s);
+          setMenuError(null);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setMenuError(err.message || 'Impossible de charger les modules.');
+          setMenuModules([]);
+          setMenuPeriodes([]);
+          setMenuSaisies([]);
+        }
+      }
+    };
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
+
+  const today = new Date();
+
+  const currentPeriod = useCallback(
+    (periodicity) => {
+      const list = menuPeriodes.filter((p) => p.periodicity === periodicity);
+      const started = list
+        .filter((p) => new Date(p.start) <= today)
+        .sort((a, b) => new Date(b.start) - new Date(a.start));
+      return started[0] || list.sort((a, b) => new Date(b.start) - new Date(a.start))[0] || null;
+    },
+    [menuPeriodes],
+  );
+
+  // État ouvert/fermé du groupe « Modules », mémorisé dans localStorage (try/catch, interface fonctionnelle sans).
+  const STORAGE_KEY = 'sigbd:client:modulesOpen';
+  const [modulesOpen, setModulesOpen] = useState(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw === null ? true : raw !== 'false';
+    } catch (err) {
+      return true;
+    }
+  });
+  const toggleModules = useCallback(() => {
+    setModulesOpen((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem(STORAGE_KEY, String(next));
+      } catch (err) {}
+      return next;
+    });
+  }, []);
+
+  const isModulesActive = location.pathname.startsWith('/modules');
+
   // Menu du rôle : libellés et ordre exacts de la SPEC §4
   const menuItems = ROLE_MENUS[user?.role] || [];
+
+  const renderItem = (item) => {
+    // Groupe déroulant « Modules » (client uniquement)
+    if (item.type === 'group') {
+      const activeCls =
+        'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors bg-[#1F5FA8] text-white shadow-sm';
+      const inactiveCls =
+        'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-white/80 hover:bg-white/10 hover:text-white';
+      const modules = [...menuModules]
+        .filter((m) => m.active)
+        .sort((a, b) => a.code.localeCompare(b.code));
+
+      return (
+        <div key={item.path} className="flex flex-col gap-1">
+          <button
+            type="button"
+            onClick={toggleModules}
+            aria-expanded={modulesOpen}
+            aria-controls="menu-modules-sub"
+            className={`${isModulesActive ? activeCls : inactiveCls} w-full`}
+          >
+            <Icon name={item.icon} className="w-5 h-5 shrink-0" />
+            <span>{item.label}</span>
+            <span className="ml-auto text-[10px]">
+              {modulesOpen ? '▲' : '▼'}
+            </span>
+          </button>
+          {modulesOpen && (
+            <div
+              id="menu-modules-sub"
+              className="flex flex-col gap-0.5 max-h-[34vh] overflow-y-auto pr-2"
+            >
+              {menuError && (
+                <div className="px-3 py-2 text-xs text-[#5B6778] bg-white/5 rounded border border-white/10">
+                  {menuError}
+                </div>
+              )}
+              {modules.map((m) => {
+                if (m.kind === 'periodic') {
+                  const p = currentPeriod(m.periodicity);
+                  const saisie = p
+                    ? menuSaisies.find((s) => s.moduleId === m.id && s.periodeId === p.id)
+                    : null;
+                  return renderSubEntry(m, saisie, p, false);
+                }
+                const mine = menuSaisies
+                  .filter((s) => s.moduleId === m.id)
+                  .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                return renderSubEntry(m, mine[0] || null, null, true);
+              })}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // Entrée simple (tous les rôles, rendu inchangé)
+    return (
+      <NavLink
+        key={item.path}
+        to={item.path}
+        className={({ isActive }) =>
+          `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive
+            ? 'bg-[#1F5FA8] text-white shadow-sm'
+            : 'text-white/80 hover:bg-white/10 hover:text-white'
+          }`
+        }
+      >
+        <Icon name={item.icon} className="w-5 h-5 shrink-0" />
+        <span>{item.label}</span>
+      </NavLink>
+    );
+  };
+
+  const renderSubEntry = (m, saisie, periode, isEvent) => {
+    const puce = puceStatut(saisie, periode, isEvent, today);
+    return (
+      <NavLink
+        key={m.id}
+        to={`/modules/${m.code}`}
+        className={({ isActive }) =>
+          `flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${isActive
+            ? 'bg-[#1F5FA8]/20 text-[#1F5FA8] font-semibold'
+            : 'text-white/70 hover:bg-white/10 hover:text-white'
+          }`
+        }
+        aria-current="page"
+      >
+        <div className="min-w-0 flex items-center gap-2">
+          <span className="truncate text-[#1A2433]">{m.code}</span>
+          <span className="truncate text-[#5B6778]/80">– {m.label}</span>
+        </div>
+        <span
+          className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-semibold whitespace-nowrap ${puce.cls}`}
+          title={puce.title}
+          aria-label={puce.title}
+        >
+          {puce.label}
+        </span>
+      </NavLink>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-[#F5F7FA] text-[#1A2433]">
@@ -135,21 +347,7 @@ export default function AppShell({ children }) {
         <div>
           <div className="mb-6 h-12" aria-hidden="true" />
           <nav className="flex flex-col gap-1.5">
-            {menuItems.map((item) => (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive
-                    ? 'bg-[#1F5FA8] text-white shadow-sm'
-                    : 'text-white/80 hover:bg-white/10 hover:text-white'
-                  }`
-                }
-              >
-                <Icon name={item.icon} className="w-5 h-5 shrink-0" />
-                <span>{item.label}</span>
-              </NavLink>
-            ))}
+            {menuItems.map((item) => renderItem(item))}
           </nav>
         </div>
         <div className="px-2 pt-4 border-t border-white/10">

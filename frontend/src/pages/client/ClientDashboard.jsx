@@ -1,9 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { api, formatDate } from '../../api.js';
+import { useNavigate, Link } from 'react-router-dom';
+import { api, formatDate, formatDateTime } from '../../api.js';
 import StatusBadge from '../../components/Common/StatusBadge.jsx';
-import NouvelleSaisieModal from '../../components/Form/NouvelleSaisieModal.jsx';
-import Button from '../../components/Common/Button.jsx';
 
 const PERIODICITY_LABELS = {
   monthly: 'Mensuelle',
@@ -11,7 +9,8 @@ const PERIODICITY_LABELS = {
   event: 'Événement',
 };
 
-// Tableau de bord Client (SPEC §4) : alertes, 4 compteurs, tableau des modules.
+// Tableau de bord Client (SPEC §4) : alertes, 4 compteurs, avancement, échéances, activité.
+// Le tableau « Mes modules » a migré dans le menu latéral « Modules » (Étape 32).
 export default function ClientDashboard() {
   const navigate = useNavigate();
   const [modules, setModules] = useState([]);
@@ -20,7 +19,6 @@ export default function ClientDashboard() {
   const [me, setMe] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [modalModule, setModalModule] = useState(null);
 
   const load = async () => {
     try {
@@ -57,34 +55,23 @@ export default function ClientDashboard() {
     return started[0] || list.sort((a, b) => new Date(b.start) - new Date(a.start))[0] || null;
   };
 
-  const rows = useMemo(() => {
+  // Rapports attendus : modules périodiques ayant une période en cours.
+  const expected = useMemo(() => {
     return modules
-      .slice()
-      .sort((a, b) => a.code.localeCompare(b.code))
+      .filter((m) => m.kind === 'periodic')
       .map((m) => {
-        if (m.kind === 'periodic') {
-          const p = currentPeriod(m.periodicity);
-          const saisie = p
-            ? saisies.find((s) => s.moduleId === m.id && s.periodeId === p.id)
-            : null;
-          return { module: m, periode: p, saisie, isEvent: false };
-        }
-        const mine = saisies
-          .filter((s) => s.moduleId === m.id)
-          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        return { module: m, periode: null, saisie: mine[0] || null, isEvent: true };
-      });
+        const p = currentPeriod(m.periodicity);
+        const s = p ? saisies.find((x) => x.moduleId === m.id && x.periodeId === p.id) : null;
+        return { module: m, periode: p, saisie: s };
+      })
+      .filter((r) => r.periode);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [modules, saisies, periodes]);
 
-  const lateOf = (r) => {
-    if (!r.periode || r.saisie) return null;
-    const days = Math.floor((today - new Date(r.periode.deadline)) / 86400000);
-    return days > 0 ? days : null;
-  };
+  const remis = (saisie) => !!saisie && saisie.status !== 'brouillon'; // soumise ou au-delà
 
   // 4 compteurs (zip : En retard, Brouillons, Soumises, Rejetées)
-  const lateCount = rows.filter((r) => lateOf(r)).length;
+  const lateCount = expected.filter((r) => !r.saisie && new Date(r.periode.deadline) < today).length;
   const counters = [
     { label: 'En retard', value: lateCount, color: 'text-[#B7791F]' },
     { label: 'Brouillons', value: saisies.filter((s) => s.status === 'brouillon').length, color: 'text-[#5B6778]' },
@@ -94,26 +81,9 @@ export default function ClientDashboard() {
 
   // Alertes
   const rejetees = saisies.filter((s) => s.status === 'rejetee');
-  const rejeteeDetail = rejetees
-    .slice(0, 3)
-    .map((s) => {
-      const mod = modules.find((m) => m.id === s.moduleId);
-      const per = periodes.find((p) => p.id === s.periodeId);
-      return `${mod ? mod.label : s.moduleCode}${per ? ` – ${per.label}` : ''}`;
-    })
-    .join(' · ');
-  const missing = rows.filter((r) => !r.isEvent && !r.saisie && r.periode && new Date(r.periode.deadline) < today);
-  const missingDetail = missing
-    .slice(0, 4)
-    .map((r) => `${r.module.label} – ${r.periode.label}`)
-    .join(' · ');
-  const upcoming = rows.filter(
-    (r) =>
-      !r.isEvent &&
-      !r.saisie &&
-      r.periode &&
-      new Date(r.periode.deadline) >= today &&
-      (new Date(r.periode.deadline) - today) / 86400000 <= 7
+  const missing = expected.filter((r) => !r.saisie && new Date(r.periode.deadline) < today);
+  const upcoming = expected.filter(
+    (r) => !r.saisie && new Date(r.periode.deadline) >= today && (new Date(r.periode.deadline) - today) / 86400000 <= 7,
   );
 
   const openSaisie = (saisieId) => navigate(`/mes-saisies/${saisieId}`);
@@ -122,15 +92,21 @@ export default function ClientDashboard() {
     return <div className="text-[#5B6778]">Chargement...</div>;
   }
 
-  const actionFor = (r) => {
-    if (r.saisie) {
-      if (r.saisie.status === 'brouillon') return { label: 'Continuer', primary: false };
-      if (r.saisie.status === 'rejetee') return { label: 'Corriger', primary: false };
-      return { label: 'Consulter', primary: false };
-    }
-    if (r.isEvent) return { label: 'Nouvelle saisie', primary: true };
-    return { label: 'Saisir', primary: true };
-  };
+  // a) Avancement de la période en cours
+  const totalAttendus = expected.length;
+  const remises = expected.filter((r) => remis(r.saisie)).length;
+  const pct = totalAttendus > 0 ? Math.round((remises / totalAttendus) * 100) : 0;
+
+  // b) Prochaines échéances (attendus non remis, échéance croissante, 5 max)
+  const echeances = expected
+    .filter((r) => !remis(r.saisie))
+    .sort((a, b) => new Date(a.periode.deadline) - new Date(b.periode.deadline))
+    .slice(0, 5);
+
+  // c) Activité récente (5 dernières saisies modifiées)
+  const activite = [...saisies]
+    .sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt))
+    .slice(0, 5);
 
   return (
     <div className="space-y-6">
@@ -154,7 +130,7 @@ export default function ClientDashboard() {
         <div className="rounded-lg border border-[#B8D2EF] bg-[#EBF3FC] px-4 py-3">
           <p className="text-sm font-semibold text-[#1F5FA8]">Bienvenue sur SIGBD.</p>
           <p className="text-sm text-[#5B6778] mt-0.5">
-            Vous n'avez encore aucune saisie. Choisissez un module ci-dessous pour commencer.
+            Vous n'avez encore aucune saisie. Choisissez un module dans le menu Modules pour commencer.
           </p>
         </div>
       )}
@@ -177,20 +153,51 @@ export default function ClientDashboard() {
               </button>
             </div>
             <p className="text-sm text-[#B42318]/90 mt-0.5">
-              {rejeteeDetail}. Consultez le motif et corrigez votre saisie.
+              {rejetees.map((s, i) => {
+                const mod = modules.find((m) => m.id === s.moduleId);
+                return (
+                  <span key={i}>
+                    {i > 0 && ' · '}
+                    <Link to={`/modules/${mod ? mod.code : ''}`}>
+                      {mod ? mod.label : s.moduleCode}
+                    </Link>
+                  </span>
+                );
+              })}
+              {rejetees.length > 1 && (
+                <span className="ml-2">. Consultez le motif et corrigez votre saisie.</span>
+              )}
+              {rejetees.length === 1 && (
+                <span className="ml-2">. Consultez le motif et corrigez votre saisie.</span>
+              )}
             </p>
           </div>
         )}
         {missing.length > 0 && (
           <div className="rounded-lg border border-[#F8D7A4] bg-[#FEF6E7] px-4 py-3 text-sm text-[#B7791F] font-medium">
             {missing.length} rapport{missing.length > 1 ? 's sont' : ' est'} en retard.{' '}
-            <span className="font-normal">{missingDetail}.</span>
+            <span className="font-normal">
+              {missing.map((r, i) => (
+                <span key={i}>
+                  {i > 0 && ' · '}
+                  <Link to={`/modules/${r.module.code}`}>
+                    {r.module.label} – {r.periode.label}
+                  </Link>
+                </span>
+              ))}
+            </span>
+            .
           </div>
         )}
         {upcoming.length > 0 && (
           <div className="rounded-lg border border-[#B8D2EF] bg-[#EBF3FC] px-4 py-3 text-sm text-[#1F5FA8] font-medium">
             {upcoming.length} échéance{upcoming.length > 1 ? 's' : ''} dans les 7 prochains jours :{' '}
-            {upcoming.map((r) => r.module.code).join(', ')}.
+            {upcoming.map((r, i) => (
+              <span key={i}>
+                {i > 0 && ', '}
+                <Link to={`/modules/${r.module.code}`}>{r.module.code}</Link>
+              </span>
+            ))}.
           </div>
         )}
         {rejetees.length === 0 && missing.length === 0 && upcoming.length === 0 && (
@@ -210,124 +217,105 @@ export default function ClientDashboard() {
         ))}
       </div>
 
-      {/* Tableau des modules */}
+      {/* a) Avancement de la période en cours */}
       <div className="bg-white rounded-xl border border-[#E3E8EF] shadow-sm overflow-hidden">
         <div className="px-5 py-4 border-b border-[#E3E8EF]">
-          <h2 className="text-[16px] font-semibold text-[#0B2A4A]">Mes modules</h2>
+          <h2 className="text-[16px] font-semibold text-[#0B2A4A]">Avancement de la période en cours</h2>
           <p className="text-sm text-[#5B6778] mt-0.5">
-            Choisissez le module que vous souhaitez renseigner.
+            Rapports attendus remis (statut soumise ou au-delà) sur le total des rapports attendus.
           </p>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-[#F5F7FA] text-left">
-                <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Module</th>
-                <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Périodicité</th>
-                <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Période et échéance</th>
-                <th className="px-5 py-3 font-semibold text-[#0B2A4A]">Statut</th>
-                <th className="px-5 py-3 font-semibold text-[#0B2A4A] min-w-[260px]">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="px-5 py-8 text-center text-[#5B6778]">
-                    Aucun module disponible pour votre structure.
-                  </td>
-                </tr>
-              )}
-              {rows.map((r) => {
-                const late = lateOf(r);
-                const action = actionFor(r);
-                const nbEvent = saisies.filter((s) => s.moduleId === r.module.id).length;
-                return (
-                  <tr key={r.module.id} className="border-t border-[#E3E8EF]">
-                    <td className="px-5 py-3">
-                      <span className="font-semibold text-[#0B2A4A]">{r.module.code}</span>{' '}
-                      <span className="text-[#1A2433]">{r.module.label}</span>
-                      {r.isEvent && r.saisie && (
-                        <p className="text-[12px] text-[#5B6778] mt-0.5">
-                          {nbEvent} saisie{nbEvent > 1 ? 's' : ''} enregistrée{nbEvent > 1 ? 's' : ''}
-                        </p>
-                      )}
-                    </td>
-                    <td className="px-5 py-3 text-[#5B6778]">
-                      {r.isEvent
-                        ? PERIODICITY_LABELS.event
-                        : PERIODICITY_LABELS[r.module.periodicity] || '—'}
-                    </td>
-                    <td className="px-5 py-3 text-[#5B6778]">
-                      {r.isEvent || !r.periode ? (
-                        '—'
-                      ) : (
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span>
-                            {r.periode.label} · échéance {formatDate(r.periode.deadline)}
-                          </span>
-                          {late && (
-                            <span className="inline-flex items-center rounded-full bg-[#FEF6E7] border border-[#F8D7A4] px-2 py-0.5 text-[11px] font-semibold text-[#B7791F]">
-                              En retard de {late} jour{late > 1 ? 's' : ''}
-                            </span>
-                          )}
-                        </div>
-                      )}
-                    </td>
-                    <td className="px-5 py-3">
-                      {r.saisie ? (
-                        <StatusBadge status={r.saisie.status} />
-                      ) : (
-                        <span className="text-[#8A94A6]">Aucune saisie</span>
-                      )}
-                    </td>
-                    <td className="px-5 py-3 whitespace-nowrap">
-                      {r.isEvent && r.saisie ? (
-                        <div className="flex flex-nowrap items-center gap-2">
-                          <Button
-                            variant="secondary"
-                            size="sm"
-                            onClick={() => openSaisie(r.saisie.id)}
-                          >
-                            {action.label}
-                          </Button>
-                          <Button
-                            variant="primary"
-                            size="sm"
-                            onClick={() => setModalModule(r.module)}
-                          >
-                            Nouvelle saisie
-                          </Button>
-                        </div>
-                      ) : (
-                        <Button
-                          variant={action.primary ? 'primary' : 'secondary'}
-                          size="sm"
-                          onClick={() =>
-                            r.saisie ? openSaisie(r.saisie.id) : setModalModule(r.module)
-                          }
-                        >
-                          {action.label}
-                        </Button>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+        <div className="px-5 py-4">
+          {totalAttendus === 0 ? (
+            <p className="text-sm text-[#5B6778]">Aucun rapport attendu.</p>
+          ) : (
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-[#5B6778]">Avancement</span>
+                <span className="font-semibold text-[#0B2A4A]">{remises} sur {totalAttendus} rapports remis</span>
+              </div>
+              <div className="w-full bg-[#E3E8EF] rounded-full h-3 overflow-hidden">
+                <div
+                  role="progressbar"
+                  aria-valuenow={remises}
+                  aria-valuemin={0}
+                  aria-valuemax={totalAttendus}
+                  className="h-full bg-[#1F5FA8]"
+                  style={{ width: `${pct}%` }}
+                />
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
-      <NouvelleSaisieModal
-        module={modalModule}
-        periodes={periodes}
-        isOpen={!!modalModule}
-        onClose={() => setModalModule(null)}
-        onCreated={(id) => {
-          setModalModule(null);
-          navigate(`/mes-saisies/${id}`);
-        }}
-      />
+      {/* b) Prochaines échéances & c) Activité récente */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white rounded-xl border border-[#E3E8EF] shadow-sm overflow-hidden">
+          <div className="px-5 py-4 border-b border-[#E3E8EF]">
+            <h2 className="text-[16px] font-semibold text-[#0B2A4A]">Prochaines échéances</h2>
+          </div>
+          <div className="px-5 py-4">
+            {echeances.length === 0 ? (
+              <p className="text-sm text-[#5B6778]">Aucune échéance à venir.</p>
+            ) : (
+              <ul className="space-y-3">
+                {echeances.map((r) => {
+                  const deadline = new Date(r.periode.deadline);
+                  const diff = Math.floor((deadline - today) / 86400000);
+                  const retard = Math.floor((today - deadline) / 86400000);
+                  return (
+                    <li key={r.module.id} className="border-b border-[#E3E8EF] pb-2 last:border-b-0">
+                      <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
+                        <Link to={`/modules/${r.module.code}`} className="font-semibold text-[#0B2A4A]">
+                          {r.module.code}
+                        </Link>
+                        <span className="text-sm text-[#5B6778]">{r.periode.label}</span>
+                      </div>
+                      <div className="text-sm text-[#5B6778]">
+                        Échéance {formatDate(r.periode.deadline)}{' '}
+                        {diff < 0 ? `· En retard de ${retard} jour${retard > 1 ? 's' : ''}` : `· ${diff} jour${diff > 1 ? 's' : ''} restant${diff > 1 ? 's' : ''}`}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl border border-[#E3E8EF] shadow-sm overflow-hidden">
+          <div className="px-5 py-4 border-b border-[#E3E8EF]">
+            <h2 className="text-[16px] font-semibold text-[#0B2A4A]">Activité récente</h2>
+          </div>
+          <div className="px-5 py-4">
+            {activite.length === 0 ? (
+              <p className="text-sm text-[#5B6778]">Aucune activité pour le moment.</p>
+            ) : (
+              <ul className="space-y-3">
+                {activite.map((s) => {
+                  const mod = modules.find((m) => m.id === s.moduleId);
+                  return (
+                    <li key={s.id} className="border-b border-[#E3E8EF] pb-2 last:border-b-0 cursor-pointer hover:bg-[#F5F7FA]" onClick={() => openSaisie(s.id)}>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-semibold text-[#0B2A4A]">
+                            {mod ? `${mod.code} — ${mod.label}` : s.moduleCode}
+                          </p>
+                          <StatusBadge status={s.status} />
+                        </div>
+                        <p className="text-sm text-[#5B6778]">
+                          {formatDateTime(s.updatedAt || s.createdAt)}
+                        </p>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

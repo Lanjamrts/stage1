@@ -39,15 +39,15 @@ Les saisies de démonstration (modules NCA et TSE) utilisent des EPN réels du r
 ### 1. Le Client crée une saisie pour Septembre 2026 (2 min)
 
 - **Compte** : Client — `104562`
-- **Écran** : « Mes saisies » <!-- frontend/src/menus.js:6 -->
+- **Écran** : « Tableau de bord », puis menu latéral « Modules » <!-- frontend/src/components/Layout/AppShell.jsx -->
 - **Actions** :
-  - Cliquer « Créer une nouvelle saisie » <!-- frontend/src/pages/client/MesSaisies.jsx:240 -->
-  - Module : « Rapport d'activités » (RA), Période : « Septembre 2026 » (mensuelle) → « Créer » <!-- frontend/src/components/Form/NouvelleSaisieModal.jsx:194 -->
+  - Cliquer sur « Modules » dans le menu latéral, puis « RA – Rapport d'activités » <!-- frontend/src/components/Layout/AppShell.jsx -->
+  - Sur la carte « Période en cours », cliquer « Saisir », Période : « Septembre 2026 » (mensuelle), « Commencer la saisie » <!-- frontend/src/pages/client/ModulePage.jsx -->
   - Remplir quelques champs (ex. « Activités réalisées », « Indicateurs de performance »)
-  - Cliquer « Enregistrer » <!-- frontend/src/components/Form/NouvelleSaisieModal.jsx:177 -->
+  - Cliquer « Enregistrer » <!-- frontend/src/components/Form/NouvelleSaisieModal.jsx:194 -->
   - Cliquer « Soumettre » <!-- frontend/src/pages/client/SaisieDetail.jsx:240 -->
-- **Résultat attendu** : Saisie passe en statut « Soumise », badge « Soumise » visible dans la liste
-- **Ce qu'on dit** : « Le client crée son brouillon pour la période Septembre 2026, l'enregistre, puis le soumet pour validation. »
+- **Résultat attendu** : Saisie passe en statut « Soumise », badge « Soumise » visible dans la liste et sur la page du module
+- **Ce qu'on dit** : « Le client choisit son module dans le menu latéral Modules, crée son brouillon pour la période Septembre 2026, l'enregistre, puis le soumet pour validation. Sur son tableau de bord, l'avancement, les prochaines échéances et l'activité récente se mettent à jour. »
 
 ---
 

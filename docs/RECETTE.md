@@ -37,7 +37,7 @@ Aucun test automatique.
 2. Saisir un IM invalide (ex: `999999`) et mot de passe `Test@2026`, cliquer sur « Connexion » → message d'erreur « Identifiant ou mot de passe incorrect »
 3. Saisir IM valide `104562` et mot de passe incorrect `WrongPass` → message d'erreur « Identifiant ou mot de passe incorrect »
 4. Saisir IM valide `104562` et mot de passe `Test@2026`, cliquer sur « Connexion » → redirection vers le Tableau de bord (client)
-5. Vérifier que le menu affiche « Tableau de bord » et « Mes saisies »
+5. Vérifier que le menu affiche « Tableau de bord », « Modules » et « Mes saisies »
 6. Se déconnecter (menu utilisateur → Déconnexion)
 7. Répéter avec le compte admin2 `108231` → redirection vers « Données saisies »
 8. Répéter avec le compte admin1 `120344` → redirection vers « Tableau de bord »
@@ -83,8 +83,8 @@ Aucun test automatique.
 
 **Procédure manuelle :**
 1. Se connecter en client (`104562` / `Test@2026`)
-2. Sur le Tableau de bord, cliquer sur « Nouvelle saisie »
-3. Choisir Module « Rapport d'activités » (RA), Période « Septembre 2026 » (mensuelle), cliquer « Créer »
+2. Dans le menu latéral, cliquer sur « Modules », puis sur « RA – Rapport d'activités »
+3. Sur la carte « Période en cours », cliquer « Saisir », choisir Période « Septembre 2026 » (mensuelle), cliquer « Commencer la saisie »
 4. Remplir quelques champs : « Activités réalisées » = `Test activités`, « Indicateurs de performance » = `Test indicateurs`
 5. Cliquer sur « Enregistrer » → message « Brouillon enregistré. »
 6. Revenir sur la liste « Mes saisies » → la saisie apparaît en statut « Brouillon »
