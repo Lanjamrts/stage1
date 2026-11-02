@@ -23,26 +23,35 @@ const STATUS_LABELS = {
   archivee: 'Archivée',
 };
 
-// Pastille de statut pour une entrée de sous-menu (couleur + libellé textuel, la couleur n'est pas le seul indicateur).
+// Pastille de statut (couleur + libellé textuel, la couleur n'est pas le seul indicateur).
 const puceStatut = (saisie, periode, isEvent, today) => {
   if (saisie) {
     if (saisie.status === 'rejetee') {
-      return { label: 'Rejetée', cls: 'border-[#F6C7C3] bg-[#FEF3F2] text-[#B42318]', title: 'Rejetée' };
+      return { label: 'Rejetée', dot: 'bg-[#F87171]', title: 'Rejetée' };
     }
     if (saisie.status === 'brouillon') {
-      return { label: 'Brouillon', cls: 'border-[#E3E8EF] bg-[#F5F7FA] text-[#5B6778]', title: 'Brouillon' };
+      return { label: 'Brouillon', dot: 'bg-[#7DB3F0]', title: 'Brouillon' };
     }
     return {
       label: STATUS_LABELS[saisie.status] || saisie.status,
-      cls: 'border-[#B7E3C8] bg-[#EBF7EE] text-[#1E7B4F]',
+      dot: 'bg-[#4ADE80]',
       title: STATUS_LABELS[saisie.status] || saisie.status,
     };
   }
   if (!isEvent && periode && new Date(periode.deadline) < today) {
-    return { label: 'En retard', cls: 'border-[#F8D7A4] bg-[#FEF6E7] text-[#B7791F]', title: 'En retard' };
+    return { label: 'En retard', dot: 'bg-[#F5B544]', title: 'En retard' };
   }
-  return { label: 'Aucune saisie', cls: 'border-[#D6DCE5] bg-[#F5F7FA] text-[#5B6778]', title: 'Aucune saisie' };
+  return { label: 'Aucune saisie', dot: 'bg-white/40', title: 'Aucune saisie' };
 };
+
+// Légende des pastilles de statut (sous le sous-menu, repliée par défaut).
+const LEGENDE_PASTILLES = [
+  ['Aucune saisie', 'bg-white/40'],
+  ['Brouillon', 'bg-[#7DB3F0]'],
+  ['En retard', 'bg-[#F5B544]'],
+  ['Soumise ou au-delà', 'bg-[#4ADE80]'],
+  ['Rejetée', 'bg-[#F87171]'],
+];
 
 export default function AppShell({ children }) {
   const [user, setUser] = useState(null);
@@ -225,17 +234,26 @@ export default function AppShell({ children }) {
           >
             <Icon name={item.icon} className="w-5 h-5 shrink-0" />
             <span>{item.label}</span>
-            <span className="ml-auto text-[10px]">
-              {modulesOpen ? '▲' : '▼'}
-            </span>
+            <svg
+              className={`w-4 h-4 shrink-0 transition-transform duration-200 ${modulesOpen ? 'rotate-180' : ''}`}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
           </button>
           {modulesOpen && (
             <div
               id="menu-modules-sub"
-              className="flex flex-col gap-0.5 max-h-[34vh] overflow-y-auto pr-2"
+              className="flex flex-col gap-0.5 mt-1 pr-2 overflow-y-auto max-h-[calc(100vh-420px)] min-h-[120px] scrollbar-thin"
             >
               {menuError && (
-                <div className="px-3 py-2 text-xs text-[#5B6778] bg-white/5 rounded border border-white/10">
+                <div className="px-3 py-2 text-xs text-white/70 bg-white/5 rounded border border-white/10">
                   {menuError}
                 </div>
               )}
@@ -252,6 +270,24 @@ export default function AppShell({ children }) {
                   .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
                 return renderSubEntry(m, mine[0] || null, null, true);
               })}
+              {/* Légende des pastilles de statut */}
+              <details className="mt-3 pt-2 border-t border-white/10">
+                <summary className="cursor-pointer select-none text-[11px] text-white/60 hover:text-white">
+                  Légende des pastilles
+                </summary>
+                <ul className="mt-1 space-y-0.5">
+                  {LEGENDE_PASTILLES.map(([libelle, couleur]) => (
+                    <li key={libelle} className="flex items-center gap-2">
+                      <span
+                        className={`w-2 h-2 rounded-full shrink-0 ${couleur}`}
+                        title={libelle}
+                        aria-label={libelle}
+                      />
+                      <span className="text-[11px] text-white/70">{libelle}</span>
+                    </li>
+                  ))}
+                </ul>
+              </details>
             </div>
           )}
         </div>
@@ -283,24 +319,22 @@ export default function AppShell({ children }) {
         key={m.id}
         to={`/modules/${m.code}`}
         className={({ isActive }) =>
-          `flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${isActive
-            ? 'bg-[#1F5FA8]/20 text-[#1F5FA8] font-semibold'
-            : 'text-white/70 hover:bg-white/10 hover:text-white'
+          `flex items-center justify-between gap-2 pl-9 pr-2 py-1.5 rounded-lg text-[13px] transition-colors ${isActive
+            ? 'bg-white/15 text-white font-semibold'
+            : 'text-white/80 hover:bg-white/10 hover:text-white'
           }`
         }
-        aria-current="page"
       >
-        <div className="min-w-0 flex items-center gap-2">
-          <span className="truncate text-[#1A2433]">{m.code}</span>
-          <span className="truncate text-[#5B6778]/80">– {m.label}</span>
-        </div>
+        <span className="truncate" title={`${m.code} – ${m.label}`}>
+          <span className="font-semibold">{m.code}</span>{' '}
+          <span>– {m.label}</span>
+        </span>
         <span
-          className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-semibold whitespace-nowrap ${puce.cls}`}
+          className={`w-2 h-2 rounded-full shrink-0 ${puce.dot}`}
           title={puce.title}
           aria-label={puce.title}
-        >
-          {puce.label}
-        </span>
+        />
+        <span className="sr-only">{puce.title}</span>
       </NavLink>
     );
   };
