@@ -339,3 +339,15 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 - Aucun outil de test frontend ajouté (n'existe pas dans le dépôt).
 - RECETTE.md et docs/DEMO.md mises à jour : parcours client = menu Modules → page Modules → un module → saisie ; tableau de bord = avancement, échéances, activité.
 
+## [P34] Socle Oracle XE 21c
+
+- Base de données cible validée par l'encadrant (cahier des charges §13 : « Oracle ou MongoDB »).
+- `oracledb` en **mode léger (thin)** : pas d'appel à `oracledb.initOracleClient()`, aucun Instant Client Oracle requis côté Node. La 11g n'est pas ciblée.
+- `knex` (client `oracledb`) pour l'abstraction de requête ; singleton paresseux via `getKnex()` (aucun effet de bord à l'import), `pingOracle()`, `closeOracle()`.
+- Liaison de paramètres uniquement : aucune requête SQL construite par concatenation de texte utilisateur (règle consignée en commentaire dans `backend/src/db/oracle.js`).
+- MongoDB reste la base active jusqu'à la fin de la migration ; les variables Oracle sont optionnelles et l'application démarre sans elles.
+- Objectifs de la migration Oracle : JSON natif, colonnes `IDENTITY`, pagination `OFFSET FETCH`, noms d'identifiants ≤ 128 caractères, booléens en `NUMBER(1)`, chaîne vide = `NULL` à gérer.
+- Commande de test : `backend/src/scripts/oracle-ping.js` + scripts `oracle:ping` (backend), `db:oracle:ping`, `db:oracle:up`, `db:oracle:down` (racine).
+- Service Docker `oracle` (image `gvenzl/oracle-xe:21-slim`, volume nommé `sigbd_oracle_data`, healthcheck `healthcheck.sh`, `restart unless-stopped`) ; service `mongo` inchangé. En production, l'informatique du ministère installe Oracle XE 21c de façon classique ou fournit un schéma existant ; l'application ne dépend que des variables `ORACLE_*`.
+- Aucun des modèles Mongoose, contrôleurs, seeds, scripts existants ni des tests existants n'a été modifié.
+

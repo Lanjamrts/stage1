@@ -20,6 +20,7 @@
     "backup": "node src/scripts/backup.js",
     "restore": "node src/scripts/restore.js",
     "backup:verify": "node src/scripts/verify-backup.js",
+    "oracle:ping": "node src/scripts/oracle-ping.js",
     "test": "npm run seed:test && vitest run",
     "seed:test": "NODE_ENV=test MONGODB_URI=mongodb://127.0.0.1:27017/sigbd_test node src/seed/demo.js --yes --purge-audit"
   },
@@ -33,7 +34,9 @@
     "express-rate-limit": "^7.4.0",
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
+    "knex": "^3.3.0",
     "mongoose": "^8.6.0",
+    "oracledb": "^26.0.0",
     "pdfkit": "^0.15.0",
     "zod": "^3.23.8"
   },

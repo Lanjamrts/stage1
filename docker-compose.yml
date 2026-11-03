@@ -1,4 +1,7 @@
 # DÉVELOPPEMENT UNIQUEMENT – pas d'authentification, ne pas utiliser en production.
+# Base Oracle XE 21c : en production, l'informatique du ministère installe Oracle XE 21c
+# de façon classique ou fournit un schéma existant ; l'application ne dépend que des
+# variables ORACLE_* (ORACLE_USER, ORACLE_PASSWORD, ORACLE_CONNECT_STRING, …).
 services:
   mongo:
     image: mongo:7
@@ -14,5 +17,25 @@ services:
       timeout: 5s
       retries: 5
 
+  oracle:
+    image: gvenzl/oracle-xe:21-slim
+    container_name: sigbd-oracle
+    ports:
+      - "127.0.0.1:1521:1521"
+    environment:
+      - ORACLE_PASSWORD=${ORACLE_PASSWORD:?ORACLE_PASSWORD doit être définie}
+      - APP_USER=${APP_USER:?APP_USER doit être définie}
+      - APP_USER_PASSWORD=${APP_USER_PASSWORD:?APP_USER_PASSWORD doit être définie}
+    volumes:
+      - sigbd_oracle_data:/opt/oracle/oradata
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "/opt/oracle/scripts/healthcheck.sh"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
 volumes:
   sigbd_mongo_data:
+  sigbd_oracle_data:
