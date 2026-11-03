@@ -36,27 +36,6 @@ export default function AuditJournal() {
 
   const read = (key) => urlParams.get(key) || EMPTY_PARAMS[key];
 
-  // Anti-rebond 400 ms sur la recherche : seule la valeur debouncée est envoyée au serveur.
-  // Après l'anti-rebond, q est écrit dans l'URL et la page revient à 1.
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedQ(qLocal);
-      if (!isInitial.current) {
-        const urlQ = urlParams.get('q') || '';
-        if (qLocal !== urlQ) {
-          navigateTo({ q: qLocal }, true);
-        }
-      }
-      isInitial.current = false;
-    }, 400);
-    return () => clearTimeout(timer);
-  }, [qLocal, urlParams, navigateTo]);
-
-  // Synchronise le champ local avec l'URL (navigation retour/avant).
-  useEffect(() => {
-    setQLocal(urlParams.get('q') || '');
-  }, [urlParams.get('q')]);
-
   const buildParams = useCallback(
     (updates) => {
       const next = new URLSearchParams(urlParams);
@@ -108,6 +87,27 @@ export default function AuditJournal() {
       anomalyNoMatch = true;
     }
   }
+
+  // Anti-rebond 400 ms sur la recherche : seule la valeur debouncée est envoyée au serveur.
+  // Après l'anti-rebond, q est écrit dans l'URL et la page revient à 1.
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQ(qLocal);
+      if (!isInitial.current) {
+        const urlQ = urlParams.get('q') || '';
+        if (qLocal !== urlQ) {
+          navigateTo({ q: qLocal }, true);
+        }
+      }
+      isInitial.current = false;
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [qLocal, urlParams, navigateTo]);
+
+  // Synchronise le champ local avec l'URL (navigation retour/avant).
+  useEffect(() => {
+    setQLocal(urlParams.get('q') || '');
+  }, [urlParams.get('q')]);
 
   const fetchRows = useCallback(async () => {
     setLoading(true);
