@@ -32,7 +32,7 @@ export function Toolbar({
     >
       {/* Période */}
       <div className="flex flex-wrap gap-2 items-end">
-        <span className="text-sm font-semibold text-[#0B2A4A]">P\u00e9riode</span>
+        <span className="text-sm font-semibold text-[#0B2A4A]">Période</span>
         {PERIOD_SHORTCUTS.map((p) => (
           <Button
             key={p.label}
@@ -124,7 +124,7 @@ export function Toolbar({
             else onActionChange('');
           }}
           className="h-[36px] px-3 rounded-lg border border-[#D6DCE5] bg-white text-sm min-w-[140px]"
-          aria-label="R\u00e9sultat"
+          aria-label="Résultat"
         >
           {RESULTAT_OPTIONS.map((o) => (
             <option key={o.value} value={o.value}>
@@ -136,7 +136,7 @@ export function Toolbar({
 
       {(hasFilters || q || period || from || to) && (
         <Button variant="secondary" size="sm" onClick={onReset}>
-          <span aria-hidden="true">↺</span> R\u00e9initialiser les filtres
+          <span aria-hidden="true">↺</span> Réinitialiser les filtres
         </Button>
       )}
     </div>

@@ -94,7 +94,7 @@ export function AuditTable({
         <tbody>
           <tr>
             <td colSpan={6} className="px-5 py-10 text-center text-[#5B6778]">
-              Aucune entr\u00e9e ne correspond \u00e0 ces filtres.
+              Aucune entrée ne correspond à ces filtres.
             </td>
           </tr>
         </tbody>

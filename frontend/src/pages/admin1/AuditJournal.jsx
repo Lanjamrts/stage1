@@ -35,7 +35,7 @@ export default function AuditJournal() {
 
   const read = (key) => urlParams.get(key) || EMPTY_PARAMS[key];
 
-  // Anti-rebond 400 ms sur la recherche : seule la valeur debounc\u00e9e est envoy\u00e9e au serveur.
+  // Anti-rebond 400 ms sur la recherche : seule la valeur debouncée est envoyée au serveur.
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedQ(qLocal), 400);
     return () => clearTimeout(timer);
@@ -86,6 +86,9 @@ export default function AuditJournal() {
   const periodLabel = PERIOD_SHORTCUTS.find((p) => p.sinceMinutes != null && String(p.sinceMinutes) === sinceParam)
     ?.label;
 
+  const anomalyActions = ['login_failure', 'login_failure_desactive', 'login_lockout'];
+  const effectiveAction = resultatParam === 'anomalies' ? anomalyActions.join(',') : actionParam;
+
   const fetchRows = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -117,14 +120,11 @@ export default function AuditJournal() {
     } finally {
       setLoading(false);
     }
-  }, [buildParams, page, limit, q, actionParam, roleParam, fromParam, toParam, sinceParam, resultatParam]);
+  }, [buildParams, page, limit, q, effectiveAction, actionParam, roleParam, fromParam, toParam, sinceParam, resultatParam]);
 
   useEffect(() => {
     void fetchRows();
   }, [fetchRows]);
-
-  const anomalyActions = ['login_failure', 'login_failure_desactive', 'login_lockout'];
-  const effectiveAction = resultatParam === 'anomalies' ? anomalyActions.join(',') : actionParam;
 
   const setFilter = (key, value) => {
     navigateTo({ [key]: value }, true);
@@ -180,16 +180,16 @@ export default function AuditJournal() {
           </span>
         </h1>
         <p className="text-sm text-[#5B6778] mt-1">
-          Historique automatique des connexions et des actions sensibles. Les lignes ne peuvent \u00eatre
-          ni modifi\u00e9es ni supprim\u00e9es.
+          Historique automatique des connexions et des actions sensibles.           Les lignes ne peuvent être
+          ni modifiées ni supprimées.
         </p>
         <p className="text-sm text-[#5B6778] mt-2">
-          {TZ_LABEL}. Donn\u00e9es conserv\u00e9es 12 mois minimum.
+          {TZ_LABEL}. Données conservées 12 mois minimum.
         </p>
       </div>
 
       <div className="rounded-lg border border-[#B8D2EF] bg-[#EBF3FC] px-4 py-3 text-sm text-[#1F5FA8]">
-        Les donn\u00e9es du journal sont conserv\u00e9es pendant 12 mois minimum.
+        Les données du journal sont conservées pendant 12 mois minimum.
       </div>
 
       <Toolbar

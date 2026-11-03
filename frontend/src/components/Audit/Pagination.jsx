@@ -22,7 +22,7 @@ export function Pagination({
           onChange={(e) => onChangeLimit(Number(e.target.value))}
           className="h-[32px] px-2 rounded border border-[#D6DCE5] bg-white text-sm"
         >
-          [25, 50, 100].map((n) => (
+          {[25, 50, 100].map((n) => (
             <option key={n} value={n}>
               {n}
             </option>
@@ -36,7 +36,7 @@ export function Pagination({
           onClick={() => onChangePage(page - 1)}
           disabled={page <= 1}
         >
-          Pr\u00e9c\u00e9dent
+          Précédent
         </Button>
         <span className="font-semibold text-[#0B2A4A]">
           Page {page} sur {totalPages}
@@ -50,7 +50,7 @@ export function Pagination({
           Suivant
         </Button>
         <span className="text-[#5B6778]">
-          \u00b7 {total} {total > 1 ? 'événements' : 'événement'}
+          · {total} {total > 1 ? 'événements' : 'événement'}
         </span>
       </div>
     </div>

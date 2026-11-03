@@ -81,13 +81,13 @@ export function DetailPanel({ isOpen, row, onClose }) {
         ref={panelRef}
         role="dialog"
         aria-modal="true"
-        aria-label="D\u00e9tail de l'\u00e9v\u00e9nement d'audit"
+        aria-label="Détail de l'événement d'audit"
         onKeyDown={handleKeyDown}
         onClick={(e) => e.stopPropagation()}
         className={`fixed top-0 right-0 bottom-0 bg-white shadow-2xl z-50 flex flex-col md:w-[480px] md:top-16 md:bottom-auto h-full md:h-auto max-h-full`}
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-[#E3E8EF] flex-shrink-0">
-          <h2 className="text-[18px] font-semibold text-[#0B2A4A]">D\u00e9tail de l'\u00e9v\u00e9nement</h2>
+          <h2 className="text-[18px] font-semibold text-[#0B2A4A]">Détail de l'événement</h2>
           <button
             ref={closeBtnRef}
             type="button"
@@ -131,12 +131,12 @@ export function DetailPanel({ isOpen, row, onClose }) {
           </div>
           <div className="pt-2 border-t border-[#E3E8EF] space-y-2">
             <p className="text-xs font-semibold text-[#5B6778] uppercase">
-              Derni\u00e8res actions de cet utilisateur
+              Dernières actions de cet utilisateur
             </p>
             {actionsLoading ? (
               <p className="text-[#5B6778] text-sm">Chargement…</p>
             ) : userActions.length === 0 ? (
-              <p className="text-[#5B6778] text-sm">Aucune autre action r\u00e9cente.</p>
+              <p className="text-[#5B6778] text-sm">Aucune autre action récente.</p>
             ) : (
               <ul className="space-y-2 text-sm text-[#5B6778]">
                 {userActions.map((a) => (
