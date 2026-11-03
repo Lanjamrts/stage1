@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Button from '../../components/Common/Button.jsx';
-import { PERIOD_SHORTCUTS, TZ_LABEL } from '../../components/Audit/helpers.js';
+import { PERIOD_SHORTCUTS, TZ_LABEL, ACTION_LIBELLE, ANOMALY_ACTIONS } from '../../components/Audit/helpers.js';
 import { Toolbar } from '../../components/Audit/Toolbar.jsx';
 import { AuditTable } from '../../components/Audit/Table.jsx';
 import { Pagination } from '../../components/Audit/Pagination.jsx';
@@ -32,14 +32,25 @@ export default function AuditJournal() {
   const [error, setError] = useState(null);
   const [selectedRow, setSelectedRow] = useState(null);
   const rowRefs = useRef({});
+  const isInitial = useRef(true);
 
   const read = (key) => urlParams.get(key) || EMPTY_PARAMS[key];
 
   // Anti-rebond 400 ms sur la recherche : seule la valeur debouncée est envoyée au serveur.
+  // Après l'anti-rebond, q est écrit dans l'URL et la page revient à 1.
   useEffect(() => {
-    const timer = setTimeout(() => setDebouncedQ(qLocal), 400);
+    const timer = setTimeout(() => {
+      setDebouncedQ(qLocal);
+      if (!isInitial.current) {
+        const urlQ = urlParams.get('q') || '';
+        if (qLocal !== urlQ) {
+          navigateTo({ q: qLocal }, true);
+        }
+      }
+      isInitial.current = false;
+    }, 400);
     return () => clearTimeout(timer);
-  }, [qLocal]);
+  }, [qLocal, urlParams, navigateTo]);
 
   // Synchronise le champ local avec l'URL (navigation retour/avant).
   useEffect(() => {
@@ -86,25 +97,42 @@ export default function AuditJournal() {
   const periodLabel = PERIOD_SHORTCUTS.find((p) => p.sinceMinutes != null && String(p.sinceMinutes) === sinceParam)
     ?.label;
 
-  const anomalyActions = ['login_failure', 'login_failure_desactive', 'login_lockout'];
-  const effectiveAction = resultatParam === 'anomalies' ? anomalyActions.join(',') : actionParam;
+  const anomalyValue = [...ANOMALY_ACTIONS].join(',');
+  let effectiveAction = actionParam;
+  let anomalyNoMatch = false;
+  if (resultatParam === 'anomalies') {
+    if (actionParam === '') {
+      effectiveAction = anomalyValue;
+    } else if (!ANOMALY_ACTIONS.has(actionParam)) {
+      effectiveAction = '';
+      anomalyNoMatch = true;
+    }
+  }
 
   const fetchRows = useCallback(async () => {
     setLoading(true);
     setError(null);
-    const qs = buildParams({
-      page,
-      limit,
-      q,
-      action: effectiveAction,
-      role: roleParam,
-      from: fromParam,
-      to: toParam,
-      since: sinceParam,
-      resultat: resultatParam,
-    });
+    // Aucun résultat si Résultat = Anomalies et l'action choisie n'est pas une anomalie.
+    if (anomalyNoMatch) {
+      setRows([]);
+      setTotal(0);
+      setLoading(false);
+      return;
+    }
+    // Paramètres API explicites : page, limit, q, action, role, from, to, sinceMinutes.
+    // Jamais 'since' ni 'resultat' (paramètres d'interface uniquement).
+    const apiParams = new URLSearchParams();
+    apiParams.set('page', String(page));
+    apiParams.set('limit', String(limit));
+    if (q) apiParams.set('q', q);
+    if (effectiveAction) apiParams.set('action', effectiveAction);
+    if (roleParam) apiParams.set('role', roleParam);
+    if (fromParam) apiParams.set('from', fromParam);
+    if (toParam) apiParams.set('to', toParam);
+    const sinceMinutes = sinceParam ? Number(sinceParam) : null;
+    if (sinceMinutes) apiParams.set('sinceMinutes', String(sinceMinutes));
     try {
-      const res = await fetch(`/api/audit?${qs.toString()}`, { credentials: 'include' });
+      const res = await fetch(`/api/audit?${apiParams.toString()}`, { credentials: 'include' });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         throw new Error(data.message || 'Une erreur est survenue.');
@@ -120,7 +148,7 @@ export default function AuditJournal() {
     } finally {
       setLoading(false);
     }
-  }, [buildParams, page, limit, q, effectiveAction, actionParam, roleParam, fromParam, toParam, sinceParam, resultatParam]);
+  }, [page, limit, q, effectiveAction, anomalyNoMatch, roleParam, fromParam, toParam, sinceParam]);
 
   useEffect(() => {
     void fetchRows();
@@ -132,23 +160,20 @@ export default function AuditJournal() {
 
   const onPeriodChange = (label) => {
     const p = PERIOD_SHORTCUTS.find((x) => x.label === label);
-    if (p && p.sinceMinutes !== null) {
-      navigateTo({ since: String(p.sinceMinutes), from: '', to: '' }, true);
-    } else {
-      navigateTo({ since: '' }, true);
-    }
+    navigateTo({
+      since: p && p.sinceMinutes !== null ? String(p.sinceMinutes) : '',
+      from: '',
+      to: '',
+    }, true);
   };
 
-  const onSinceChange = (minutes) => {
-    navigateTo({ since: minutes == null ? '' : String(minutes) }, true);
-  };
+  const onFromChange = (v) => navigateTo({ from: v, since: '' }, true);
+  const onToChange = (v) => navigateTo({ to: v, since: '' }, true);
 
   const onQChange = (e) => {
     setQLocal(e.target.value);
   };
 
-  const onFromChange = (v) => setFilter('from', v);
-  const onToChange = (v) => setFilter('to', v);
   const onActionChange = (v) => setFilter('action', v);
   const onRoleChange = (v) => setFilter('role', v);
   const onResultatChange = (v) => setFilter('resultat', v);
@@ -202,7 +227,6 @@ export default function AuditJournal() {
         role={roleParam}
         resultat={resultatParam}
         onPeriodChange={onPeriodChange}
-        onSinceChange={onSinceChange}
         onFromChange={onFromChange}
         onToChange={onToChange}
         onQChange={onQChange}
@@ -216,6 +240,12 @@ export default function AuditJournal() {
       {error && (
         <div className="rounded-lg border border-[#F6C7C3] bg-[#FEF3F2] px-4 py-3 text-sm text-[#B42318]">
           {error}
+        </div>
+      )}
+
+      {anomalyNoMatch && (
+        <div className="rounded-lg border border-[#F3D9A4] bg-[#FFF7E8] px-4 py-3 text-sm text-[#B7791F]">
+          Aucune anomalie pour l'action choisie (« {ACTION_LIBELLE(actionParam)} » n'est pas une anomalie).
         </div>
       )}
 

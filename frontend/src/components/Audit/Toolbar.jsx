@@ -1,11 +1,10 @@
 "use client";
 import React from 'react';
-import { PERIOD_SHORTCUTS, RESULTAT_OPTIONS, ANOMALY_ACTIONS, ACTION_LABELS } from './helpers.js';
+import { PERIOD_SHORTCUTS, RESULTAT_OPTIONS, ACTION_LABELS } from './helpers.js';
 import Button from '../Common/Button.jsx';
 
 export function Toolbar({
   period,
-  sinceMinutes,
   from,
   to,
   q,
@@ -13,7 +12,6 @@ export function Toolbar({
   role,
   resultat,
   onPeriodChange,
-  onSinceChange,
   onFromChange,
   onToChange,
   onQChange,
@@ -23,8 +21,6 @@ export function Toolbar({
   onReset,
   hasFilters,
 }) {
-  const anomalyValue = [...ANOMALY_ACTIONS].join(',');
-  const isAnomaly = resultat === 'anomalies';
 
   return (
     <div
@@ -38,16 +34,13 @@ export function Toolbar({
             key={p.label}
             variant="secondary"
             size="sm"
-            onClick={() => {
-              onPeriodChange(p.label);
-              if (p.sinceMinutes !== null) onSinceChange(p.sinceMinutes);
-              else onSinceChange(null);
-            }}
+            onClick={() => onPeriodChange(p.label)}
             className={
               period === p.label
                 ? 'bg-[#1F5FA8] text-white'
                 : 'border border-[#D6DCE5] bg-white text-[#1A2433] hover:bg-[#F5F7FA]'
             }
+            aria-pressed={period === p.label}
           >
             {p.label}
           </Button>
@@ -59,7 +52,6 @@ export function Toolbar({
             value={from || ''}
             onChange={(e) => {
               onFromChange(e.target.value);
-              onSinceChange(null);
             }}
             className="h-[36px] px-2 rounded border border-[#D6DCE5] bg-white text-sm"
             aria-label="Du"
@@ -70,7 +62,6 @@ export function Toolbar({
             value={to || ''}
             onChange={(e) => {
               onToChange(e.target.value);
-              onSinceChange(null);
             }}
             className="h-[36px] px-2 rounded border border-[#D6DCE5] bg-white text-sm"
             aria-label="Au"
@@ -92,12 +83,11 @@ export function Toolbar({
 
       {/* Filtres */}
       <div className="flex flex-wrap gap-2 items-end">
-        <select
-          value={action || ''}
-          onChange={(e) => {
-            onActionChange(e.target.value);
-            onResultatChange('');
-          }}
+          <select
+            value={action || ''}
+            onChange={(e) => {
+              onActionChange(e.target.value);
+            }}
           className="h-[36px] px-3 rounded-lg border border-[#D6DCE5] bg-white text-sm min-w-[200px]"
           aria-label="Action"
         >
@@ -120,8 +110,6 @@ export function Toolbar({
           value={resultat || ''}
           onChange={(e) => {
             onResultatChange(e.target.value);
-            if (e.target.value === 'anomalies') onActionChange(anomalyValue);
-            else onActionChange('');
           }}
           className="h-[36px] px-3 rounded-lg border border-[#D6DCE5] bg-white text-sm min-w-[140px]"
           aria-label="Résultat"
