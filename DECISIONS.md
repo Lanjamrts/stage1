@@ -339,3 +339,19 @@ Journal des choix ambigus. Une ligne par décision, la plus simple chaque fois.
 - Aucun outil de test frontend ajouté (n'existe pas dans le dépôt).
 - RECETTE.md et docs/DEMO.md mises à jour : parcours client = menu Modules → page Modules → un module → saisie ; tableau de bord = avancement, échéances, activité.
 
+
+## Step 33 – Journal d'audit : pagination, filtres de surveillance, détail au clic
+
+- [P33] GET /api/audit : nouveaux paramètres validés par zod — page (≥ 1, défaut 1), limit (1–100, défaut 50), q (1–64), userId (1–64, exact), action (liste ≤ 10 valeurs séparées par des virgules), role, from, to, sinceMinutes (1–43200). Remplacement de .limit(500) par skip((page−1)·limit).limit(limit), tri createdAt décroissant puis _id décroissant.
+- [P33] Le corps de la réponse reste un TABLEAU au format inchangé ; le total filtré passe par l'en-tête X-Total-Count avec Access-Control-Expose-Headers (pas d'élargissement du CORS). DELETE/PATCH/POST sur /api/audit restent à 404 (aucune route d'écriture).
+- [P33] Filtres combinés en ET : action ($in), plage de dates (granularité jour), sinceMinutes (createdAt ≥ maintenant − N minutes), rôle (résolution ObjectId + IM), q (regex échappée, insensitive, sur l'objet OU sur nom/prénom/IM des utilisateurs, leurs ids et IM alimentent le filtre userId), userId exact. q + rôle => intersection des listes d'utilisateurs.
+- [P33] Pas de chargement complet des utilisateurs : seuls les utilisateurs référencés par les lignes de la page courante sont chargés pour userLabel et userRole.
+- [P33] Index créés s'ils n'existent pas sur JournalAudit : { createdAt: -1 } et { userId: 1, createdAt: -1 } (index uniquement, pas de changement de schéma).
+- [P33] Frontend : barre d'outils fixe (sticky sous la TopBar) avec raccourcis de période (Dernière heure / 24 h / 7 jours / 30 jours / Personnalisée, calculés en sinceMinutes côté client), recherche « Utilisateur ou objet » avec anti-rebond 400 ms, filtre Action, filtre Profil, filtre Résultat (Tous / Anomalies via action multi-valeurs), réinitialisation ; tout retour à la page 1 ; filtres, q, page et limit mémorisés dans l'URL.
+- [P33] Pagination serveur en tête et en pied (25/50/100 lignes par page, Précédent / Suivant, « Page X sur Y · N événements »).
+- [P33] Nouvel ordre des colonnes : Date et heure, Action, Utilisateur, Profil, Objet, Adresse ; heure jj/mm/aaaa hh:mm:ss ; fuseau « Heure de Madagascar (UTC+3) » indiqué dans le sous-titre et le panneau de détail.
+- [P33] Colonne Action : libellé + couleur (rouge anomalie, orange, neutre ; jamais la couleur seule) ; lignes d'anomalie sur fond rosé très léger. Colonne Adresse : « ::1 » et « ::ffff:127.0.0.1 » → « Local (127.0.0.1) », « ::ffff:a.b.c.d » → « a.b.c.d », adresse brute dans title.
+- [P33] Séparateurs par jour (« Lundi 2 novembre 2026 », jour de la semaine en français) avant le premier événement de chaque jour sur la page affichée ; en-tête de tableau fixe (thead sticky).
+- [P33] Panneau de détail latéral au clic/Entrée sur une ligne (plein écran sous 1024 px) : date et heure complètes avec fuseau, action libellée + code, utilisateur, profil, objet, adresse interprétée + brute, 5 dernières actions de l'utilisateur (GET /api/audit?userId=…&limit=5). Fermeture par bouton, Échap ou clic hors panneau ; piège de focus et retour du focus sur la ligne ; lignes accessibles (tabIndex, role, aria-selected).
+- [P33] Suppression du badge « Journal immuable certifié DGBF » (affirmation non étayée par la SPEC) ; conservé : bandeau « Lecture seule », conservation 12 mois, états chargement/erreur/vide en français. Aucune nouvelle dépendance.
+- [P33] RECETTE.md et docs/DEMO.md mises à jour : parcours audit (raccourcis de période, anomalies, recherche, pagination, panneau de détail).

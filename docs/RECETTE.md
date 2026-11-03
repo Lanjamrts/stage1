@@ -64,7 +64,7 @@ Aucun test automatique.
 6. Rechercher `991000` dans la barre de recherche → l'utilisateur apparaît dans la liste
 7. Cliquer sur l'utilisateur → vérifier les informations affichées
 8. Cliquer sur « Désactiver » → confirmation, utilisateur marqué inactif
-9. Vérifier que l'historique (journal d'audit) conserve les traces de création et désactivation : aller dans « Journal d'audit », filtrer sur l'action « user_create » et « user_deactivate »
+9. Vérifier que l'historique (journal d'audit) conserve les traces de création et désactivation : aller dans « Journal d'audit », filtrer sur l'action « user_create » et « user_deactivate » (pagination : « Lignes par page », séparateurs par jour, panneau de détail au clic sur une ligne).
 
 **Note :** L'application DÉSACTIVE les comptes au lieu de les supprimer (l'historique est ainsi conservé).
 
