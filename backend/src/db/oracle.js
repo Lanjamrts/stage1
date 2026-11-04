@@ -22,34 +22,65 @@ function configOracle() {
 }
 
 function masquerMotDePasse(message) {
-  const config = loadConfig();
-  if (!config.ORACLE_PASSWORD) return message;
-  return message.replaceAll(config.ORACLE_PASSWORD, '*****');
+  let motDePasse;
+  try {
+    motDePasse = loadConfig().ORACLE_PASSWORD;
+  } catch {
+    // Configuration incomplète : on masque quand même, via l'environnement.
+    motDePasse = process.env.ORACLE_PASSWORD;
+  }
+  if (!motDePasse) return message;
+  return message.replaceAll(motDePasse, '*****');
 }
 
-function messageErreurOracle(err) {
-  const code = err && err.errorNum ? String(err.errorNum) : null;
-  const message = masquerMotDePasse(err && err.message ? String(err.message) : 'Erreur Oracle inconnue.');
+const MESSAGES_ORACLE = {
+  identifiants: 'Identifiants Oracle refusés (ORA-01017) : vérifiez ORACLE_USER et ORACLE_PASSWORD. ',
+  identifiantsAbsents: 'Identifiants Oracle absents : définissez ORACLE_USER et ORACLE_PASSWORD. ',
+  service: 'Service Oracle introuvable (ORA-12514) : vérifiez ORACLE_CONNECT_STRING. ',
+  serviceNonEnregistre: 'Service Oracle non enregistré : Oracle démarre peut-être encore, réessayez dans une minute, ou vérifiez ORACLE_CONNECT_STRING. ',
+  delai: 'Délai de connexion Oracle dépassé (ORA-12170). ',
+  injoignable: 'Oracle est injoignable (connexion refusée) : le conteneur ou le service Oracle est-il démarré ? Vérifiez ORACLE_CONNECT_STRING. ',
+};
+
+// Traduit une erreur Oracle/node-oracledb en une phrase claire en français,
+// sur une seule ligne et sans jamais exposer le mot de passe.
+export function messageErreurOracle(err) {
+  const code = err && err.errorNum != null ? String(err.errorNum) : null;
+  const brut = err && err.message ? String(err.message) : 'Erreur Oracle inconnue.';
+  const message = masquerMotDePasse(brut).split('\n')[0].trim() || 'Erreur Oracle inconnue.';
+  const lower = message.toLowerCase();
+
+  if (lower.includes('njs-101')) {
+    return MESSAGES_ORACLE.identifiantsAbsents + message;
+  }
+  if (lower.includes('njs-518') || (code === '12514' && lower.includes('not registered'))) {
+    return MESSAGES_ORACLE.serviceNonEnregistre + message;
+  }
 
   switch (code) {
+    case '1017':
     case '01017':
-      return "Identifiants Oracle refuses (ORA-01017) : verifiez ORACLE_USER et ORACLE_PASSWORD. " + message;
+      return MESSAGES_ORACLE.identifiants + message;
     case '12514':
-      return "Service Oracle introuvable (ORA-12514) : verifiez ORACLE_CONNECT_STRING. " + message;
+      return MESSAGES_ORACLE.service + message;
     case '12170':
-      return "Délai de connexion Oracle depasse (ORA-12170). " + message;
+      return MESSAGES_ORACLE.delai + message;
+    case '503':
+      return MESSAGES_ORACLE.injoignable + message;
     default:
       break;
   }
 
-  const lower = message.toLowerCase();
-  if (lower.includes('connect timed out') || lower.includes('timeout')) {
-    return "Délai de connexion Oracle depasse : l'hôte ne repond pas. " + message;
+  if (lower.includes('njs-503') || lower.includes('econnrefused')) {
+    return MESSAGES_ORACLE.injoignable + message;
   }
-  if (lower.includes('getaddrinfo') || lower.includes('enotfound') || lower.includes('econnrefused') || lower.includes('injoignable')) {
-    return "Hôte Oracle injoignable : verifiez ORACLE_CONNECT_STRING et le reseau. " + message;
+  if (lower.includes('connect timed out') || lower.includes('timeout') || lower.includes('timed out') || lower.includes('etimedout')) {
+    return "Délai de connexion Oracle dépassé : l'hôte ne répond pas. " + message;
   }
-  return "Erreur Oracle : " + message;
+  if (lower.includes('getaddrinfo') || lower.includes('enotfound') || lower.includes('injoignable')) {
+    return 'Hôte Oracle injoignable : vérifiez ORACLE_CONNECT_STRING et le réseau. ' + message;
+  }
+  return 'Erreur Oracle : ' + message;
 }
 
 export async function getKnex() {
@@ -60,6 +91,14 @@ export async function getKnex() {
     client: 'oracledb',
     connection: { user, password, connectString },
     pool,
+    // Journal silencieux : les erreurs de connexion sont traduites par
+    // messageErreurOracle() et affichées par le script appelant.
+    log: {
+      error: () => {},
+      warn: () => {},
+      deprecate: () => {},
+      debug: () => {},
+    },
   });
   return knexInstance;
 }
