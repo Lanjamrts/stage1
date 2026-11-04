@@ -12,6 +12,7 @@
     "db:oracle:up": "docker compose up -d oracle",
     "db:oracle:down": "docker compose stop oracle",
     "db:oracle:ping": "npm run oracle:ping --prefix backend",
+    "db:oracle:schema": "npm run oracle:schema --prefix backend",
     "test": "npm test --prefix backend",
     "build": "npm run build --prefix frontend",
     "loadtest": "node scripts/loadtest.mjs"

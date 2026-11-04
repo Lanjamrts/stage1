@@ -21,6 +21,7 @@
     "restore": "node src/scripts/restore.js",
     "backup:verify": "node src/scripts/verify-backup.js",
     "oracle:ping": "node src/scripts/oracle-ping.js",
+    "oracle:schema": "node src/scripts/oracle-schema.js",
     "test": "npm run seed:test && vitest run",
     "seed:test": "NODE_ENV=test MONGODB_URI=mongodb://127.0.0.1:27017/sigbd_test node src/seed/demo.js --yes --purge-audit"
   },
