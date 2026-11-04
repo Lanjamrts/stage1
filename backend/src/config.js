@@ -18,9 +18,20 @@ const configSchema = z.object({
   RATE_LIMIT_USER_MAX: z.coerce.number().int().min(50).default(1200),
   LOGIN_RATE_LIMIT_WINDOW_MINUTES: z.coerce.number().int().min(1).default(5),
   LOGIN_RATE_LIMIT_MAX: z.coerce.number().int().min(5).default(60),
+  // Base Oracle (optionnelle : l'application démarre sur MongoDB sans ces variables)
+  ORACLE_USER: z.string().optional(),
+  ORACLE_PASSWORD: z.string().optional(),
+  ORACLE_CONNECT_STRING: z.string().default('127.0.0.1:1521/XEPDB1'),
+  ORACLE_POOL_MIN: z.coerce.number().int().positive().default(1),
+  ORACLE_POOL_MAX: z.coerce.number().int().positive().default(10),
+  // Variables Oracle de test : lues uniquement quand NODE_ENV=test
+  ORACLE_TEST_USER: z.string().optional(),
+  ORACLE_TEST_PASSWORD: z.string().optional(),
+  ORACLE_TEST_CONNECT_STRING: z.string().optional(),
 });
 
 const DEFAULT_TEST_JWT_SECRET = 'test-secret-key-for-testing-only-do-not-use-in-production-32chars';
+const ORACLE_PASSWORD_EXAMPLE = 'votre-mot-de-passe-oracle-ici';
 
 let config;
 
@@ -36,6 +47,27 @@ export function parseEnv(env) {
     if (data.JWT_SECRET === 'votre-secret-jwt-d-au-moins-32-caracteres-ici') {
       throw new Error('JWT_SECRET ne peut pas être la valeur d\'exemple en production');
     }
+    const oraclePresente = ['ORACLE_USER', 'ORACLE_PASSWORD', 'ORACLE_CONNECT_STRING', 'ORACLE_POOL_MIN', 'ORACLE_POOL_MAX'].some(
+      (k) => env[k] !== undefined && env[k] !== '',
+    );
+    if (oraclePresente) {
+      if (!data.ORACLE_USER) {
+        throw new Error('ORACLE_USER est requis en production quand une variable Oracle est définie');
+      }
+      if (!data.ORACLE_PASSWORD) {
+        throw new Error('ORACLE_PASSWORD est requis en production quand une variable Oracle est définie');
+      }
+      if (data.ORACLE_PASSWORD === ORACLE_PASSWORD_EXAMPLE) {
+        throw new Error("ORACLE_PASSWORD ne peut pas être la valeur d'exemple en production");
+      }
+    }
+  }
+
+  // Les variables Oracle de test ne sont lues que quand NODE_ENV=test.
+  if (data.NODE_ENV !== 'test') {
+    data.ORACLE_TEST_USER = undefined;
+    data.ORACLE_TEST_PASSWORD = undefined;
+    data.ORACLE_TEST_CONNECT_STRING = undefined;
   }
 
   return data;
@@ -57,7 +89,18 @@ export function loadConfig() {
     RATE_LIMIT_USER_MAX: process.env.RATE_LIMIT_USER_MAX,
     LOGIN_RATE_LIMIT_WINDOW_MINUTES: process.env.LOGIN_RATE_LIMIT_WINDOW_MINUTES,
     LOGIN_RATE_LIMIT_MAX: process.env.LOGIN_RATE_LIMIT_MAX,
+    ORACLE_USER: process.env.ORACLE_USER,
+    ORACLE_PASSWORD: process.env.ORACLE_PASSWORD,
+    ORACLE_CONNECT_STRING: process.env.ORACLE_CONNECT_STRING,
+    ORACLE_POOL_MIN: process.env.ORACLE_POOL_MIN,
+    ORACLE_POOL_MAX: process.env.ORACLE_POOL_MAX,
   };
+
+  if (process.env.NODE_ENV === 'test') {
+    env.ORACLE_TEST_USER = process.env.ORACLE_TEST_USER;
+    env.ORACLE_TEST_PASSWORD = process.env.ORACLE_TEST_PASSWORD;
+    env.ORACLE_TEST_CONNECT_STRING = process.env.ORACLE_TEST_CONNECT_STRING;
+  }
 
   config = parseEnv(env);
 

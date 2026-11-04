@@ -98,6 +98,44 @@ Crée le premier administrateur (production).
 
 Après un seed:demo il faut se reconnecter.
 
+## Base Oracle (migration en cours)
+
+La base de données active reste **MongoDB** jusqu'à la fin de la migration. Le socle Oracle XE 21c est posé à part (dépendances `oracledb` + `knex`, module `backend/src/db/oracle.js`, service Docker) et n'est utilisé que si les variables `ORACLE_*` sont définies.
+
+### Prérequis
+
+- Oracle XE 21c accessible sur `127.0.0.1:1521/XEPDB1` (service `XEPDB1`, utilisateur applicatif `sigbd`).
+- `oracledb` en **mode léger (thin)** : aucun Instant Client Oracle n'est nécessaire côté Node.
+- Variables optionnelles (sans elles, l'application tourne sur MongoDB) :
+  - `ORACLE_USER` : utilisateur applicatif
+  - `ORACLE_PASSWORD` : mot de passe (jamais journalisé ni renvoyé au client)
+  - `ORACLE_CONNECT_STRING` (défaut `127.0.0.1:1521/XEPDB1`)
+  - `ORACLE_POOL_MIN` (défaut `1`), `ORACLE_POOL_MAX` (défaut `10`)
+
+### Démarrer Oracle (Docker, développement uniquement)
+
+```bash
+npm run db:oracle:up        # démarre le service oracle (docker compose)
+```
+
+Nécessite `ORACLE_PASSWORD`, `APP_USER` et `APP_USER_PASSWORD` dans l'environnement (aucune valeur en clair dans `docker-compose.yml`). Pour l'arrêter : `npm run db:oracle:down`.
+
+### Tester la connexion Oracle
+
+```bash
+npm run oracle:ping --prefix backend
+```
+ou depuis la racine :
+```bash
+npm run db:oracle:ping
+```
+
+Affiche `Oracle OK — version … — service …` ou un message d'erreur clair (code de sortie 1 en cas d'échec, pool fermé). Exécuter avec les variables `ORACLE_*` définies dans le terminal (le mot de passe n'est jamais affiché).
+
+### Mots de passe
+
+Aucun mot de passe réel n'est stocké dans le dépôt. `backend/.env.example` contient uniquement des placeholders (ex. `votre-mot-de-passe-oracle-ici`). Le mot de passe Oracle n'est jamais journalisé ni retourné au client.
+
 ### Mise en service (production)
 
 1. `npm run seed:ref` — crée les profils, les 13 gabarits de modules, les 32 ministères et les 223 EPN (données de référence, idempotent, ne supprime rien).

@@ -9,6 +9,9 @@
     "dev": "concurrently -n api,web -c blue,green \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
     "db:up": "docker compose up -d mongo",
     "db:down": "docker compose down",
+    "db:oracle:up": "docker compose up -d oracle",
+    "db:oracle:down": "docker compose stop oracle",
+    "db:oracle:ping": "npm run oracle:ping --prefix backend",
     "test": "npm test --prefix backend",
     "build": "npm run build --prefix frontend",
     "loadtest": "node scripts/loadtest.mjs"
