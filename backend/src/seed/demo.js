@@ -10,14 +10,15 @@ import { loadConfig } from '../config.js';
 
 import RegionModel from '../models/Region.js';
 import StructureModel from '../models/Structure.js';
-import ProfilModel from '../models/Profil.js';
 import UtilisateurModel from '../models/Utilisateur.js';
 import PeriodeModel from '../models/Periode.js';
-import ReferentielModel from '../models/Referentiel.js';
 import ModuleModel from '../models/Module.js';
 import SaisieModel from '../models/Saisie.js';
 import RemarqueModel from '../models/Remarque.js';
 import { getAuditRepository } from '../repositories/auditRepository.js';
+import { getProfilRepository } from '../repositories/profilRepository.js';
+import { getReferentielRepository } from '../repositories/referentielRepository.js';
+import { closeOracle } from '../db/oracle.js';
 import { MODULES } from './modules.js';
 import { buildSaisies } from './saisies.js';
 import { ensureProfils, ensureModules, ensureEpnReference } from './common.js';
@@ -94,10 +95,10 @@ async function seed() {
   await Promise.all([
     RegionModel.deleteMany({}),
     StructureModel.deleteMany({}),
-    ProfilModel.deleteMany({}),
+    getProfilRepository().supprimerTout(),
     UtilisateurModel.deleteMany({}),
     PeriodeModel.deleteMany({}),
-    ReferentielModel.deleteMany({}),
+    getReferentielRepository().supprimerTout(),
     ModuleModel.deleteMany({}),
     SaisieModel.deleteMany({}),
     RemarqueModel.deleteMany({}),
@@ -158,7 +159,7 @@ async function seed() {
   for (const s of SERVICES) referentiels.push({ type: 'services', value: s });
   for (const g of GRADES) referentiels.push({ type: 'grades', value: g });
   for (const st of STDS) referentiels.push({ type: 'std', value: st });
-  await ReferentielModel.insertMany(referentiels);
+  await getReferentielRepository().insererPlusieurs(referentiels);
   console.log(`${referentiels.length} referentiels crees`);
 
   // 5. Periodes (3)
@@ -216,10 +217,15 @@ async function seed() {
   console.log(`${saisies.length} saisies creees`);
 
   await mongoose.disconnect();
+  // closeOracle est sans effet si Oracle n'a pas ete utilise : il ferme le
+  // pool ouvert par un depot (REFERENTIEL/PROFIL/AUDIT sur Oracle) pour que
+  // le processus se termine.
+  await closeOracle();
   console.log('Seed termine avec succes.');
 }
 
-seed().catch(err => {
+seed().catch(async (err) => {
   console.error('Erreur de seed:', err);
+  await closeOracle().catch(() => {});
   process.exit(1);
 });

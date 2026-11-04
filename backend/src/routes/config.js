@@ -4,8 +4,8 @@ import PDFDocument from 'pdfkit';
 import { z } from 'zod';
 
 import Module from '../models/Module.js';
-import Referentiel from '../models/Referentiel.js';
 import Saisie from '../models/Saisie.js';
+import { getReferentielRepository } from '../repositories/referentielRepository.js';
 import { requireRole, logAudit } from '../middleware/auth.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { MODULES } from '../seed/modules.js';
@@ -147,7 +147,7 @@ router.post(
     const fieldIssue = findFieldIssue(data.fields);
     if (fieldIssue) return res.status(400).json({ message: fieldIssue });
 
-    const epnDocs = await Referentiel.find({ type: 'epn' }).lean();
+    const epnDocs = await getReferentielRepository().lister('epn');
     const epnDict = {};
     for (const d of epnDocs) epnDict[String(d.value)] = { ministere: d.ministere || '', regime: d.regime || '' };
     const epnValue = epnDocs.length ? epnDocs[0] : null;

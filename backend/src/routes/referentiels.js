@@ -1,9 +1,9 @@
 import express from 'express';
 import { z } from 'zod';
 
-import Referentiel from '../models/Referentiel.js';
 import Structure from '../models/Structure.js';
 import Region from '../models/Region.js';
+import { getReferentielRepository } from '../repositories/referentielRepository.js';
 import { requireRole } from '../middleware/auth.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 
@@ -69,7 +69,7 @@ router.get(
       const rows = await Region.find({}).sort({ name: 1 }).lean();
       return res.status(200).json({ type, values: rows.map((r) => r.name) });
     }
-    const rows = await Referentiel.find({ type }).sort({ value: 1 }).lean();
+    const rows = await getReferentielRepository().lister(type);
     if (type === 'epn') {
       return res.status(200).json({
         type,
@@ -110,9 +110,10 @@ router.post(
     const parsed = valueSchema.safeParse(req.body || {});
     if (!parsed.success) return res.status(400).json({ message: parsed.error.issues[0].message });
     const { type } = req.params;
-    const existing = await Referentiel.findOne({ type, value: parsed.data.value }).lean();
+    const repo = getReferentielRepository();
+    const existing = await repo.trouver(type, parsed.data.value);
     if (existing) return res.status(409).json({ message: 'Cette valeur existe déjà.' });
-    const doc = await Referentiel.create({ type, value: parsed.data.value });
+    const doc = await repo.creer({ type, value: parsed.data.value });
     return res.status(201).json({ type, value: doc.value });
   })
 );
@@ -124,15 +125,17 @@ const renameHandler = asyncHandler(async (req, res) => {
   if (!parsed.success) return res.status(400).json({ message: parsed.error.issues[0].message });
   const { type } = req.params;
   const { value, newValue } = parsed.data;
-  const doc = await Referentiel.findOne({ type, value });
+  const repo = getReferentielRepository();
+  const doc = await repo.trouver(type, value);
   if (!doc) return res.status(404).json({ message: 'Ressource introuvable.' });
+  let valeurFinale = doc.value;
   if (value !== newValue) {
-    const dup = await Referentiel.findOne({ type, value: newValue }).lean();
+    const dup = await repo.trouver(type, newValue);
     if (dup) return res.status(409).json({ message: 'Cette valeur existe déjà.' });
-    doc.value = newValue;
-    await doc.save();
+    await repo.renommer(type, value, newValue);
+    valeurFinale = newValue;
   }
-  return res.status(200).json({ type, value: doc.value });
+  return res.status(200).json({ type, value: valeurFinale });
 });
 
 router.put('/:type', renameHandler);
