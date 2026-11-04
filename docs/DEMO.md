@@ -155,15 +155,20 @@ Les saisies de démonstration (modules NCA et TSE) utilisent des EPN réels du r
 - **Compte** : Admin 1 — `120344` (ou Développeur `123009`)
 - **Écran** : « Journal d'audit » <!-- frontend/src/menus.js:17,23 -->
 - **Actions** :
-  - Filtrer par action : voir les libellés affichés <!-- frontend/src/pages/admin1/AuditJournal.jsx:8-30 -->
+  - Filtrer par action : voir les libellés affichés <!-- frontend/src/pages/admin1/AuditJournal.jsx -->
     - `saisie_submit` → « Soumission de saisie »
     - `saisie_validate` → « Validation de saisie »
     - `saisie_reject` → « Rejet de saisie »
     - `saisie_export` → « Export vers la base »
     - `download_excel` → « Téléchargement Excel »
     - `download_pdf` → « Téléchargement PDF »
-- **Résultat attendu** : Traçabilité complète, append-only (pas de suppression)
-- **Ce qu'on dit** : « Audit append-only : chaque action sensible laisse une trace immuable avec libellé français. »
+  - Utiliser les raccourcis de période (« Dernière heure », « 24 h », « 7 jours », « 30 jours », « Personnalisée »)
+  - Filtrer le « Résultat » sur « Anomalies » (connexions échouées, verrouillages) : les lignes s'affichent sur fond rosé
+  - Rechercher un utilisateur ou un objet (recherche serveur, anti-rebond)
+  - Paginer (« Lignes par page » 25 / 50 / 100, « Page X sur Y · N événements », en tête et en pied du tableau)
+  - Cliquer sur une ligne pour ouvrir le panneau de détail (date et heure complète avec fuseau, action libellée + code technique, adresse interprétée, dernières actions de l'utilisateur) ; fermer avec le bouton, Échap ou un clic hors panneau
+- **Résultat attendu** : Traçabilité complète, append-only (pas de suppression, pas de bouton Modifier/Supprimer), lecture seule, fuseau heure de Madagascar (UTC+3)
+- **Ce qu'on dit** : « Audit append-only : chaque action sensible laisse une trace immuable avec libellé français ; le journal reste consultable même avec beaucoup d'activité grâce aux filtres et à la pagination. »
 
 ---
 
