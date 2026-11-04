@@ -35,7 +35,9 @@ function masquerMotDePasse(message) {
 
 const MESSAGES_ORACLE = {
   identifiants: 'Identifiants Oracle refusés (ORA-01017) : vérifiez ORACLE_USER et ORACLE_PASSWORD. ',
+  identifiantsAbsents: 'Identifiants Oracle absents : définissez ORACLE_USER et ORACLE_PASSWORD. ',
   service: 'Service Oracle introuvable (ORA-12514) : vérifiez ORACLE_CONNECT_STRING. ',
+  serviceNonEnregistre: 'Service Oracle non enregistré : Oracle démarre peut-être encore, réessayez dans une minute, ou vérifiez ORACLE_CONNECT_STRING. ',
   delai: 'Délai de connexion Oracle dépassé (ORA-12170). ',
   injoignable: 'Oracle est injoignable (connexion refusée) : le conteneur ou le service Oracle est-il démarré ? Vérifiez ORACLE_CONNECT_STRING. ',
 };
@@ -47,6 +49,13 @@ export function messageErreurOracle(err) {
   const brut = err && err.message ? String(err.message) : 'Erreur Oracle inconnue.';
   const message = masquerMotDePasse(brut).split('\n')[0].trim() || 'Erreur Oracle inconnue.';
   const lower = message.toLowerCase();
+
+  if (lower.includes('njs-101')) {
+    return MESSAGES_ORACLE.identifiantsAbsents + message;
+  }
+  if (lower.includes('njs-518') || (code === '12514' && lower.includes('not registered'))) {
+    return MESSAGES_ORACLE.serviceNonEnregistre + message;
+  }
 
   switch (code) {
     case '1017':

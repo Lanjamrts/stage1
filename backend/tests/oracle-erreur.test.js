@@ -51,6 +51,26 @@ describe("Traduction des erreurs Oracle (messageErreurOracle)", () => {
     }
   });
 
+  it('NJS-101 → identifiants absents, accents présents, une seule ligne', () => {
+    const m = messageErreurOracle({ message: 'NJS-101: no credentials specified' });
+    expect(m).toContain('Identifiants Oracle absents : définissez ORACLE_USER et ORACLE_PASSWORD.');
+    expect(m).not.toContain('absents : definissez');
+    expect(m).toContain('NJS-101: no credentials specified');
+    expect(m).not.toContain('\n');
+  });
+
+  it('NJS-518 → service non enregistré, accents présents, une seule ligne', () => {
+    const m = messageErreurOracle({
+      message: 'NJS-518: cannot connect ... Service "XEPDB1" is not registered with the listener ...',
+    });
+    expect(m).toContain(
+      'Service Oracle non enregistré : Oracle démarre peut-être encore, réessayez dans une minute, ou vérifiez ORACLE_CONNECT_STRING.',
+    );
+    expect(m).not.toContain('non enregistre :');
+    expect(m).toContain('not registered with the listener');
+    expect(m).not.toContain('\n');
+  });
+
   it('Erreur inconnue → « Erreur Oracle : … »', () => {
     expect(messageErreurOracle(err('boom inattendu'))).toBe('Erreur Oracle : boom inattendu');
     expect(messageErreurOracle(null)).toBe('Erreur Oracle : Erreur Oracle inconnue.');
