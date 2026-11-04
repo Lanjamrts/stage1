@@ -30,6 +30,8 @@ const configSchema = z.object({
   ORACLE_TEST_CONNECT_STRING: z.string().optional(),
   // Stockage du journal d'audit : MongoDB par défaut, Oracle si demandé
   AUDIT_STORE: z.enum(['mongo', 'oracle']).default('mongo'),
+  // Stockage des référentiels et des profils : MongoDB par défaut, Oracle si demandé
+  REFERENCE_STORE: z.enum(['mongo', 'oracle']).default('mongo'),
 });
 
 const DEFAULT_TEST_JWT_SECRET = 'test-secret-key-for-testing-only-do-not-use-in-production-32chars';
@@ -54,7 +56,9 @@ export function parseEnv(env) {
     );
     // Le journal d'audit sur Oracle exige les mêmes identifiants que la base.
     const auditSurOracle = data.AUDIT_STORE === 'oracle';
-    if (oraclePresente || auditSurOracle) {
+    // Idem pour les référentiels et les profils.
+    const referenceSurOracle = data.REFERENCE_STORE === 'oracle';
+    if (oraclePresente || auditSurOracle || referenceSurOracle) {
       if (!data.ORACLE_USER) {
         throw new Error('ORACLE_USER est requis en production quand une variable Oracle est définie');
       }
@@ -99,6 +103,7 @@ export function loadConfig() {
     ORACLE_POOL_MIN: process.env.ORACLE_POOL_MIN,
     ORACLE_POOL_MAX: process.env.ORACLE_POOL_MAX,
     AUDIT_STORE: process.env.AUDIT_STORE,
+    REFERENCE_STORE: process.env.REFERENCE_STORE,
   };
 
   if (process.env.NODE_ENV === 'test') {

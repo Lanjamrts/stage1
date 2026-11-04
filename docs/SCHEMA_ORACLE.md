@@ -192,6 +192,8 @@ deux saisies périodiques identiques (structure, module, période) sont refusée
 | index unique `{type, value}` | `UQ_REFERENTIEL_TYPE_VALEUR (TYPE_REF, VALEUR)` | — | contrainte `UNIQUE` |
 | `createdAt` / `updatedAt` | `CREATED_AT` / `UPDATED_AT` | `TIMESTAMP(3) WITH TIME ZONE` | `NOT NULL DEFAULT SYSTIMESTAMP` |
 
+`PROFIL` et `REFERENTIEL` sont les deux tables lues et écrites par le code applicatif quand `REFERENCE_STORE=oracle` (dépôts `backend/src/repositories/profilOracle.js` et `referentielOracle.js`, par défaut `mongo`) ; les 11 autres tables restent sur MongoDB.
+
 ### REMARQUE
 
 | Champ Mongo | Colonne | Type Oracle | Contrainte |

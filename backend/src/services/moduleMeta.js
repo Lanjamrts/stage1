@@ -3,7 +3,7 @@
 // Résolution des listes de référence utilisées par les champs select/multiselect
 // (field.source : 'structures' | 'epn' | 'std' | 'directions' | 'services' | 'grades').
 import Structure from '../models/Structure.js';
-import Referentiel from '../models/Referentiel.js';
+import { getReferentielRepository } from '../repositories/referentielRepository.js';
 
 // Parcourt une liste de champs (avec sous-champs de tableaux) et retourne
 // la liste des sources distinctes utilisées.
@@ -27,7 +27,7 @@ export async function resolveOptions(sources) {
       const rows = await Structure.find({ active: true }).sort({ label: 1 }).lean();
       out[source] = rows.map((s) => s.label);
     } else {
-      const rows = await Referentiel.find({ type: source }).sort({ value: 1 }).lean();
+      const rows = await getReferentielRepository().lister(source);
       out[source] = rows.map((r) => r.value);
     }
   }

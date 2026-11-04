@@ -4,7 +4,7 @@ import PDFDocument from 'pdfkit';
 import Saisie from '../models/Saisie.js';
 import Structure from '../models/Structure.js';
 import Region from '../models/Region.js';
-import Referentiel from '../models/Referentiel.js';
+import { getReferentielRepository } from '../repositories/referentielRepository.js';
 import { logAudit } from '../middleware/auth.js';
 import { structuresInScope, statusesInScope } from '../middleware/scope.js';
 import { serializeSaisie } from '../services/serializeSaisie.js';
@@ -185,7 +185,7 @@ export async function exportCollecte(req, res) {
   const stamp = new Date().toISOString().slice(0, 10);
 
   // Le référentiel EPN est chargé une seule fois par export (dictionnaire valeur → {ministere, regime}).
-  const epnDocs = await Referentiel.find({ type: 'epn' }).lean();
+  const epnDocs = await getReferentielRepository().lister('epn');
   const epnDict = {};
   for (const d of epnDocs) {
     epnDict[String(d.value)] = { ministere: d.ministere || '', regime: d.regime || '' };

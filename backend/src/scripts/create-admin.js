@@ -12,7 +12,8 @@ import { loadConfig } from '../config.js';
 
 import UtilisateurModel from '../models/Utilisateur.js';
 import StructureModel from '../models/Structure.js';
-import ProfilModel from '../models/Profil.js';
+import { getProfilRepository } from '../repositories/profilRepository.js';
+import { closeOracle } from '../db/oracle.js';
 
 dotenv.config();
 const config = loadConfig();
@@ -55,7 +56,7 @@ async function main() {
   }
 
   // Récupérer le profil admin1
-  const admin1Profil = await ProfilModel.findOne({ code: 'admin1' });
+  const admin1Profil = await getProfilRepository().trouverParCode('admin1');
   if (!admin1Profil) {
     console.error('Profil admin1 introuvable. Lancez le seed d\'abord.');
     await mongoose.disconnect();
@@ -136,6 +137,9 @@ async function main() {
 
   rl.close();
   await mongoose.disconnect();
+  // Sans effet si Oracle n'a pas ete utilise : referme le pool ouvert par le
+  // depot des profils (REFERENCE_STORE=oracle) pour que le processus se termine.
+  await closeOracle();
 }
 
 main().catch((err) => {

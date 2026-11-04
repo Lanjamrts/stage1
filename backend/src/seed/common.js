@@ -5,9 +5,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import mongoose from 'mongoose';
 
-import ProfilModel from '../models/Profil.js';
 import ModuleModel from '../models/Module.js';
-import ReferentielModel from '../models/Referentiel.js';
+import { getProfilRepository } from '../repositories/profilRepository.js';
+import { getReferentielRepository } from '../repositories/referentielRepository.js';
+import { closeOracle } from '../db/oracle.js';
 import { MODULES } from './modules.js';
 import { loadConfig } from '../config.js';
 
@@ -22,8 +23,8 @@ export const PROFILS = [
 export async function ensureProfils() {
   let created = 0;
   for (const p of PROFILS) {
-    const res = await ProfilModel.updateOne({ code: p.code }, { $setOnInsert: p }, { upsert: true });
-    created += res.upsertedCount || 0;
+    const res = await getProfilRepository().assurer(p);
+    if (res) created++;
   }
   return { created, existing: PROFILS.length - created };
 }
@@ -253,29 +254,29 @@ export async function ensureEpnReference({ apply = false, epnPath, ministeresPat
   let ministeresCreated = 0;
   let ministeresExisting = 0;
   for (const ministere of ministeres) {
-    const res = await ReferentielModel.updateOne(
-      { type: 'ministeres', value: ministere },
-      { $setOnInsert: { type: 'ministeres', value: ministere } },
-      { upsert: true }
-    );
-    if (res.upsertedCount) ministeresCreated++;
+    const res = await getReferentielRepository().assurer({ type: 'ministeres', value: ministere });
+    if (res) ministeresCreated++;
     else ministeresExisting++;
   }
 
   let epnsCreated = 0;
   let epnsExisting = 0;
   for (const e of epns) {
-    const res = await ReferentielModel.updateOne(
-      { type: 'epn', value: e.nom },
-      { $set: { ministere: e.ministere, regime: e.regime, acronyme: e.acronyme }, $setOnInsert: { type: 'epn', value: e.nom } },
-      { upsert: true }
-    );
-    if (res.upsertedCount) epnsCreated++;
+    const res = await getReferentielRepository().assurerEpn({
+      value: e.nom,
+      ministere: e.ministere,
+      regime: e.regime,
+      acronyme: e.acronyme,
+    });
+    if (res) epnsCreated++;
     else epnsExisting++;
   }
 
   if (!alreadyConnected) {
     await mongoose.disconnect();
+    // Ce script a ouvert ses deux connexions : les refermer pour que le
+    // processus se termine (closeOracle est sans effet si Oracle n'a pas ete utilise).
+    await closeOracle();
   }
 
   return {
