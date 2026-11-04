@@ -1,20 +1,27 @@
 #!/usr/bin/env node
 "use strict";
 
-import { pingOracle, closeOracle } from '../db/oracle.js';
+import { pingOracle, closeOracle, messageErreurOracle } from '../db/oracle.js';
+
+const verbose = process.argv.includes('--verbose') || process.env.DEBUG_ORACLE === '1';
 
 async function main() {
+  let code = 0;
   try {
     const result = await pingOracle();
     console.log(`Oracle OK — version ${result.version} — service ${result.service}`);
-    process.exit(0);
   } catch (err) {
-    console.error(err && err.message ? String(err.message) : 'Erreur Oracle inconnue.');
-    await closeOracle();
-    process.exit(1);
+    code = 1;
+    if (verbose && err && err.stack) console.error(String(err.stack));
+    console.error(`Échec Oracle : ${messageErreurOracle(err)}`);
   } finally {
-    await closeOracle();
+    try {
+      await closeOracle();
+    } catch {
+      /* pool déjà fermé */
+    }
   }
+  process.exit(code);
 }
 
 main();
