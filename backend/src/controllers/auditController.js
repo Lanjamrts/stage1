@@ -1,8 +1,8 @@
 "use strict";
 import { z } from 'zod';
 
-import JournalAudit from '../models/JournalAudit.js';
 import Utilisateur from '../models/Utilisateur.js';
+import { getAuditRepository } from '../repositories/auditRepository.js';
 
 const ROLES = ['client', 'admin2', 'admin1', 'developpeur', 'consultant'];
 
@@ -46,23 +46,9 @@ function intersectIdLists(lists) {
   return inter;
 }
 
-let indexesEnsured = false;
-async function ensureIndexes() {
-  if (indexesEnsured) return;
-  try {
-    await JournalAudit.collection.createIndex({ createdAt: -1 });
-    await JournalAudit.collection.createIndex({ userId: 1, createdAt: -1 });
-    indexesEnsured = true;
-  } catch (e) {
-    // Les index sont optionnels : l'absence ne doit pas bloquer la lecture.
-  }
-}
-
 // GET /api/audit (admin1, developpeur) : lecture seule, filtres, pagination (SPEC §8).
 // Le corps reste un TABLEAU ; le total passe par l'en-tête X-Total-Count.
 export async function listAudit(req, res) {
-  await ensureIndexes();
-
   const parsed = querySchema.safeParse(req.query || {});
   if (!parsed.success) return res.status(400).json({ message: 'Filtre invalide.' });
   const { page, limit, q, userId, action, role, from, to, sinceMinutes } = parsed.data;
@@ -84,13 +70,10 @@ export async function listAudit(req, res) {
     }
   }
 
-  const filter = {};
   const userIdClauses = []; // listes d'identifiants (IDs et IM) à intersequer
-  const orClauses = [];
-
+  let actionsFiltrees;
   if (action) {
-    const values = action.split(',').map((v) => v.trim()).filter(Boolean);
-    filter.action = { $in: values };
+    actionsFiltrees = action.split(',').map((v) => v.trim()).filter(Boolean);
   }
 
   // Plage de dates (granularité jour) et depuis N minutes.
@@ -112,11 +95,6 @@ export async function listAudit(req, res) {
   if (gte && lte && gte > lte) {
     return res.status(400).json({ message: 'Date invalide.' });
   }
-  if (gte || lte) {
-    filter.createdAt = {};
-    if (gte) filter.createdAt.$gte = gte;
-    if (lte) filter.createdAt.$lte = lte;
-  }
 
   // Filtre rôle : résout les identifiants (ObjectId en texte ou IM) des utilisateurs du rôle.
   if (role) {
@@ -128,7 +106,6 @@ export async function listAudit(req, res) {
   if (q) {
     const escaped = q.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&');
     const regex = new RegExp(escaped, 'i');
-    orClauses.push({ object: regex });
     const qUsers = await Utilisateur.find({
       $or: [{ nom: regex }, { prenom: regex }, { im: regex }],
     }).select('_id im').lean();
@@ -140,25 +117,22 @@ export async function listAudit(req, res) {
     userIdClauses.push([userId]);
   }
 
-  if (userIdClauses.length > 0) {
-    const inter = intersectIdLists(userIdClauses);
-    orClauses.push({ userId: { $in: inter } });
-  }
+  // Les deux branches (objet contient q, utilisateur dans la liste) sont
+  // combinées en OU par le dépôt ; le reste des filtres est en ET.
+  const userRefsIn = userIdClauses.length > 0 ? intersectIdLists(userIdClauses) : undefined;
 
-  if (orClauses.length > 0) {
-    filter.$or = orClauses;
-  }
-
-  const total = await JournalAudit.countDocuments(filter);
-
-  const rows = await JournalAudit.find(filter)
-    .sort({ createdAt: -1, _id: -1 })
-    .skip((page - 1) * limit)
-    .limit(limit)
-    .lean();
+  const { total, lignes } = await getAuditRepository().lister({
+    actions: actionsFiltrees,
+    depuis: gte,
+    jusqu: lte,
+    userRefsIn,
+    objetContient: q,
+    page,
+    limit,
+  });
 
   // Utilisateurs référencés par la page courante seulement (pas tout le recueil).
-  const pageUserIds = [...new Set(rows.map((r) => r.userId).filter(Boolean))];
+  const pageUserIds = [...new Set(lignes.map((l) => l.userRef).filter(Boolean))];
   const oids = pageUserIds.filter(isObjectIdString);
   const ims = pageUserIds.filter((id) => !isObjectIdString(id));
   const orUsers = [];
@@ -176,18 +150,18 @@ export async function listAudit(req, res) {
   res.set('X-Total-Count', String(total));
   res.set('Access-Control-Expose-Headers', 'X-Total-Count');
   return res.status(200).json(
-    rows.map((r) => ({
-      id: String(r._id),
-      date: r.createdAt,
-      action: r.action,
-      userId: r.userId,
+    lignes.map((l) => ({
+      id: l.id,
+      date: l.createdAt,
+      action: l.action,
+      userId: l.userRef,
       userLabel:
-        labelById.get(r.userId) ||
-        labelByIm.get(r.userId) ||
-        (r.userId ? `Inconnu (IM ${r.userId})` : '–'),
-      userRole: roleById.get(r.userId) || roleByIm.get(r.userId) || null,
-      object: r.object,
-      ip: r.ip,
+        labelById.get(l.userRef) ||
+        labelByIm.get(l.userRef) ||
+        (l.userRef ? `Inconnu (IM ${l.userRef})` : '–'),
+      userRole: roleById.get(l.userRef) || roleByIm.get(l.userRef) || null,
+      object: l.objet,
+      ip: l.ip,
     }))
   );
 }

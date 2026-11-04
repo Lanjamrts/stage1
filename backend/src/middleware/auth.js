@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import UtilisateurModel from '../models/Utilisateur.js';
 import { setSessionCookie } from '../services/auth.js';
 import { getConfig } from '../config.js';
+import { getAuditRepository } from '../repositories/auditRepository.js';
 
 const { JWT_SECRET } = getConfig();
 
@@ -67,13 +68,13 @@ export function requireRole(roles) {
   };
 }
 
-// Helper pour écrire les lignes d'audit
+// Helper pour écrire les lignes d'audit (MongoDB ou Oracle selon AUDIT_STORE)
 export async function logAudit(userId, action, object, ip) {
   try {
-    await (await import('../models/JournalAudit.js')).default.create({
-      userId: userId ? String(userId) : 'unknown',
+    await getAuditRepository().ajouter({
+      userRef: userId ? String(userId) : 'unknown',
       action,
-      object,
+      objet: object,
       ip: ip || 'unknown',
       createdAt: new Date(),
     });

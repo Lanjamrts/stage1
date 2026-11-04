@@ -14,10 +14,10 @@ import ProfilModel from '../models/Profil.js';
 import UtilisateurModel from '../models/Utilisateur.js';
 import PeriodeModel from '../models/Periode.js';
 import ReferentielModel from '../models/Referentiel.js';
-import JournalAuditModel from '../models/JournalAudit.js';
 import ModuleModel from '../models/Module.js';
 import SaisieModel from '../models/Saisie.js';
 import RemarqueModel from '../models/Remarque.js';
+import { getAuditRepository } from '../repositories/auditRepository.js';
 import { MODULES } from './modules.js';
 import { buildSaisies } from './saisies.js';
 import { ensureProfils, ensureModules, ensureEpnReference } from './common.js';
@@ -105,7 +105,7 @@ async function seed() {
   console.log('Collections nettoyees');
 
   if (PURGE_AUDIT) {
-    await JournalAuditModel.deleteMany({});
+    await getAuditRepository().supprimerTout();
     console.log('Journal d\'audit supprime (--purge-audit)');
   } else {
     console.log('Journal d\'audit conserve');

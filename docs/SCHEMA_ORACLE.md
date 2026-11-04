@@ -216,6 +216,8 @@ deux saisies périodiques identiques (structure, module, période) sont refusée
 | index `{createdAt: -1}` | `IX_JOURNAL_AUDIT_DATE (CREATED_AT DESC)` | — |  |
 | index `{userId: 1, createdAt: -1}` | `IX_JOURNAL_AUDIT_USER (USER_REF, CREATED_AT DESC)` | — |  |
 
+Cette table est la cible du journal d'audit quand `AUDIT_STORE=oracle` (dépôt `backend/src/repositories/auditOracle.js`, par défaut `mongo`). En mode `mongo`, la table reste vide ; les deux modes sont couverts par la même suite de contrat (`backend/tests/audit-repository.test.js`).
+
 ## Inventaire
 
 - **13 tables**, **27 instructions** de création (13 `CREATE TABLE` + 14 `CREATE [UNIQUE] INDEX`), **13 `DROP TABLE`**.
