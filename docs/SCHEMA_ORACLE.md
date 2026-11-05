@@ -67,6 +67,8 @@ part, aucun modèle, contrôleur, service, seed ni test existant n'a été modif
 | `name` | `NAME_REGION` | `VARCHAR2(100 CHAR)` | `NOT NULL`, `UQ_REGION_NAME_REGION` |
 | `createdAt` / `updatedAt` | `CREATED_AT` / `UPDATED_AT` | `TIMESTAMP(3) WITH TIME ZONE` | `NOT NULL DEFAULT SYSTIMESTAMP` |
 
+Cette table est l'une des trois cibles du noyau quand `CORE_STORE=oracle` (dépôt `backend/src/repositories/regionOracle.js`, par défaut `mongo`).
+
 ### STRUCTURE
 
 | Champ Mongo | Colonne | Type Oracle | Contrainte |
@@ -78,6 +80,8 @@ part, aucun modèle, contrôleur, service, seed ni test existant n'a été modif
 | `regionId` | `REGION_ID` | `NUMBER` | nullable, `FK_STRUCTURE_REGION_ID` → `REGION(ID)`, index `IX_STRUCTURE_REGION_ID` |
 | `active` | `ACTIVE` | `NUMBER(1)` | `DEFAULT 1 NOT NULL`, `CK_STRUCTURE_ACTIVE` (`0`,`1`) |
 | `createdAt` / `updatedAt` | `CREATED_AT` / `UPDATED_AT` | `TIMESTAMP(3) WITH TIME ZONE` | `NOT NULL DEFAULT SYSTIMESTAMP` |
+
+Cette table est l'une des trois cibles du noyau quand `CORE_STORE=oracle` (dépôt `backend/src/repositories/structureOracle.js`, par défaut `mongo`).
 
 ### UTILISATEUR
 
@@ -108,6 +112,8 @@ part, aucun modèle, contrôleur, service, seed ni test existant n'a été modif
 | `periodicity` | `PERIODICITE` | `VARCHAR2(10 CHAR)` | `NOT NULL`, `CK_PERIODE_PERIODICITE` (`monthly`,`quarterly`) |
 | index unique `{periodicity, start}` | — | index unique `UQ_PERIODE_PERIODICITE_DATE_DEBUT (PERIODICITE, DATE_DEBUT)` | **index** et non contrainte `UNIQUE` : ORA-02329 interdit `UNIQUE` sur une colonne `TIMESTAMP WITH TIME ZONE` |
 | `createdAt` / `updatedAt` | `CREATED_AT` / `UPDATED_AT` | `TIMESTAMP(3) WITH TIME ZONE` | `NOT NULL DEFAULT SYSTIMESTAMP` |
+
+Cette table est l'une des trois cibles du noyau quand `CORE_STORE=oracle` (dépôt `backend/src/repositories/periodeOracle.js`, par défaut `mongo`).
 
 ### MODULE_SIGBD (`modules`)
 
@@ -192,7 +198,7 @@ deux saisies périodiques identiques (structure, module, période) sont refusée
 | index unique `{type, value}` | `UQ_REFERENTIEL_TYPE_VALEUR (TYPE_REF, VALEUR)` | — | contrainte `UNIQUE` |
 | `createdAt` / `updatedAt` | `CREATED_AT` / `UPDATED_AT` | `TIMESTAMP(3) WITH TIME ZONE` | `NOT NULL DEFAULT SYSTIMESTAMP` |
 
-`PROFIL` et `REFERENTIEL` sont les deux tables lues et écrites par le code applicatif quand `REFERENCE_STORE=oracle` (dépôts `backend/src/repositories/profilOracle.js` et `referentielOracle.js`, par défaut `mongo`) ; les 11 autres tables restent sur MongoDB.
+`PROFIL` et `REFERENTIEL` sont les tables lues et écrites par le code applicatif quand `REFERENCE_STORE=oracle` (dépôts `backend/src/repositories/profilOracle.js` et `referentielOracle.js`) ; `REGION`, `STRUCTURE` et `PERIODE` basculent avec `CORE_STORE=oracle` (dépôts `regionOracle.js`, `structureOracle.js` et `periodeOracle.js`) ; `JOURNAL_AUDIT` avec `AUDIT_STORE=oracle` (dépôt `auditOracle.js`). Par défaut ces trois interrupteurs valent `mongo`. Les 7 tables restantes (`UTILISATEUR`, `SAISIE`, `SAISIE_VALIDATION`, `REMARQUE`, `MODULE_SIGBD` et ses deux tables de jonction) ne sont portées que sur MongoDB.
 
 ### REMARQUE
 
