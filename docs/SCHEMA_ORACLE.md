@@ -100,6 +100,8 @@ Cette table est l'une des trois cibles du noyau quand `CORE_STORE=oracle` (dép�
 | `lockedUntil` | `LOCKED_UNTIL` | `TIMESTAMP(3) WITH TIME ZONE` | nullable |
 | `createdAt` / `updatedAt` | `CREATED_AT` / `UPDATED_AT` | `TIMESTAMP(3) WITH TIME ZONE` | `NOT NULL DEFAULT SYSTIMESTAMP` |
 
+Cette table est une cible du noyau quand `CORE_STORE=oracle` (dépôt `backend/src/repositories/utilisateurOracle.js`, par défaut `mongo`).
+
 ### PERIODE
 
 | Champ Mongo | Colonne | Type Oracle | Contrainte |
@@ -146,6 +148,8 @@ Cette table est l'une des trois cibles du noyau quand `CORE_STORE=oracle` (dép�
 | `moduleId` | `MODULE_ID` | `NUMBER` | `NOT NULL`, `PK_MODULE_TYPE_STRUCTURE` avec `TYPE_STRUCTURE`, `FK_MODULE_TYPE_STRUCTURE_MODULE_ID` → `MODULE_SIGBD(ID)` **ON DELETE CASCADE** |
 | `structureTypes[]` | `TYPE_STRUCTURE` | `VARCHAR2(12 CHAR)` | `NOT NULL`, `CK_MODULE_TYPE_STRUCTURE_TYPE_STRUCTURE` (8 valeurs), PK composite |
 | `createdAt` / `updatedAt` | `CREATED_AT` / `UPDATED_AT` | `TIMESTAMP(3) WITH TIME ZONE` | `NOT NULL DEFAULT SYSTIMESTAMP` |
+
+Ces trois tables sont les cibles du noyau quand `CORE_STORE=oracle` (dépôt `backend/src/repositories/moduleOracle.js`, par défaut `mongo`).
 
 ### SAISIE
 
@@ -198,7 +202,7 @@ deux saisies périodiques identiques (structure, module, période) sont refusée
 | index unique `{type, value}` | `UQ_REFERENTIEL_TYPE_VALEUR (TYPE_REF, VALEUR)` | — | contrainte `UNIQUE` |
 | `createdAt` / `updatedAt` | `CREATED_AT` / `UPDATED_AT` | `TIMESTAMP(3) WITH TIME ZONE` | `NOT NULL DEFAULT SYSTIMESTAMP` |
 
-`PROFIL` et `REFERENTIEL` sont les tables lues et écrites par le code applicatif quand `REFERENCE_STORE=oracle` (dépôts `backend/src/repositories/profilOracle.js` et `referentielOracle.js`) ; `REGION`, `STRUCTURE` et `PERIODE` basculent avec `CORE_STORE=oracle` (dépôts `regionOracle.js`, `structureOracle.js` et `periodeOracle.js`) ; `JOURNAL_AUDIT` avec `AUDIT_STORE=oracle` (dépôt `auditOracle.js`). Par défaut ces trois interrupteurs valent `mongo`. Les 7 tables restantes (`UTILISATEUR`, `SAISIE`, `SAISIE_VALIDATION`, `REMARQUE`, `MODULE_SIGBD` et ses deux tables de jonction) ne sont portées que sur MongoDB.
+`PROFIL` et `REFERENTIEL` sont les tables lues et écrites par le code applicatif quand `REFERENCE_STORE=oracle` (dépôts `backend/src/repositories/profilOracle.js` et `referentielOracle.js`) ; `REGION`, `STRUCTURE`, `PERIODE`, `UTILISATEUR` et `MODULE_SIGBD` (avec ses deux tables de jonction) basculent avec `CORE_STORE=oracle` (dépôts `regionOracle.js`, `structureOracle.js`, `periodeOracle.js`, `utilisateurOracle.js` et `moduleOracle.js`) ; `JOURNAL_AUDIT` avec `AUDIT_STORE=oracle` (dépôt `auditOracle.js`). Par défaut ces trois interrupteurs valent `mongo`. Les 3 tables restantes (`SAISIE`, `SAISIE_VALIDATION`, `REMARQUE`) ne sont portées que sur MongoDB.
 
 ### REMARQUE
 
