@@ -32,6 +32,8 @@ const configSchema = z.object({
   AUDIT_STORE: z.enum(['mongo', 'oracle']).default('mongo'),
   // Stockage des référentiels et des profils : MongoDB par défaut, Oracle si demandé
   REFERENCE_STORE: z.enum(['mongo', 'oracle']).default('mongo'),
+  // Stockage du noyau (régions, structures, périodes) : MongoDB par défaut, Oracle si demandé
+  CORE_STORE: z.enum(['mongo', 'oracle']).default('mongo'),
 });
 
 const DEFAULT_TEST_JWT_SECRET = 'test-secret-key-for-testing-only-do-not-use-in-production-32chars';
@@ -58,7 +60,9 @@ export function parseEnv(env) {
     const auditSurOracle = data.AUDIT_STORE === 'oracle';
     // Idem pour les référentiels et les profils.
     const referenceSurOracle = data.REFERENCE_STORE === 'oracle';
-    if (oraclePresente || auditSurOracle || referenceSurOracle) {
+    // Idem pour le noyau (régions, structures, périodes).
+    const coreSurOracle = data.CORE_STORE === 'oracle';
+    if (oraclePresente || auditSurOracle || referenceSurOracle || coreSurOracle) {
       if (!data.ORACLE_USER) {
         throw new Error('ORACLE_USER est requis en production quand une variable Oracle est définie');
       }
@@ -104,6 +108,7 @@ export function loadConfig() {
     ORACLE_POOL_MAX: process.env.ORACLE_POOL_MAX,
     AUDIT_STORE: process.env.AUDIT_STORE,
     REFERENCE_STORE: process.env.REFERENCE_STORE,
+    CORE_STORE: process.env.CORE_STORE,
   };
 
   if (process.env.NODE_ENV === 'test') {
