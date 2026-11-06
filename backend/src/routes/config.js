@@ -3,9 +3,10 @@ import express from 'express';
 import PDFDocument from 'pdfkit';
 import { z } from 'zod';
 
-import Module from '../models/Module.js';
-import Saisie from '../models/Saisie.js';
+import { getModuleRepository } from '../repositories/moduleRepository.js';
+import { getSaisieRepository } from '../repositories/saisieRepository.js';
 import { getReferentielRepository } from '../repositories/referentielRepository.js';
+import { estIdValide } from '../repositories/ids.js';
 import { requireRole, logAudit } from '../middleware/auth.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { MODULES } from '../seed/modules.js';
@@ -13,7 +14,6 @@ import { buildExportModel } from '../services/exportModel.js';
 import { renderPdf } from '../services/exportPdf.js';
 import { buildExampleRow, buildSheets } from '../services/previewExport.js';
 
-const OBJECT_ID = /^[0-9a-fA-F]{24}$/;
 const NOT_FOUND = 'Ressource introuvable.';
 const FIELD_KEY = /^[a-z][a-z0-9_]*$/i;
 const FIELD_TYPES = [
@@ -107,20 +107,30 @@ router.post(
     const fieldIssue = findFieldIssue(data.fields);
     if (fieldIssue) return res.status(400).json({ message: fieldIssue });
 
-    const existing = await Module.findOne({ code: data.code }).lean();
+    const existing = await getModuleRepository().trouverParCode(data.code);
     if (existing) return res.status(409).json({ message: 'Ce code de gabarit existe déjà.' });
 
-    const doc = await Module.create({
-      code: data.code,
-      label: data.label,
-      periodicity: data.periodicity,
-      allowedPeriodicities: data.allowedPeriodicities ?? [],
-      kind: data.kind,
-      structureTypes: data.structureTypes,
-      fields: data.fields,
-      version: 1,
-      active: true,
-    });
+    let doc;
+    try {
+      doc = await getModuleRepository().creer({
+        code: data.code,
+        label: data.label,
+        periodicity: data.periodicity,
+        allowedPeriodicities: data.allowedPeriodicities ?? [],
+        kind: data.kind,
+        structureTypes: data.structureTypes,
+        fields: data.fields,
+        version: 1,
+        active: true,
+      });
+    } catch (error) {
+      // Le dépôt normalise la violation d'unicité (code 11000 de MongoDB,
+      // ORA-00001 d'Oracle) en une Error dont `code` vaut 'DOUBLON'.
+      if (error && error.code === 'DOUBLON') {
+        return res.status(409).json({ message: 'Ce code de gabarit existe déjà.' });
+      }
+      throw error;
+    }
     await logAudit(req.user._id, 'module_publish', `module:${doc._id}`, req.ip);
     return res.status(201).json({ id: String(doc._id), code: doc.code, version: doc.version });
   })
@@ -183,8 +193,8 @@ router.put(
   '/:id',
   asyncHandler(async (req, res) => {
     const id = req.params.id;
-    if (!OBJECT_ID.test(id)) return res.status(404).json({ message: NOT_FOUND });
-    const doc = await Module.findById(id);
+    if (!estIdValide(id)) return res.status(404).json({ message: NOT_FOUND });
+    const doc = await getModuleRepository().trouverParId(id);
     if (!doc) return res.status(404).json({ message: NOT_FOUND });
 
     const parsed = updateSchema.safeParse(req.body || {});
@@ -193,17 +203,22 @@ router.put(
     const fieldIssue = findFieldIssue(data.fields);
     if (fieldIssue) return res.status(400).json({ message: fieldIssue });
 
-    doc.label = data.label;
-    doc.periodicity = data.periodicity;
-    if (data.allowedPeriodicities !== undefined) doc.allowedPeriodicities = data.allowedPeriodicities;
-    doc.kind = data.kind;
-    doc.structureTypes = data.structureTypes;
-    doc.fields = data.fields;
-    doc.version = doc.version + 1; // version N+1 ; les saisies gardent leur version
-    await doc.save();
+    // version N+1 ; les saisies gardent leur version.
+    const maj = await getModuleRepository().mettreAJour(id, {
+      label: data.label,
+      periodicity: data.periodicity,
+      kind: data.kind,
+      structureTypes: data.structureTypes,
+      fields: data.fields,
+      version: doc.version + 1,
+      ...(data.allowedPeriodicities !== undefined
+        ? { allowedPeriodicities: data.allowedPeriodicities }
+        : {}),
+    });
+    if (!maj) return res.status(404).json({ message: NOT_FOUND });
 
     await logAudit(req.user._id, 'module_publish', `module:${doc._id}`, req.ip);
-    return res.status(200).json({ id: String(doc._id), code: doc.code, version: doc.version });
+    return res.status(200).json({ id: String(maj._id), code: maj.code, version: maj.version });
   })
 );
 
@@ -212,12 +227,12 @@ router.patch(
   '/:id/active',
   asyncHandler(async (req, res) => {
     const id = req.params.id;
-    if (!OBJECT_ID.test(id)) return res.status(404).json({ message: NOT_FOUND });
+    if (!estIdValide(id)) return res.status(404).json({ message: NOT_FOUND });
     const active = req.body ? req.body.active : undefined;
     if (typeof active !== 'boolean') {
       return res.status(400).json({ message: 'Ce champ est obligatoire.' });
     }
-    const doc = await Module.findByIdAndUpdate(id, { active }, { new: true });
+    const doc = await getModuleRepository().mettreAJour(id, { active });
     if (!doc) return res.status(404).json({ message: NOT_FOUND });
     return res.status(200).json({ id: String(doc._id), active: doc.active });
   })
@@ -228,8 +243,8 @@ router.delete(
   '/:id',
   asyncHandler(async (req, res) => {
     const id = req.params.id;
-    if (!OBJECT_ID.test(id)) return res.status(404).json({ message: NOT_FOUND });
-    const doc = await Module.findById(id);
+    if (!estIdValide(id)) return res.status(404).json({ message: NOT_FOUND });
+    const doc = await getModuleRepository().trouverParId(id);
     if (!doc) return res.status(404).json({ message: NOT_FOUND });
 
     // c) rapport de départ : on ne le supprime pas, on le désactive
@@ -240,7 +255,7 @@ router.delete(
     }
 
     // d) une saisie y fait référence : blocage
-    const hasSaisie = await Saisie.exists({ moduleId: doc._id });
+    const hasSaisie = await getSaisieRepository().existePourModule(String(doc._id));
     if (hasSaisie) {
       return res.status(409).json({ message: 'Ce rapport contient des saisies : désactivez-le plutôt.' });
     }
@@ -251,7 +266,7 @@ router.delete(
       return res.status(400).json({ message: 'Le code saisi ne correspond pas.' });
     }
 
-    await Module.findByIdAndDelete(doc._id);
+    await getModuleRepository().supprimer(String(doc._id));
     await logAudit(req.user._id, 'module_delete', `module:${doc._id}`, req.ip);
     return res.status(200).json({ id: String(doc._id), code: doc.code });
   })

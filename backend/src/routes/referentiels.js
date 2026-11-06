@@ -1,9 +1,9 @@
 import express from 'express';
 import { z } from 'zod';
 
-import Structure from '../models/Structure.js';
-import Region from '../models/Region.js';
 import { getReferentielRepository } from '../repositories/referentielRepository.js';
+import { getStructureRepository } from '../repositories/structureRepository.js';
+import { getRegionRepository } from '../repositories/regionRepository.js';
 import { requireRole } from '../middleware/auth.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 
@@ -49,9 +49,10 @@ router.get(
       return res.status(400).json({ message: 'Type de liste invalide.' });
     }
     if (type === 'structures') {
-      const rows = await Structure.find({ active: true }).sort({ label: 1 }).lean();
+      // Le dépôt trie déjà par label croissant.
+      const rows = await getStructureRepository().lister({ actives: true, trierParLabel: true });
       if (req.query.full === '1') {
-        const regions = await Region.find({}).lean();
+        const regions = await getRegionRepository().lister();
         const regionName = new Map(regions.map((r) => [String(r._id), r.name]));
         return res.status(200).json({
           type,
@@ -66,7 +67,8 @@ router.get(
       return res.status(200).json({ type, values: rows.map((s) => s.label) });
     }
     if (type === 'regions') {
-      const rows = await Region.find({}).sort({ name: 1 }).lean();
+      // Le dépôt trie déjà par name croissant.
+      const rows = await getRegionRepository().lister();
       return res.status(200).json({ type, values: rows.map((r) => r.name) });
     }
     const rows = await getReferentielRepository().lister(type);

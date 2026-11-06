@@ -1,7 +1,8 @@
 import express from 'express';
 
-import Module from '../models/Module.js';
-import Structure from '../models/Structure.js';
+import { getModuleRepository } from '../repositories/moduleRepository.js';
+import { getStructureRepository } from '../repositories/structureRepository.js';
+import { estIdValide } from '../repositories/ids.js';
 import { MODULES } from '../seed/modules.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { acceptedPeriodicities } from '../utils/periodicity.js';
@@ -18,22 +19,23 @@ router.get(
   '/',
   asyncHandler(async (req, res) => {
     const user = req.user;
-    let filter = {};
+    let options = {};
     let withFields = false;
 
     if (user.role === 'client') {
-      const structure = await Structure.findById(user.structureId).lean();
+      const structure = await getStructureRepository().trouverParId(String(user.structureId));
       if (!structure) return res.status(404).json({ message: 'Structure introuvable.' });
-      filter = { active: true, structureTypes: structure.type };
+      options = { actifs: true, typeStructure: structure.type };
       withFields = true; // le client remplit le formulaire
     } else if (user.role === 'developpeur') {
-      filter = {};
+      options = {};
       withFields = true;
     } else {
-      filter = { active: true };
+      options = { actifs: true };
     }
 
-    const modules = await Module.find(filter).sort({ code: 1 }).lean();
+    // Le dépôt trie déjà par code croissant.
+    const modules = await getModuleRepository().lister(options);
     return res.status(200).json(
       modules.map((m) => ({
         id: String(m._id),
@@ -57,15 +59,15 @@ router.get(
   '/:id',
   asyncHandler(async (req, res) => {
     const id = req.params.id;
-    if (!/^[0-9a-fA-F]{24}$/.test(id)) {
+    if (!estIdValide(id)) {
       return res.status(404).json({ message: 'Module introuvable.' });
     }
-    const m = await Module.findById(id).lean();
+    const m = await getModuleRepository().trouverParId(id);
     if (!m) return res.status(404).json({ message: 'Module introuvable.' });
 
     const user = req.user;
     if (user.role === 'client') {
-      const structure = await Structure.findById(user.structureId).lean();
+      const structure = await getStructureRepository().trouverParId(String(user.structureId));
       if (!structure || !m.structureTypes.includes(structure.type) || !m.active) {
         return res.status(404).json({ message: 'Module introuvable.' });
       }
