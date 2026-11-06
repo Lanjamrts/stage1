@@ -202,7 +202,7 @@ deux saisies périodiques identiques (structure, module, période) sont refusée
 | index unique `{type, value}` | `UQ_REFERENTIEL_TYPE_VALEUR (TYPE_REF, VALEUR)` | — | contrainte `UNIQUE` |
 | `createdAt` / `updatedAt` | `CREATED_AT` / `UPDATED_AT` | `TIMESTAMP(3) WITH TIME ZONE` | `NOT NULL DEFAULT SYSTIMESTAMP` |
 
-`PROFIL` et `REFERENTIEL` sont les tables lues et écrites par le code applicatif quand `REFERENCE_STORE=oracle` (dépôts `backend/src/repositories/profilOracle.js` et `referentielOracle.js`) ; `REGION`, `STRUCTURE`, `PERIODE`, `UTILISATEUR` et `MODULE_SIGBD` (avec ses deux tables de jonction) basculent avec `CORE_STORE=oracle` (dépôts `regionOracle.js`, `structureOracle.js`, `periodeOracle.js`, `utilisateurOracle.js` et `moduleOracle.js`) ; `JOURNAL_AUDIT` avec `AUDIT_STORE=oracle` (dépôt `auditOracle.js`). Par défaut ces trois interrupteurs valent `mongo`. Les 3 tables restantes (`SAISIE`, `SAISIE_VALIDATION`, `REMARQUE`) ne sont portées que sur MongoDB.
+`PROFIL` et `REFERENTIEL` sont les tables lues et écrites par le code applicatif quand `REFERENCE_STORE=oracle` (dépôts `backend/src/repositories/profilOracle.js` et `referentielOracle.js`) ; `REGION`, `STRUCTURE`, `PERIODE`, `UTILISATEUR`, `MODULE_SIGBD` (avec ses deux tables de jonction), `SAISIE` (avec `SAISIE_VALIDATION`) et `REMARQUE` basculent avec `CORE_STORE=oracle` (dépôts `regionOracle.js`, `structureOracle.js`, `periodeOracle.js`, `utilisateurOracle.js`, `moduleOracle.js`, `saisieOracle.js` et `remarqueOracle.js`) ; `JOURNAL_AUDIT` avec `AUDIT_STORE=oracle` (dépôt `auditOracle.js`). Par défaut ces trois interrupteurs valent `mongo`. Les routes, contrôleurs, services, scripts et seeds ne basculent qu'à l'étape 41 : voir « Portage des tables » ci-dessous.
 
 ### REMARQUE
 
@@ -229,6 +229,30 @@ deux saisies périodiques identiques (structure, module, période) sont refusée
 | index `{userId: 1, createdAt: -1}` | `IX_JOURNAL_AUDIT_USER (USER_REF, CREATED_AT DESC)` | — |  |
 
 Cette table est la cible du journal d'audit quand `AUDIT_STORE=oracle` (dépôt `backend/src/repositories/auditOracle.js`, par défaut `mongo`). En mode `mongo`, la table reste vide ; les deux modes sont couverts par la même suite de contrat (`backend/tests/audit-repository.test.js`).
+
+## Portage des tables (dépôts, étapes 38 à 40)
+
+Une ligne par table : le dépôt qui la lit et l'écrit selon l'interrupteur (par défaut `mongo`).
+Préparation seule : les routes, contrôleurs, services, scripts et seeds ne basculent qu'à l'étape 41.
+
+| Table | Interrupteur | Dépôt (mode `mongo`) | Dépôt (mode `oracle`) |
+| --- | --- | --- | --- |
+| `PROFIL` | `REFERENCE_STORE` | `profilMongo.js` | `profilOracle.js` |
+| `REGION` | `CORE_STORE` | `regionMongo.js` | `regionOracle.js` |
+| `STRUCTURE` | `CORE_STORE` | `structureMongo.js` | `structureOracle.js` |
+| `PERIODE` | `CORE_STORE` | `periodeMongo.js` | `periodeOracle.js` |
+| `UTILISATEUR` | `CORE_STORE` | `utilisateurMongo.js` | `utilisateurOracle.js` |
+| `MODULE_SIGBD` | `CORE_STORE` | `moduleMongo.js` | `moduleOracle.js` |
+| `MODULE_PERIODICITE` | `CORE_STORE` | (tableau `allowedPeriodicities` du document `modules`) | `moduleOracle.js` |
+| `MODULE_TYPE_STRUCTURE` | `CORE_STORE` | (tableau `structureTypes` du document `modules`) | `moduleOracle.js` |
+| `SAISIE` | `CORE_STORE` | `saisieMongo.js` | `saisieOracle.js` |
+| `SAISIE_VALIDATION` | `CORE_STORE` | (tableau `validations` embarqué du document `saisies`) | `saisieOracle.js` |
+| `REMARQUE` | `CORE_STORE` | `remarqueMongo.js` | `remarqueOracle.js` |
+| `REFERENTIEL` | `REFERENCE_STORE` | `referentielMongo.js` | `referentielOracle.js` |
+| `JOURNAL_AUDIT` | `AUDIT_STORE` | `auditMongo.js` | `auditOracle.js` |
+
+Le choix du dépôt est relu **à chaque appel** par `getXxxRepository()` (jamais d'implémentation cachée) ;
+l'écriture `SAISIE.VALEURS_JSON` et `MODULE_SIGBD.FIELDS_JSON` lie une chaîne `JSON.stringify(...)`.
 
 ## Inventaire
 

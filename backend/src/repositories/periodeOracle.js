@@ -9,6 +9,7 @@
 import { getKnex } from '../db/oracle.js';
 import { estIdValide } from './ids.js';
 import { erreurDoublonSi } from './doublon.js';
+import { construireIn } from './listeIn.js';
 
 const COLONNES = 'ID, LABEL, DATE_DEBUT, DATE_FIN, DATE_LIMITE, PERIODICITE, CREATED_AT, UPDATED_AT';
 
@@ -51,6 +52,16 @@ export async function trouverParId(id) {
   if (!estIdValide(id)) return null;
   const lignes = await requeter(`SELECT ${COLONNES} FROM PERIODE WHERE ID = ?`, [Number(id)]);
   return lignes.length > 0 ? lignes[0] : null;
+}
+
+// Ajout étape 40 : ids invalides et en double ignorés, [] pour une liste
+// vide ou sans id valide, ordre de création (ID croissant), IN découpé.
+export async function listerParIds(ids) {
+  if (!Array.isArray(ids) || ids.length === 0) return [];
+  const valides = [...new Set(ids.filter((id) => estIdValide(id)))];
+  if (valides.length === 0) return [];
+  const { condition, valeurs } = construireIn('ID', valides.map(Number));
+  return requeter(`SELECT ${COLONNES} FROM PERIODE WHERE ${condition} ORDER BY ID`, valeurs);
 }
 
 export async function listerTerminees(avant) {
