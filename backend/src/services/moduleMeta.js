@@ -2,7 +2,7 @@
 
 // Résolution des listes de référence utilisées par les champs select/multiselect
 // (field.source : 'structures' | 'epn' | 'std' | 'directions' | 'services' | 'grades').
-import Structure from '../models/Structure.js';
+import { getStructureRepository } from '../repositories/structureRepository.js';
 import { getReferentielRepository } from '../repositories/referentielRepository.js';
 
 // Parcourt une liste de champs (avec sous-champs de tableaux) et retourne
@@ -24,7 +24,8 @@ export async function resolveOptions(sources) {
   const out = {};
   for (const source of sources) {
     if (source === 'structures') {
-      const rows = await Structure.find({ active: true }).sort({ label: 1 }).lean();
+      // Le dépôt trie déjà par label croissant.
+      const rows = await getStructureRepository().lister({ actives: true, trierParLabel: true });
       out[source] = rows.map((s) => s.label);
     } else {
       const rows = await getReferentielRepository().lister(source);

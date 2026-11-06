@@ -1,6 +1,6 @@
 import express from 'express';
 
-import Periode from '../models/Periode.js';
+import { getPeriodeRepository } from '../repositories/periodeRepository.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 
 const router = express.Router();
@@ -9,7 +9,8 @@ const router = express.Router();
 router.get(
   '/',
   asyncHandler(async (req, res) => {
-    const periodes = await Periode.find({}).sort({ start: -1 }).lean();
+    // Le dépôt trie déjà start décroissant.
+    const periodes = await getPeriodeRepository().lister();
     return res.status(200).json(
       periodes.map((p) => ({
         id: String(p._id),
