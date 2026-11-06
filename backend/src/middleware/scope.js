@@ -1,6 +1,5 @@
 "use strict";
-import StructureModel from '../models/Structure.js';
-import RegionModel from '../models/Region.js';
+import { getStructureRepository } from '../repositories/structureRepository.js';
 
 // Helpers de périmètre (rôle + portée) — utilisés par les routes des phases suivantes.
 // Retournent les structures visibles par l'utilisateur, ou null = « toutes ».
@@ -16,7 +15,7 @@ export async function structuresInScope(user) {
   if (user.role === 'admin1' || user.role === 'consultant') return null; // toutes
   if (user.role === 'developpeur') return []; // aucun rapport
 
-  const structure = await StructureModel.findById(user.structureId);
+  const structure = await getStructureRepository().trouverParId(String(user.structureId));
   if (!structure) return [];
 
   // client : sa seule structure
@@ -25,10 +24,10 @@ export async function structuresInScope(user) {
   // admin2 : toute sa région (structures sans région = hors périmètre)
   if (user.role === 'admin2') {
     if (!structure.regionId) return [structure._id];
-    const regional = await StructureModel.find({
+    const regional = await getStructureRepository().lister({
       regionId: structure.regionId,
-      type: { $in: ['SRB', 'SRSP', 'SRPE', 'CIRBF', 'DRBF'] },
-    }).select('_id');
+      types: ['SRB', 'SRSP', 'SRPE', 'CIRBF', 'DRBF'],
+    });
     return regional.map((s) => s._id);
   }
 
@@ -39,7 +38,7 @@ export async function structuresInScope(user) {
 export async function regionOfUser(user) {
   if (!user) return null;
   if (user.role === 'admin1' || user.role === 'consultant') return null; // toutes régions
-  const structure = await StructureModel.findById(user.structureId);
+  const structure = await getStructureRepository().trouverParId(String(user.structureId));
   return structure ? structure.regionId : null;
 }
 

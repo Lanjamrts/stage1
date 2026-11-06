@@ -1,8 +1,8 @@
 "use strict";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import UtilisateurModel from '../models/Utilisateur.js';
 import { getConfig } from '../config.js';
+import { getUtilisateurRepository } from '../repositories/utilisateurRepository.js';
 
 const { JWT_SECRET, SESSION_TIMEOUT_MINUTES, NODE_ENV } = getConfig();
 export { SESSION_TIMEOUT_MINUTES };
@@ -56,20 +56,21 @@ export function verifyToken(token) {
 
 // Gestion des tentatives échouées et du verrouillage
 export async function handleFailedAttempt(im) {
-  const utilisateur = await UtilisateurModel.findOne({ im });
+  const utilisateur = await getUtilisateurRepository().trouverParIm(im);
   if (!utilisateur) return;
 
-  utilisateur.failedAttempts = (utilisateur.failedAttempts || 0) + 1;
+  const failedAttempts = (utilisateur.failedAttempts || 0) + 1;
+  const champs = { failedAttempts };
 
-  if (utilisateur.failedAttempts >= MAX_FAILED_ATTEMPTS) {
-    utilisateur.lockedUntil = new Date(Date.now() + LOCKOUT_DURATION_MINUTES * 60 * 1000);
+  if (failedAttempts >= MAX_FAILED_ATTEMPTS) {
+    champs.lockedUntil = new Date(Date.now() + LOCKOUT_DURATION_MINUTES * 60 * 1000);
   }
 
-  await utilisateur.save();
+  await getUtilisateurRepository().mettreAJourParIm(im, champs);
 }
 
 export async function resetFailedAttempts(im) {
-  await UtilisateurModel.updateOne({ im }, { failedAttempts: 0, lockedUntil: null });
+  await getUtilisateurRepository().mettreAJourParIm(im, { failedAttempts: 0, lockedUntil: null });
 }
 
 export function isAccountLocked(utilisateur) {
@@ -78,9 +79,5 @@ export function isAccountLocked(utilisateur) {
 
 // Déblocage automatique si le temps est écoulé (appelée périodiquement)
 export async function unlockExpiredAccounts() {
-  const now = Date.now();
-  await UtilisateurModel.updateMany(
-    { lockedUntil: { $lte: new Date(now) } },
-    { lockedUntil: null, failedAttempts: 0 }
-  );
+  await getUtilisateurRepository().debloquerExpires(new Date());
 }
