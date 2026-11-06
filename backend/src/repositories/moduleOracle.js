@@ -197,6 +197,24 @@ export async function trouverParId(id) {
   return lireParId(db, id);
 }
 
+// Ajout étape 40 : ids invalides et en double ignorés, [] pour une liste
+// vide ou sans id valide, ordre de création (ID croissant), IN découpé,
+// tableaux enfants reconstruits (format habituel du dépôt).
+export async function listerParIds(ids) {
+  if (!Array.isArray(ids) || ids.length === 0) return [];
+  const valides = [...new Set(ids.filter((id) => estIdValide(id)))];
+  if (valides.length === 0) return [];
+  const { condition, valeurs } = construireIn('ID', valides.map(Number));
+  const db = await getKnex();
+  const resultat = await db.raw(`SELECT ${COLONNES} FROM MODULE_SIGBD WHERE ${condition} ORDER BY ID`, valeurs);
+  const lignes = resultat.rows || resultat;
+  const enfants = await lireEnfantsPlusieurs(
+    db,
+    lignes.map((ligne) => Number(ligne.ID))
+  );
+  return lignes.map((ligne) => convertir(ligne, enfants.get(String(ligne.ID))));
+}
+
 export async function trouverParCode(code) {
   const db = await getKnex();
   return lireParCode(db, code);

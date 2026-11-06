@@ -19,6 +19,15 @@ export async function trouverParId(id) {
   return Periode.findById(id).lean();
 }
 
+// Ajout étape 40 : ids invalides et en double ignorés, [] pour une liste
+// vide ou sans id valide, ordre de création (_id croissant).
+export async function listerParIds(ids) {
+  if (!Array.isArray(ids) || ids.length === 0) return [];
+  const valides = [...new Set(ids.filter((id) => estIdValide(id)))];
+  if (valides.length === 0) return [];
+  return Periode.find({ _id: { $in: valides } }).sort({ _id: 1 }).lean();
+}
+
 export async function listerTerminees(avant) {
   return Periode.find({ end: { $lt: avant } }).sort(TRI).lean();
 }

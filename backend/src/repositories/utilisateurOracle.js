@@ -192,6 +192,16 @@ export async function trouverParId(id) {
   return lignes.length > 0 ? lignes[0] : null;
 }
 
+// Ajout étape 40 : ids invalides et en double ignorés, [] pour une liste
+// vide ou sans id valide, ordre de création (ID croissant), IN découpé.
+export async function listerParIds(ids) {
+  if (!Array.isArray(ids) || ids.length === 0) return [];
+  const valides = [...new Set(ids.filter((id) => estIdValide(id)))];
+  if (valides.length === 0) return [];
+  const { condition, valeurs } = construireIn('ID', valides.map(Number));
+  return requeter(`SELECT ${COLONNES} FROM UTILISATEUR WHERE ${condition} ORDER BY ID`, valeurs);
+}
+
 export async function trouverParIm(im) {
   const lignes = await requeter(`SELECT ${COLONNES} FROM UTILISATEUR WHERE IM = ?`, [im]);
   return lignes.length > 0 ? lignes[0] : null;
