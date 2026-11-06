@@ -1,8 +1,9 @@
 "use strict";
 import bcrypt from 'bcrypt';
-import UtilisateurModel from '../models/Utilisateur.js';
 import { hashPassword, comparePassword, setSessionCookie, SESSION_TIMEOUT_MINUTES, handleFailedAttempt, resetFailedAttempts, isAccountLocked } from '../services/auth.js';
 import { logAudit } from '../middleware/auth.js';
+import { getUtilisateurRepository } from '../repositories/utilisateurRepository.js';
+import { getStructureRepository } from '../repositories/structureRepository.js';
 
 export async function login(req, res) {
   const { im, password } = req.body;
@@ -13,7 +14,7 @@ export async function login(req, res) {
     return res.status(400).json({ message: 'Identifiant ou mot de passe incorrect.' });
   }
 
-  const utilisateur = await UtilisateurModel.findOne({ im });
+  const utilisateur = await getUtilisateurRepository().trouverParIm(im);
   if (!utilisateur) {
     await logAudit(im, 'login_failure', 'utilisateur', clientIP);
     return res.status(400).json({ message: 'Identifiant ou mot de passe incorrect.' });
@@ -67,8 +68,7 @@ export async function logout(req, res) {
 }
 
 export async function me(req, res) {
-  const StructureModel = (await import('../models/Structure.js')).default;
-  const structure = await StructureModel.findById(req.user.structureId).catch(() => null);
+  const structure = await getStructureRepository().trouverParId(String(req.user.structureId));
   return res.status(200).json({
     im: req.user.im,
     nom: req.user.nom,
@@ -128,7 +128,12 @@ export async function changePassword(req, res) {
   }
 
   const nouveauHash = await hashPassword(newPassword);
-  await UtilisateurModel.updateOne({ _id: utilisateur._id }, { passwordHash: nouveauHash, mustChangePassword: false, failedAttempts: 0, lockedUntil: null });
+  await getUtilisateurRepository().mettreAJour(String(utilisateur._id), {
+    passwordHash: nouveauHash,
+    mustChangePassword: false,
+    failedAttempts: 0,
+    lockedUntil: null,
+  });
 
   await logAudit(utilisateur._id, 'password_change', 'utilisateur', clientIP);
   return res.status(200).json({ message: 'Mot de passe changé avec succès' });

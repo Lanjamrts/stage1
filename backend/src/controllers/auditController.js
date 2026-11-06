@@ -1,8 +1,8 @@
 "use strict";
 import { z } from 'zod';
 
-import Utilisateur from '../models/Utilisateur.js';
 import { getAuditRepository } from '../repositories/auditRepository.js';
+import { getUtilisateurRepository } from '../repositories/utilisateurRepository.js';
 
 const ROLES = ['client', 'admin2', 'admin1', 'developpeur', 'consultant'];
 
@@ -31,9 +31,9 @@ function endOfDay(value) {
   return Number.isNaN(d.getTime()) ? null : d;
 }
 
-function isObjectIdString(value) {
-  return /^[0-9a-fA-F]{24}$/.test(value);
-}
+// Identifiants d'un utilisateur tels qu'ils peuvent figurer dans `USER_REF` :
+// l'id textuel (24 hex en mongo, chiffres en oracle) et l'IM.
+const refsDeUtilisateur = (u) => [String(u._id), u.im];
 
 // Intersection de plusieurs listes d'identifiants (filtres role/q/userId en ET).
 function intersectIdLists(lists) {
@@ -98,18 +98,14 @@ export async function listAudit(req, res) {
 
   // Filtre rôle : résout les identifiants (ObjectId en texte ou IM) des utilisateurs du rôle.
   if (role) {
-    const users = await Utilisateur.find({ role }).select('_id im').lean();
-    userIdClauses.push(users.flatMap((u) => [String(u._id), u.im]));
+    const users = await getUtilisateurRepository().listerParRole(role);
+    userIdClauses.push(users.flatMap(refsDeUtilisateur));
   }
 
   // Recherche q : utilisateurs (nom/prénom/IM) ET lignes dont l'objet contient q.
   if (q) {
-    const escaped = q.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&');
-    const regex = new RegExp(escaped, 'i');
-    const qUsers = await Utilisateur.find({
-      $or: [{ nom: regex }, { prenom: regex }, { im: regex }],
-    }).select('_id im').lean();
-    userIdClauses.push(qUsers.flatMap((u) => [String(u._id), u.im]));
+    const qUsers = await getUtilisateurRepository().rechercher(q);
+    userIdClauses.push(qUsers.flatMap(refsDeUtilisateur));
   }
 
   // Filtre utilisateur exact (identifiant tel que stocké : ObjectId texte ou IM brut).
@@ -133,14 +129,7 @@ export async function listAudit(req, res) {
 
   // Utilisateurs référencés par la page courante seulement (pas tout le recueil).
   const pageUserIds = [...new Set(lignes.map((l) => l.userRef).filter(Boolean))];
-  const oids = pageUserIds.filter(isObjectIdString);
-  const ims = pageUserIds.filter((id) => !isObjectIdString(id));
-  const orUsers = [];
-  if (oids.length) orUsers.push({ _id: { $in: oids } });
-  if (ims.length) orUsers.push({ im: { $in: ims } });
-  const users = orUsers.length
-    ? await Utilisateur.find({ $or: orUsers }).select('im nom prenom role').lean()
-    : [];
+  const users = await getUtilisateurRepository().trouverParRefs(pageUserIds);
 
   const labelById = new Map(users.map((u) => [String(u._id), `${u.prenom} ${u.nom}`]));
   const labelByIm = new Map(users.map((u) => [u.im, `${u.prenom} ${u.nom}`]));

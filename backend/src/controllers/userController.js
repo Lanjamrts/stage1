@@ -2,12 +2,12 @@
 import { z } from 'zod';
 import { randomInt } from 'crypto';
 
-import Utilisateur from '../models/Utilisateur.js';
-import Structure from '../models/Structure.js';
 import { hashPassword } from '../services/auth.js';
 import { logAudit } from '../middleware/auth.js';
+import { getUtilisateurRepository } from '../repositories/utilisateurRepository.js';
+import { getStructureRepository } from '../repositories/structureRepository.js';
+import { estIdValide } from '../repositories/ids.js';
 
-const OBJECT_ID = /^[0-9a-fA-F]{24}$/;
 const REQUIRED = 'Ce champ est obligatoire.';
 const ROLES = ['client', 'admin2', 'admin1', 'developpeur', 'consultant'];
 
@@ -30,7 +30,7 @@ const profileFields = {
     .refine((v) => ROLES.includes(v), 'Rôle invalide.'),
   structureId: z
     .string({ required_error: REQUIRED })
-    .regex(OBJECT_ID, 'Structure invalide.'),
+    .refine(estIdValide, 'Structure invalide.'),
 };
 
 const createSchema = z.object({
@@ -66,38 +66,25 @@ function serializeUser(u) {
   };
 }
 
-function escapeRegex(s) {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
 // GET /api/users (admin1) : liste filtrable (rôle, statut, recherche, structure)
 export async function listUsers(req, res) {
   const { role, status, q, structure } = req.query;
-  const filter = {};
-  if (role) {
-    if (!ROLES.includes(role)) return res.status(400).json({ message: 'Filtre invalide.' });
-    filter.role = role;
+  if (role && !ROLES.includes(role)) return res.status(400).json({ message: 'Filtre invalide.' });
+  if (status && !['actif', 'desactive'].includes(status)) {
+    return res.status(400).json({ message: 'Filtre invalide.' });
   }
-  if (status) {
-    if (!['actif', 'desactive'].includes(status)) {
-      return res.status(400).json({ message: 'Filtre invalide.' });
-    }
-    filter.status = status;
+  if (structure && !estIdValide(structure)) {
+    return res.status(400).json({ message: 'Filtre invalide.' });
   }
-  if (structure) {
-    if (!OBJECT_ID.test(structure)) return res.status(400).json({ message: 'Filtre invalide.' });
-    filter.structureId = structure;
-  }
-  if (q && q.trim()) {
-    const rx = new RegExp(escapeRegex(q.trim()), 'i');
-    filter.$or = [{ im: rx }, { nom: rx }, { prenom: rx }];
-  }
+  const recherche = q && q.trim() ? q.trim() : undefined;
 
-  const docs = await Utilisateur.find(filter)
-    .populate('structureId', 'label')
-    .sort({ nom: 1, prenom: 1 })
-    .limit(500)
-    .lean();
+  const docs = await getUtilisateurRepository().listerAvecStructure({
+    role,
+    status,
+    structureId: structure,
+    q: recherche,
+    limite: 500,
+  });
   return res.status(200).json(docs.map(serializeUser));
 }
 
@@ -107,16 +94,16 @@ export async function createUser(req, res) {
   if (!parsed.success) return res.status(400).json({ message: firstIssue(parsed) });
 
   const data = parsed.data;
-  const structure = await Structure.findById(data.structureId).lean();
+  const structure = await getStructureRepository().trouverParId(String(data.structureId));
   if (!structure) return res.status(400).json({ message: 'Structure inconnue.' });
 
-  const existing = await Utilisateur.findOne({ im: data.im }).lean();
+  const existing = await getUtilisateurRepository().trouverParIm(data.im);
   if (existing) return res.status(409).json({ message: 'Cet IM existe déjà.' });
 
   const provisionalPassword = generateProvisionalPassword();
   let user;
   try {
-    user = await Utilisateur.create({
+    user = await getUtilisateurRepository().creer({
       im: data.im,
       nom: data.nom,
       prenom: data.prenom,
@@ -131,7 +118,9 @@ export async function createUser(req, res) {
       lockedUntil: null,
     });
   } catch (error) {
-    if (error && error.code === 11000) {
+    // Le dépôt normalise la violation d'unicité (code 11000 de MongoDB,
+    // ORA-00001 d'Oracle) en une Error dont `code` vaut 'DOUBLON'.
+    if (error && error.code === 'DOUBLON') {
       return res.status(409).json({ message: 'Cet IM existe déjà.' });
     }
     throw error;
@@ -149,25 +138,26 @@ export async function createUser(req, res) {
 // PATCH /api/users/:id/profil (admin1)
 export async function updateProfil(req, res) {
   const id = req.params.id;
-  if (!OBJECT_ID.test(id)) return res.status(404).json({ message: 'Ressource introuvable.' });
+  if (!estIdValide(id)) return res.status(404).json({ message: 'Ressource introuvable.' });
 
   const parsed = profilSchema.safeParse(req.body || {});
   if (!parsed.success) return res.status(400).json({ message: firstIssue(parsed) });
 
   const data = parsed.data;
-  const structure = await Structure.findById(data.structureId).lean();
+  const structure = await getStructureRepository().trouverParId(String(data.structureId));
   if (!structure) return res.status(400).json({ message: 'Structure inconnue.' });
 
-  const user = await Utilisateur.findById(id);
+  const user = await getUtilisateurRepository().trouverParId(id);
   if (!user) return res.status(404).json({ message: 'Ressource introuvable.' });
 
-  user.nom = data.nom;
-  user.prenom = data.prenom;
-  user.direction = data.direction;
-  user.service = data.service;
-  user.role = data.role;
-  user.structureId = data.structureId;
-  await user.save();
+  await getUtilisateurRepository().mettreAJour(id, {
+    nom: data.nom,
+    prenom: data.prenom,
+    direction: data.direction,
+    service: data.service,
+    role: data.role,
+    structureId: data.structureId,
+  });
 
   await logAudit(req.user._id, 'profil_change', `utilisateur:${user._id}`, req.ip);
   return res.status(200).json({ id: String(user._id), message: 'Profil mis à jour.' });
@@ -176,14 +166,13 @@ export async function updateProfil(req, res) {
 // POST /api/users/:id/desactiver (admin1)
 export async function desactiverUser(req, res) {
   const id = req.params.id;
-  if (!OBJECT_ID.test(id)) return res.status(404).json({ message: 'Ressource introuvable.' });
+  if (!estIdValide(id)) return res.status(404).json({ message: 'Ressource introuvable.' });
 
-  const user = await Utilisateur.findById(id);
+  const user = await getUtilisateurRepository().trouverParId(id);
   if (!user) return res.status(404).json({ message: 'Ressource introuvable.' });
 
   if (user.status !== 'desactive') {
-    user.status = 'desactive';
-    await user.save();
+    await getUtilisateurRepository().mettreAJour(id, { status: 'desactive' });
     await logAudit(req.user._id, 'user_deactivate', `utilisateur:${user._id}`, req.ip);
   }
   return res.status(200).json({ id: String(user._id), message: 'Utilisateur désactivé.' });
@@ -193,17 +182,18 @@ export async function desactiverUser(req, res) {
 // provisoire renvoyé UNE FOIS.
 export async function reinitialiserMdp(req, res) {
   const id = req.params.id;
-  if (!OBJECT_ID.test(id)) return res.status(404).json({ message: 'Ressource introuvable.' });
+  if (!estIdValide(id)) return res.status(404).json({ message: 'Ressource introuvable.' });
 
-  const user = await Utilisateur.findById(id);
+  const user = await getUtilisateurRepository().trouverParId(id);
   if (!user) return res.status(404).json({ message: 'Ressource introuvable.' });
 
   const provisionalPassword = generateProvisionalPassword();
-  user.passwordHash = await hashPassword(provisionalPassword);
-  user.mustChangePassword = true;
-  user.failedAttempts = 0;
-  user.lockedUntil = null;
-  await user.save();
+  await getUtilisateurRepository().mettreAJour(id, {
+    passwordHash: await hashPassword(provisionalPassword),
+    mustChangePassword: true,
+    failedAttempts: 0,
+    lockedUntil: null,
+  });
 
   await logAudit(req.user._id, 'password_reset', `utilisateur:${user._id}`, req.ip);
   return res.status(200).json({
