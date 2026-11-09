@@ -1,10 +1,11 @@
 "use strict";
 import PDFDocument from 'pdfkit';
 
-import Saisie from '../models/Saisie.js';
-import Structure from '../models/Structure.js';
-import Region from '../models/Region.js';
+import { getSaisieRepository } from '../repositories/saisieRepository.js';
+import { getStructureRepository } from '../repositories/structureRepository.js';
+import { getRegionRepository } from '../repositories/regionRepository.js';
 import { getReferentielRepository } from '../repositories/referentielRepository.js';
+import { estIdValide } from '../repositories/ids.js';
 import { logAudit } from '../middleware/auth.js';
 import { structuresInScope, statusesInScope } from '../middleware/scope.js';
 import { serializeSaisie } from '../services/serializeSaisie.js';
@@ -12,7 +13,6 @@ import { buildExportModel } from '../services/exportModel.js';
 import { buildWorkbook } from '../services/exportXlsx.js';
 import { renderPdf } from '../services/exportPdf.js';
 
-const OBJECT_ID = /^[0-9a-fA-F]{24}$/;
 const STRUCTURE_TYPES = ['SRB', 'SRSP', 'SRPE', 'CIRBF', 'DRBF', 'SSEBF', 'DGBF', 'CELLULE_INFO'];
 
 function parseIdList(value) {
@@ -20,54 +20,67 @@ function parseIdList(value) {
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean);
-  if (ids.some((id) => !OBJECT_ID.test(id))) return null;
+  if (ids.some((id) => !estIdValide(id))) return null;
   return ids;
 }
 
-// Filtre commun liste/export (SPEC §8) :
+// Intersection de listes : ordre de la première, doublons retirés, entrées
+// non tableaux ignorées. Aucune liste fournie → undefined (aucun filtre) ;
+// une intersection vide → [] (donc aucune ligne, comme $in: [] avant).
+export function intersecterListes(...listes) {
+  const fournies = listes.filter((liste) => Array.isArray(liste));
+  if (fournies.length === 0) return undefined;
+  const [premiere, ...autres] = fournies;
+  const ensembles = autres.map((liste) => new Set(liste));
+  return [...new Set(premiere)].filter((valeur) => ensembles.every((ens) => ens.has(valeur)));
+}
+
+// Filtre commun liste/export (SPEC §8) : renvoie des OPTIONS de dépôt
+// (statuts, structureIds, moduleIds, periodeId) au lieu d'un filtre Mongo.
+// Conventions de retour inchangées : null = rôle refusé (403),
+// 'invalid' = filtre invalide (400), {} = aucun filtre.
 // admin1 = toutes régions ; admin2 = région forcée depuis sa structure.
-// Les conditions sont accumulées dans $and pour que le périmètre de l'admin2
-// ne soit jamais remplacé par un filtre de requête.
+// Les conditions de même nature sont en ET : les listes sont INTERSECTÉES,
+// le périmètre de l'admin2 n'est jamais remplacé par un filtre de requête.
 // Filtres admin1 : regions[] (noms), types[] (types de structure),
 // modules[] (ids), periode, structure, statut.
 async function buildFilter(user, query, { ignoreStatut = false } = {}) {
   if (user.role !== 'admin1' && user.role !== 'admin2') return null; // 403
-  const clauses = [];
+  let structureIds = null;
+  let moduleIds = null;
+  let statuts = null;
+  let periodeId;
   if (user.role === 'admin2') {
     const ids = await structuresInScope(user);
-    clauses.push({ structureId: { $in: (ids || []).map(String) } });
+    structureIds = (ids || []).map(String);
     // admin2 ne voit jamais les brouillons
-    clauses.push({ status: { $in: statusesInScope('admin2') } });
+    statuts = statusesInScope('admin2');
   }
   if (query.module) {
-    if (!OBJECT_ID.test(query.module)) return 'invalid';
-    clauses.push({ moduleId: query.module });
+    if (!estIdValide(query.module)) return 'invalid';
+    moduleIds = intersecterListes([query.module], moduleIds);
   }
   if (query.modules) {
     const ids = parseIdList(query.modules);
     if (!ids) return 'invalid';
-    clauses.push({ moduleId: { $in: ids } });
+    moduleIds = intersecterListes(moduleIds, ids);
   }
   if (query.periode) {
-    if (!OBJECT_ID.test(query.periode)) return 'invalid';
-    clauses.push({ periodeId: query.periode });
+    if (!estIdValide(query.periode)) return 'invalid';
+    periodeId = query.periode;
   }
   if (query.structure) {
-    if (!OBJECT_ID.test(query.structure)) return 'invalid';
-    clauses.push({ structureId: query.structure });
+    if (!estIdValide(query.structure)) return 'invalid';
+    structureIds = intersecterListes(structureIds, [query.structure]);
   }
   if (query.regions) {
     const names = String(query.regions)
       .split(',')
       .map((s) => s.trim())
       .filter(Boolean);
-    const regionIds = await Region.find({ name: { $in: names } }).select('_id').lean();
-    const structureIds = await Structure.find({
-      regionId: { $in: regionIds.map((r) => r._id) },
-    })
-      .select('_id')
-      .lean();
-    clauses.push({ structureId: { $in: structureIds.map((s) => s._id) } });
+    const regionIds = (await getRegionRepository().listerParNoms(names)).map((r) => String(r._id));
+    const structures = await getStructureRepository().lister({ regionIds });
+    structureIds = intersecterListes(structureIds, structures.map((s) => String(s._id)));
   }
   if (query.types) {
     const types = String(query.types)
@@ -75,19 +88,18 @@ async function buildFilter(user, query, { ignoreStatut = false } = {}) {
       .map((s) => s.trim())
       .filter(Boolean);
     if (types.length === 0 || types.some((t) => !STRUCTURE_TYPES.includes(t))) return 'invalid';
-    const structureIds = await Structure.find({ type: { $in: types } }).select('_id').lean();
-    clauses.push({ structureId: { $in: structureIds.map((s) => s._id) } });
+    const structures = await getStructureRepository().lister({ types });
+    structureIds = intersecterListes(structureIds, structures.map((s) => String(s._id)));
   }
-  if (query.statut && !ignoreStatut) clauses.push({ status: query.statut });
-  return clauses.length ? { $and: clauses } : {};
-}
+  if (query.statut && !ignoreStatut) statuts = intersecterListes(statuts, [query.statut]);
 
-const populateAll = (q) =>
-  q
-    .populate('moduleId')
-    .populate('periodeId')
-    .populate('authorId')
-    .populate('structureId');
+  const options = {};
+  if (statuts) options.statuts = statuts;
+  if (structureIds) options.structureIds = structureIds;
+  if (moduleIds) options.moduleIds = moduleIds;
+  if (periodeId !== undefined) options.periodeId = periodeId;
+  return options;
+}
 
 // GET /api/collecte
 export async function listCollecte(req, res) {
@@ -98,7 +110,12 @@ export async function listCollecte(req, res) {
   if (filter === 'invalid') {
     return res.status(400).json({ message: 'Filtre invalide.' });
   }
-  const docs = await populateAll(Saisie.find(filter)).sort({ updatedAt: -1 }).limit(1000);
+  const docs = await getSaisieRepository().lister({
+    ...filter,
+    avecLiens: true,
+    tri: 'majDesc',
+    limite: 1000,
+  });
   return res
     .status(200)
     .json(docs.map((d) => serializeSaisie(d, req.user, { withFields: false })));
@@ -113,9 +130,12 @@ export async function listHistorique(req, res) {
   if (filter === 'invalid') {
     return res.status(400).json({ message: 'Filtre invalide.' });
   }
-  const docs = await populateAll(Saisie.find(filter || {}))
-    .sort({ updatedAt: -1 })
-    .limit(1000);
+  const docs = await getSaisieRepository().lister({
+    ...(filter || {}),
+    avecLiens: true,
+    tri: 'majDesc',
+    limite: 1000,
+  });
   return res.status(200).json(
     docs.map((d) => {
       const meta = serializeSaisie(d, req.user, { withFields: false });
@@ -128,6 +148,7 @@ export async function listHistorique(req, res) {
 // ------------------------------------------------------------------ helpers export
 
 const MAX_EXPORT_IDS = 300;
+const STATUTS_EXPORT = ['exportee', 'archivee'];
 
 // Collecte la liste à exporter : uniquement exportee et archivee (SPEC §8),
 // avec les mêmes filtres que la liste (hors statut, forcé ci-dessous).
@@ -137,21 +158,18 @@ const MAX_EXPORT_IDS = 300;
 async function loadExportRows(user, query) {
   const filter = await buildFilter(user, query || {}, { ignoreStatut: true });
   if (filter === null || filter === 'invalid') return filter;
-  const clauses = filter && filter.$and ? [...filter.$and] : [];
+  const options = { ...filter, avecLiens: true, tri: 'structureMajAsc', limite: 5000 };
   let idsRestriction = false;
   if (query.ids !== undefined) {
     const ids = parseIdList(query.ids);
     if (!ids) return 'invalid';
     if (ids.length > MAX_EXPORT_IDS) return 'too_many';
-    clauses.push({ _id: { $in: ids } });
+    options.ids = ids;
     idsRestriction = true;
   } else {
-    clauses.push({ status: { $in: ['exportee', 'archivee'] } });
+    options.statuts = intersecterListes(filter.statuts, STATUTS_EXPORT);
   }
-  const finalFilter = { $and: clauses };
-  const docs = await populateAll(Saisie.find(finalFilter))
-    .sort({ structureId: 1, updatedAt: 1 })
-    .limit(5000);
+  const docs = await getSaisieRepository().lister(options);
   if (idsRestriction && docs.length === 0) return 'none_selected';
   return docs;
 }

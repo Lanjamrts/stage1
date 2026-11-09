@@ -1,11 +1,10 @@
 "use strict";
-import Module from '../models/Module.js';
-import Saisie from '../models/Saisie.js';
-import Periode from '../models/Periode.js';
-import Structure from '../models/Structure.js';
-import Region from '../models/Region.js';
-
-const OBJECT_ID = /^[0-9a-fA-F]{24}$/;
+import { getModuleRepository } from '../repositories/moduleRepository.js';
+import { getSaisieRepository } from '../repositories/saisieRepository.js';
+import { getPeriodeRepository } from '../repositories/periodeRepository.js';
+import { getStructureRepository } from '../repositories/structureRepository.js';
+import { getRegionRepository } from '../repositories/regionRepository.js';
+import { estIdValide } from '../repositories/ids.js';
 
 // « Soumise ou ultérieur » : tout statut hors brouillon (rejetee incluse,
 // car issue d'une soumission). Comptée une fois = statut courant.
@@ -24,25 +23,23 @@ const pct = (num, den) => (den > 0 ? Math.round((num / den) * 1000) / 10 : 0);
 export async function getDashboard(req, res) {
   const moduleId = req.query.module;
   const periodeId = req.query.periode;
-  if (moduleId && !OBJECT_ID.test(moduleId)) {
+  if (moduleId && !estIdValide(moduleId)) {
     return res.status(400).json({ message: 'Filtre invalide.' });
   }
-  if (periodeId && !OBJECT_ID.test(periodeId)) {
+  if (periodeId && !estIdValide(periodeId)) {
     return res.status(400).json({ message: 'Filtre invalide.' });
   }
 
   const now = new Date();
   const [periodes, modules, structures, regions, saisies] = await Promise.all([
-    Periode.find({}).lean(),
-    Module.find({ active: true }).lean(),
-    Structure.find({ active: true }).lean(),
-    Region.find({}).lean(),
-    Saisie.find({
-      ...(moduleId ? { moduleId } : {}),
-      ...(periodeId ? { periodeId } : {}),
-    })
-      .select('structureId moduleId periodeId status')
-      .lean(),
+    getPeriodeRepository().lister(),
+    getModuleRepository().lister({ actifs: true }),
+    getStructureRepository().lister({ actives: true }),
+    getRegionRepository().lister(),
+    getSaisieRepository().listerResume({
+      moduleId: moduleId || undefined,
+      periodeId: periodeId || undefined,
+    }),
   ]);
 
   const regionName = new Map(regions.map((r) => [String(r._id), r.name]));

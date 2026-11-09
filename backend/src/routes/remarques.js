@@ -1,14 +1,14 @@
 import express from 'express';
 import { z } from 'zod';
 
-import Remarque from '../models/Remarque.js';
+import { getRemarqueRepository } from '../repositories/remarqueRepository.js';
+import { estIdValide } from '../repositories/ids.js';
 import { logAudit } from '../middleware/auth.js';
 import { requireRole } from '../middleware/auth.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 
 const router = express.Router();
 
-const OBJECT_ID = /^[0-9a-fA-F]{24}$/;
 const NOT_FOUND = 'Ressource introuvable.';
 
 const createSchema = z.object({
@@ -47,8 +47,8 @@ router.post(
     if (!parsed.success) {
       return res.status(400).json({ message: parsed.error.issues[0].message });
     }
-    const remarque = await Remarque.create({
-      authorId: req.user._id,
+    const remarque = await getRemarqueRepository().creer({
+      authorId: String(req.user._id),
       context: parsed.data.context,
       text: parsed.data.text,
       state: 'nouvelle',
@@ -63,10 +63,10 @@ router.get(
   '/mes',
   requireRole(['admin1', 'admin2']),
   asyncHandler(async (req, res) => {
-    const docs = await Remarque.find({ authorId: req.user._id })
-      .populate('authorId')
-      .sort({ createdAt: -1 })
-      .limit(200);
+    const docs = await getRemarqueRepository().listerParAuteur(String(req.user._id), {
+      avecAuteur: true,
+      limite: 200,
+    });
     return res.status(200).json(docs.map(serialize));
   })
 );
@@ -76,7 +76,7 @@ router.get(
   '/',
   requireRole(['developpeur']),
   asyncHandler(async (req, res) => {
-    const docs = await Remarque.find({}).populate('authorId').sort({ createdAt: -1 }).limit(500);
+    const docs = await getRemarqueRepository().lister({ avecAuteur: true, limite: 500 });
     return res.status(200).json(docs.map(serialize));
   })
 );
@@ -86,18 +86,14 @@ router.patch(
   '/:id/etat',
   requireRole(['developpeur']),
   asyncHandler(async (req, res) => {
-    if (!OBJECT_ID.test(req.params.id)) {
+    if (!estIdValide(req.params.id)) {
       return res.status(404).json({ message: NOT_FOUND });
     }
     const parsed = etatSchema.safeParse(req.body || {});
     if (!parsed.success) {
       return res.status(400).json({ message: parsed.error.issues[0].message });
     }
-    const remarque = await Remarque.findByIdAndUpdate(
-      req.params.id,
-      { state: parsed.data.etat },
-      { new: true }
-    );
+    const remarque = await getRemarqueRepository().changerEtat(req.params.id, parsed.data.etat);
     if (!remarque) return res.status(404).json({ message: NOT_FOUND });
     await logAudit(req.user._id, 'remarque_state_change', `remarque:${remarque._id}`, req.ip);
     return res.status(200).json({ message: 'État mis à jour.', state: remarque.state });
