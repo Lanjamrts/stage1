@@ -1,6 +1,9 @@
 "use strict";
 
+import { pathToFileURL } from 'node:url';
+
 import { ensureEpnReference } from '../seed/common.js';
+import { fermerBase } from './connexion.js';
 
 function parseArg(name) {
   const prefix = `--${name}=`;
@@ -16,20 +19,25 @@ async function main() {
   const ministeresPath = parseArg('ministeres');
 
   const res = await ensureEpnReference({ apply: APPLY, epnPath, ministeresPath });
-  if (!res.success) {
-    process.exit(1);
-  }
-  if (res.dryRun) {
-    process.exit(0);
-  }
+  if (!res.success) return 1;
+  if (res.dryRun) return 0;
 
   console.log(`Ministeres : ${res.created.ministeres} cree(s), ${res.existing.ministeres} deja present(s)`);
   console.log(`EPN : ${res.created.epns} cree(s), ${res.existing.epns} deja present(s)`);
-
-  process.exit(0);
+  return 0;
 }
 
-main().catch((err) => {
-  console.error('Erreur:', err);
-  process.exit(1);
-});
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main()
+    .then(async (code) => {
+      // Aucune sortie avant la fermeture : le pool et MongoDB sont refermes
+      // puis le code est rendu au systeme.
+      await fermerBase();
+      process.exit(code);
+    })
+    .catch(async (err) => {
+      console.error('Erreur:', err);
+      await fermerBase().catch(() => {});
+      process.exit(1);
+    });
+}
