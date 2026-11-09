@@ -6,38 +6,48 @@
 // pas d'entrée dans validations (non prévue pour archivee).
 // Usage : npm run archive
 
-import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import { loadConfig } from '../config.js';
+import { pathToFileURL } from 'node:url';
 
-import PeriodeModel from '../models/Periode.js';
-import SaisieModel from '../models/Saisie.js';
+import { getPeriodeRepository } from '../repositories/periodeRepository.js';
+import { getSaisieRepository } from '../repositories/saisieRepository.js';
+import { ouvrirBase, fermerBase } from './connexion.js';
 
 dotenv.config();
-const config = loadConfig();
 
-async function main() {
-  await mongoose.connect(config.MONGODB_URI);
-
-  const periodesTerminees = await PeriodeModel.find({ end: { $lt: new Date() } }).select('_id').lean();
-  const periodeIds = periodesTerminees.map((p) => p._id);
+// Exporté pour les tests : aucune connexion gérée ici (main() ouvre et ferme).
+export async function archiverSaisiesExportees() {
+  const periodesTerminees = await getPeriodeRepository().listerTerminees(new Date());
+  // Chaînes : estIdValide (dépôt Saisie) refuse toute valeur non chaîne.
+  const periodeIds = periodesTerminees.map((p) => String(p._id));
 
   let archived = 0;
   if (periodeIds.length > 0) {
-    const result = await SaisieModel.updateMany(
-      { status: 'exportee', periodeId: { $in: periodeIds } },
-      { $set: { status: 'archivee' } }
-    );
-    archived = result.modifiedCount || 0;
+    archived = (await getSaisieRepository().archiverExportees(periodeIds)) || 0;
   }
 
   console.log(`Periodes terminees: ${periodeIds.length}`);
   console.log(`Saisies archivees: ${archived}`);
 
-  await mongoose.disconnect();
+  return { code: 0, periodesTerminees: periodeIds.length, archivees: archived };
 }
 
-main().catch((err) => {
-  console.error("Echec de l'archivage:", err.message);
-  process.exit(1);
-});
+async function main() {
+  await ouvrirBase();
+  try {
+    const { code } = await archiverSaisiesExportees();
+    return code;
+  } finally {
+    await fermerBase();
+  }
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().then(
+    (code) => process.exit(code),
+    (err) => {
+      console.error("Echec de l'archivage:", err.message);
+      process.exit(1);
+    }
+  );
+}

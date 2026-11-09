@@ -1,16 +1,16 @@
 "use strict";
 
-import mongoose from 'mongoose';
-import { loadConfig } from '../config.js';
-import Periode from '../models/Periode.js';
+import { pathToFileURL } from 'node:url';
+
+import { getPeriodeRepository } from '../repositories/periodeRepository.js';
+import { ouvrirBase, fermerBase } from './connexion.js';
 
 const MOIS = [
   'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
   'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
 ];
 
-function parseArgs() {
-  const args = process.argv.slice(2);
+export function parseArgs(args = process.argv.slice(2)) {
   const options = {
     annee: null,
     echeanceMensuelleJour: null,
@@ -103,7 +103,7 @@ function formatDate(d) {
   return d.toISOString().slice(0, 10);
 }
 
-function computePeriods(options) {
+export function calculerPeriodes(options) {
   const { annee, echeanceMensuelleJour, echeanceTrimestrielleJours, premierMois } = options;
   const periods = [];
 
@@ -139,20 +139,12 @@ function computePeriods(options) {
   return periods;
 }
 
-async function main() {
-  const options = parseArgs();
-  const config = loadConfig();
+// Lecture seule : les périodes déjà présentes, celles à créer et les conflits.
+export async function planifier(options) {
+  const periodes = calculerPeriodes(options);
 
-  const periods = computePeriods(options);
-
-  await mongoose.connect(config.MONGODB_URI);
-  const dbName = mongoose.connection.name;
-  console.log(`Base cible : ${dbName}`);
-
-  const keys = periods.map(p => ({ periodicity: p.periodicity, start: p.start }));
-  const existing = await Periode.find({
-    $or: keys
-  }).lean();
+  const keys = periodes.map(p => ({ periodicity: p.periodicity, start: p.start }));
+  const existing = await getPeriodeRepository().listerParCles(keys);
 
   const existingByKey = new Map();
   const existingByLabel = new Map();
@@ -165,7 +157,7 @@ async function main() {
   const toCreate = [];
   const alreadyPresent = [];
 
-  for (const p of periods) {
+  for (const p of periodes) {
     const key = `${p.periodicity}|${p.start.getTime()}`;
     if (existingByKey.has(key)) {
       const ex = existingByKey.get(key);
@@ -182,58 +174,82 @@ async function main() {
     }
   }
 
-  if (conflicts.length > 0) {
-    for (const c of conflicts) console.error(c);
-    await mongoose.disconnect();
-    process.exit(1);
+  return { periodes, existantes: existing, aCreer: toCreate, dejaPresentes: alreadyPresent, conflits: conflicts };
+}
+
+// Exécution complète (sans connexion) : retourne le code de sortie et les
+// compteurs, en reprenant les messages et l'ordre de l'original.
+export async function executerInitPeriodes(options) {
+  const plan = await planifier(options);
+
+  if (plan.conflits.length > 0) {
+    for (const c of plan.conflits) console.error(c);
+    return { code: 1, conflits: plan.conflits, creees: 0, dejaPresentes: plan.dejaPresentes.length };
   }
 
   const now = new Date();
-  const pastDeadline = toCreate.filter(p => p.deadline < now);
+  const pastDeadline = plan.aCreer.filter(p => p.deadline < now);
   if (pastDeadline.length > 0) {
     console.log(`ATTENTION : ${pastDeadline.length} periode(s) a creer ont une echeance deja depassee : le tableau de bord les comptera comme attendues et en retard pour toutes les structures.`);
     if (options.apply && !options.autoriserEcheancesPassees) {
       console.error('Ecriture refusee : utilisez --premier-mois pour ne generer que les periodes a venir, ou --autoriser-echeances-passees pour forcer.');
-      await mongoose.disconnect();
-      process.exit(1);
+      return { code: 1, conflits: [], creees: 0, dejaPresentes: plan.dejaPresentes.length };
     }
   }
 
-  console.log(`Periodes : ${toCreate.length} a creer, ${alreadyPresent.length} deja presente(s)`);
-  for (const p of toCreate) {
+  console.log(`Periodes : ${plan.aCreer.length} a creer, ${plan.dejaPresentes.length} deja presente(s)`);
+  for (const p of plan.aCreer) {
     console.log(`  + ${p.label} | ${p.periodicity} | ${formatDate(p.start)} -> ${formatDate(p.end)} | echeance ${formatDate(p.deadline)}`);
   }
 
   if (!options.apply) {
     console.log('DRY-RUN : aucune donnee ecrite. Relancez avec --apply pour ecrire.');
-    await mongoose.disconnect();
-    process.exit(0);
+    return { code: 0, conflits: [], creees: 0, dejaPresentes: plan.dejaPresentes.length };
   }
+
+  const existantesParCle = new Map(
+    plan.existantes.map(p => [`${p.periodicity}|${p.start.getTime()}`, p])
+  );
 
   let created = 0;
   let existingCount = 0;
 
-  for (const p of periods) {
+  for (const p of plan.periodes) {
     const key = `${p.periodicity}|${p.start.getTime()}`;
-    const ex = existingByKey.get(key);
-    if (ex) {
+    if (existantesParCle.has(key)) {
       existingCount++;
       continue;
     }
-    await Periode.updateOne(
-      { periodicity: p.periodicity, start: p.start },
-      { $setOnInsert: { label: p.label, start: p.start, end: p.end, deadline: p.deadline, periodicity: p.periodicity } },
-      { upsert: true }
-    );
-    created++;
+    const { cree } = await getPeriodeRepository().creerSiAbsent(p);
+    if (cree) {
+      created++;
+    } else {
+      existingCount++;
+    }
   }
 
   console.log(`Periodes : ${created} creee(s), ${existingCount} deja presente(s)`);
-  await mongoose.disconnect();
-  process.exit(0);
+  return { code: 0, conflits: [], creees: created, dejaPresentes: existingCount };
 }
 
-main().catch(err => {
-  console.error('Erreur:', err);
-  process.exit(1);
-});
+async function main() {
+  const options = parseArgs();
+  const { nom } = await ouvrirBase();
+  console.log(`Base cible : ${nom}`);
+  try {
+    const { code } = await executerInitPeriodes(options);
+    return code;
+  } finally {
+    await fermerBase();
+  }
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().then(
+    (code) => process.exit(code),
+    (err) => {
+      console.error('Erreur:', err);
+      process.exit(1);
+    }
+  );
+}

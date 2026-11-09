@@ -5,10 +5,10 @@
 // Dry-run par défaut : rien n'est ecrit. Passez --apply pour ecrire.
 // Idempotent : un second --apply ne cree aucune modification.
 
-import { loadConfig } from '../config.js';
-import mongoose from 'mongoose';
+import { pathToFileURL } from 'node:url';
 
-import Module from '../models/Module.js';
+import { getModuleRepository } from '../repositories/moduleRepository.js';
+import { ouvrirBase, fermerBase } from './connexion.js';
 
 const MODULE_CODE = 'NCA';
 const TABLE_KEY = 'membres';
@@ -20,14 +20,6 @@ const NEW_FIELD = {
   min: 1,
   placeholder: '1 = premier mandat, 2 = deuxième mandat, etc.',
 };
-
-function parseArg(name) {
-  const prefix = `--${name}=`;
-  for (const arg of process.argv.slice(2)) {
-    if (arg.startsWith(prefix)) return arg.slice(prefix.length);
-  }
-  return undefined;
-}
 
 function findTable(fields) {
   return Array.isArray(fields) ? fields.find((f) => f && f.key === TABLE_KEY && f.type === 'table') : null;
@@ -44,7 +36,7 @@ function fieldEqual(a, b) {
 
 // Calcule la nouvelle definition des champs du module si la colonne est manquante
 // ou differente. Retourne { needsChange, fields, message }.
-function computeFields(moduleDoc) {
+export function computeFields(moduleDoc) {
   const fields = Array.isArray(moduleDoc.fields) ? [...moduleDoc.fields] : [];
   const table = findTable(fields);
   if (!table) {
@@ -76,18 +68,13 @@ function computeFields(moduleDoc) {
   };
 }
 
-async function main() {
-  const config = loadConfig();
-  const APPLY = process.argv.includes('--apply');
-
-  await mongoose.connect(config.MONGODB_URI);
-  const dbName = mongoose.connection.name;
-  console.log(`Base cible : ${dbName}`);
-
-  const moduleDoc = await Module.findOne({ code: MODULE_CODE }).lean();
+// Exécution complète (sans connexion) : retourne le code de sortie et le
+// résultat, en reprenant les messages de l'original.
+export async function executerNcaMandat({ apply = false } = {}) {
+  const moduleDoc = await getModuleRepository().trouverParCode(MODULE_CODE);
   if (!moduleDoc) {
     console.error(`Module ${MODULE_CODE} introuvable.`);
-    process.exit(1);
+    return { code: 1, modifie: false };
   }
 
   const { needsChange, fields, message } = computeFields(moduleDoc);
@@ -96,27 +83,41 @@ async function main() {
   console.log(` - ${message}`);
   if (!needsChange) {
     console.log('DRY-RUN : aucune modification necessaire. Rien a ecrire.');
-    process.exit(0);
+    return { code: 0, modifie: false };
   }
 
-  if (!APPLY) {
+  if (!apply) {
     console.log('DRY-RUN : la colonne serait ajoutee. Relancez avec --apply pour ecrire.');
-    await mongoose.disconnect();
-    process.exit(0);
+    return { code: 0, modifie: false };
   }
 
-  const res = await Module.updateOne({ code: MODULE_CODE }, { $set: { fields } });
-  if (res.matchedCount === 0) {
+  const modifie = await getModuleRepository().mettreAJourFields(MODULE_CODE, fields);
+  if (!modifie) {
     console.error(`Module ${MODULE_CODE} introuvable au moment de l'ecriture.`);
-    await mongoose.disconnect();
-    process.exit(1);
+    return { code: 1, modifie: false };
   }
-  console.log(`${res.matchedCount} module(s) mis a jour, ${res.modifiedCount} modification(s) ecrite(s).`);
-  await mongoose.disconnect();
-  process.exit(0);
+  console.log(`1 module(s) mis a jour, 1 modification(s) ecrite(s).`);
+  return { code: 0, modifie: true };
 }
 
-main().catch((err) => {
-  console.error('Erreur:', err);
-  process.exit(1);
-});
+async function main() {
+  const APPLY = process.argv.includes('--apply');
+  const { nom } = await ouvrirBase();
+  console.log(`Base cible : ${nom}`);
+  try {
+    const { code } = await executerNcaMandat({ apply: APPLY });
+    return code;
+  } finally {
+    await fermerBase();
+  }
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().then(
+    (code) => process.exit(code),
+    (err) => {
+      console.error('Erreur:', err.message);
+      process.exit(1);
+    }
+  );
+}
