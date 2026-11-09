@@ -3,14 +3,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import mongoose from 'mongoose';
 
-import ModuleModel from '../models/Module.js';
 import { getProfilRepository } from '../repositories/profilRepository.js';
 import { getReferentielRepository } from '../repositories/referentielRepository.js';
-import { closeOracle } from '../db/oracle.js';
+import { getModuleRepository } from '../repositories/moduleRepository.js';
 import { MODULES } from './modules.js';
-import { loadConfig } from '../config.js';
+import { ouvrirBase, fermerBase } from '../scripts/connexion.js';
 
 export const PROFILS = [
   { code: 'client', label: 'Client' },
@@ -32,19 +30,12 @@ export async function ensureProfils() {
 export async function ensureModules() {
   let created = 0;
   for (const m of MODULES) {
-    const res = await ModuleModel.updateOne(
-      { code: m.code },
-      { $setOnInsert: { ...m, version: 1, active: true } },
-      { upsert: true },
-    );
-    created += res.upsertedCount || 0;
+    const res = await getModuleRepository().assurer({ ...m, version: 1, active: true });
+    if (res.cree) created++;
   }
   // Databases created before this field existed: fill it for RA only if it is missing.
   // Never overwrites a value that already exists (a developer may have chosen otherwise).
-  await ModuleModel.updateOne(
-    { code: 'RA', allowedPeriodicities: { $exists: false } },
-    { $set: { allowedPeriodicities: ['monthly', 'quarterly'] } },
-  );
+  await getModuleRepository().completerPeriodicitesAutorisees('RA', ['monthly', 'quarterly']);
   return { created, existing: MODULES.length - created };
 }
 
@@ -244,12 +235,8 @@ export async function ensureEpnReference({ apply = false, epnPath, ministeresPat
     return { success: true, dryRun: true };
   }
 
-  const alreadyConnected = mongoose.connection.readyState === 1;
-  if (!alreadyConnected) {
-    await mongoose.connect(loadConfig().MONGODB_URI);
-  }
-  const dbName = mongoose.connection.name;
-  console.log(`Base cible : ${dbName}`);
+  const { nom, ouverteParNous } = await ouvrirBase();
+  console.log(`Base cible : ${nom}`);
 
   let ministeresCreated = 0;
   let ministeresExisting = 0;
@@ -272,12 +259,10 @@ export async function ensureEpnReference({ apply = false, epnPath, ministeresPat
     else epnsExisting++;
   }
 
-  if (!alreadyConnected) {
-    await mongoose.disconnect();
-    // Ce script a ouvert ses deux connexions : les refermer pour que le
-    // processus se termine (closeOracle est sans effet si Oracle n'a pas ete utilise).
-    await closeOracle();
-  }
+  // Referme uniquement ce que CET appel a ouvert : la connexion déjà ouverte
+  // par l'appelant (Mongo prêt) comme le pool Oracle détenu par l'appelant
+  // restent ouverts, le script appelant se chargeant de les refermer.
+  if (ouverteParNous) await fermerBase();
 
   return {
     success: true,

@@ -1,13 +1,17 @@
 "use strict";
 
+// Init structures et regions (etape 41.4b) : lecture + validation des CSV,
+// planification puis ecriture — tout passe par les depots (aucun modele
+// Mongoose direct). Messages, comptages et codes de sortie inchanges.
+
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import mongoose from 'mongoose';
-import { loadConfig } from '../config.js';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
-import Region from '../models/Region.js';
-import Structure from '../models/Structure.js';
+import { loadConfig } from '../config.js';
+import { getRegionRepository } from '../repositories/regionRepository.js';
+import { getStructureRepository } from '../repositories/structureRepository.js';
+import { ouvrirBase, fermerBase } from './connexion.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DEFAULT_DATA_DIR = path.resolve(__dirname, '../../data/init');
@@ -73,20 +77,15 @@ function parseCSV(content) {
   return { headers, rows, delimiter };
 }
 
-async function main() {
-  const config = loadConfig();
-  const args = process.argv.slice(2);
-  const APPLY = args.includes('--apply');
-  const ALLOW_UNVALIDATED = args.includes('--allow-unvalidated');
-
-  const dataDir = process.env.INIT_DATA_DIR || DEFAULT_DATA_DIR;
-
+// Lecture et validation des deux CSV : aucune base n'est ouverte ni ecrite.
+// Les erreurs sont imprimees (identiquement a avant) puis { success: false }.
+export function lireCsv(dataDir = process.env.INIT_DATA_DIR || DEFAULT_DATA_DIR) {
   const regionsPath = path.join(dataDir, 'regions.csv');
   const structuresPath = path.join(dataDir, 'structures.csv');
 
   if (!fs.existsSync(regionsPath) || !fs.existsSync(structuresPath)) {
     console.error('Fichiers CSV introuvables dans', dataDir);
-    process.exit(1);
+    return { success: false };
   }
 
   const regionsContent = fs.readFileSync(regionsPath, 'utf8');
@@ -100,11 +99,11 @@ async function main() {
 
   if (JSON.stringify(regionHeaders) !== JSON.stringify(expectedRegionHeaders)) {
     console.error('En-tete invalide dans regions.csv');
-    process.exit(1);
+    return { success: false };
   }
   if (JSON.stringify(structHeaders) !== JSON.stringify(expectedStructHeaders)) {
     console.error('En-tete invalide dans structures.csv');
-    process.exit(1);
+    return { success: false };
   }
 
   const errors = [];
@@ -167,14 +166,16 @@ async function main() {
 
   if (errors.length > 0) {
     for (const err of errors) console.error(err);
-    process.exit(1);
+    return { success: false };
   }
 
-  await mongoose.connect(config.MONGODB_URI);
-  const dbName = mongoose.connection.name;
-  console.log(`Base cible : ${dbName}`);
+  return { success: true, regionNames, structInfos, regionRows, structRows };
+}
 
-  const existingRegions = await Region.find({ name: { $in: Array.from(regionNames.values()) } }).lean();
+// Planification : lecture par depot des regions et structures deja en place,
+// detection des conflits (imprimes) puis comptages. Aucune ecriture.
+export async function planifier({ regionNames, structInfos }) {
+  const existingRegions = await getRegionRepository().listerParNoms(Array.from(regionNames.values()));
   const existingRegionMap = new Map();
   for (const r of existingRegions) existingRegionMap.set(r.name, r._id);
 
@@ -188,12 +189,11 @@ async function main() {
   const structCodeSet = new Set(structInfos.map(i => i.code));
   if (structCodeSet.size !== structInfos.length) {
     console.error('Codes de structures dupliques generes');
-    await mongoose.disconnect();
-    process.exit(1);
+    return { success: false };
   }
 
   const csvCodes = structInfos.map(i => i.code);
-  const existingStructures = await Structure.find({ code: { $in: csvCodes } }).lean();
+  const existingStructures = await getStructureRepository().listerParCodes(csvCodes);
   const existingStructByCode = new Map();
   const existingStructByLabel = new Map();
   for (const s of existingStructures) {
@@ -202,7 +202,7 @@ async function main() {
   }
 
   const centralCodes = CENTRAL_STRUCTURES.map(cs => cs.code);
-  const existingCentral = await Structure.find({ code: { $in: centralCodes } }).lean();
+  const existingCentral = await getStructureRepository().listerParCodes(centralCodes);
   for (const s of existingCentral) {
     existingStructByCode.set(s.code, s);
     existingStructByLabel.set(s.label, s);
@@ -241,13 +241,8 @@ async function main() {
 
   if (conflicts.length > 0) {
     for (const c of conflicts) console.error(c);
-    await mongoose.disconnect();
-    process.exit(1);
+    return { success: false };
   }
-
-  const unvalidatedRegions = regionRows.filter(r => r.valide.trim().toLowerCase() === 'non').length;
-  const unvalidatedStructs = structRows.filter(r => r.valide.trim().toLowerCase() === 'non').length;
-  const totalUnvalidated = unvalidatedRegions + unvalidatedStructs;
 
   const centralToCreate = CENTRAL_STRUCTURES.filter(cs => !existingStructByCode.has(cs.code)).length;
   const centralExisting = CENTRAL_STRUCTURES.length - centralToCreate;
@@ -255,82 +250,122 @@ async function main() {
   const csvToCreate = structInfos.filter((i) => !existingStructByCode.has(i.code)).length;
   const csvExisting = structInfos.length - csvToCreate;
 
-  console.log(`Regions : ${regionToCreate.length} a creer, ${regionExisting.length} deja presente(s)`);
-  console.log(`Structures : ${csvToCreate + centralToCreate} a creer, ${csvExisting + centralExisting} deja presente(s)`);
-  console.log(`Lignes non validees : ${totalUnvalidated}`);
+  return {
+    success: true,
+    regionNames,
+    structInfos,
+    regionToCreate,
+    existingRegionMap,
+    regions: { aCreer: regionToCreate.length, dejaPresentes: regionExisting.length },
+    structures: { aCreer: csvToCreate + centralToCreate, dejaPresentes: csvExisting + centralExisting },
+  };
+}
 
-  if (!APPLY) {
-    console.log('DRY-RUN : aucune donnee ecrite. Relancez avec --apply pour ecrire.');
-    await mongoose.disconnect();
-    process.exit(0);
+// Ecritures : regions par assurer (compte « creee » seulement si la region
+// n'existait pas), structures par creerSiAbsent (centrales en premier).
+async function ecrire(plan) {
+  let regionsCreees = 0;
+  const finalRegionMap = new Map(plan.existingRegionMap);
+  for (const name of plan.regionToCreate) {
+    const { region, cree } = await getRegionRepository().assurer(name);
+    if (cree) regionsCreees++;
+    finalRegionMap.set(name, region._id);
   }
 
-  if (totalUnvalidated > 0) {
-    if (!ALLOW_UNVALIDATED) {
-      console.error('Certaines lignes ne sont pas validees. Utilisez --allow-unvalidated pour forcer (interdit en production).');
-      await mongoose.disconnect();
-      process.exit(1);
-    }
-    if (config.NODE_ENV === 'production') {
-      console.error('--allow-unvalidated est interdit en production.');
-      await mongoose.disconnect();
-      process.exit(1);
-    }
-  }
-
-  let regionsCreated = 0;
-  let regionsExisting = 0;
-  for (const name of regionToCreate) {
-    const res = await Region.updateOne({ name }, { $setOnInsert: { name } }, { upsert: true });
-    if (res.upsertedCount) regionsCreated++;
-  }
-  regionsExisting = regionExisting.length;
-
-  const finalRegionMap = new Map(existingRegionMap);
-  for (const name of regionToCreate) {
-    const r = await Region.findOne({ name }).lean();
-    if (r) finalRegionMap.set(name, r._id);
-  }
-
-  let structsCreated = 0;
-  let structsExisting = 0;
+  let structsCreees = 0;
+  let structsExistantes = 0;
 
   for (const cs of CENTRAL_STRUCTURES) {
-    const existing = await Structure.findOne({ code: cs.code }).lean();
-    if (!existing) {
-      await Structure.updateOne({ code: cs.code }, { $setOnInsert: cs }, { upsert: true });
-      structsCreated++;
-    } else {
-      structsExisting++;
-    }
+    const { cree } = await getStructureRepository().creerSiAbsent({ ...cs });
+    if (cree) structsCreees++;
+    else structsExistantes++;
   }
 
-  for (const info of structInfos) {
-    const existing = await Structure.findOne({ code: info.code }).lean();
-    if (existing) {
-      structsExisting++;
-      continue;
-    }
-    const regionId = finalRegionMap.get(info.region);
-    const doc = {
+  for (const info of plan.structInfos) {
+    const { cree } = await getStructureRepository().creerSiAbsent({
       code: info.code,
       label: info.label,
       type: info.type,
-      regionId,
+      regionId: finalRegionMap.get(info.region),
       active: true,
-    };
-    await Structure.updateOne({ code: info.code }, { $setOnInsert: doc }, { upsert: true });
-    structsCreated++;
+    });
+    if (cree) structsCreees++;
+    else structsExistantes++;
   }
 
-  console.log(`Regions : ${regionsCreated} creee(s), ${regionsExisting} deja presente(s)`);
-  console.log(`Structures : ${structsCreated} creee(s), ${structsExisting} deja presente(s)`);
-
-  await mongoose.disconnect();
-  process.exit(0);
+  return {
+    regionsCreees,
+    regionsExistantes: plan.regions.dejaPresentes,
+    structsCreees,
+    structsExistantes,
+  };
 }
 
-main().catch(err => {
-  console.error('Erreur:', err);
-  process.exit(1);
-});
+// Orchestration complete (hors connexion) : retourne { code } sans process.exit.
+export async function executerInitStructures({ data, apply = false, allowUnvalidated = false }) {
+  if (!data || !data.success) return { code: 1 };
+
+  const { regionRows, structRows } = data;
+  const config = loadConfig();
+
+  const plan = await planifier(data);
+  if (!plan.success) return { code: 1 };
+
+  const unvalidatedRegions = regionRows.filter(r => r.valide.trim().toLowerCase() === 'non').length;
+  const unvalidatedStructs = structRows.filter(r => r.valide.trim().toLowerCase() === 'non').length;
+  const totalUnvalidated = unvalidatedRegions + unvalidatedStructs;
+
+  console.log(`Regions : ${plan.regions.aCreer} a creer, ${plan.regions.dejaPresentes} deja presente(s)`);
+  console.log(`Structures : ${plan.structures.aCreer} a creer, ${plan.structures.dejaPresentes} deja presente(s)`);
+  console.log(`Lignes non validees : ${totalUnvalidated}`);
+
+  if (!apply) {
+    console.log('DRY-RUN : aucune donnee ecrite. Relancez avec --apply pour ecrire.');
+    return { code: 0 };
+  }
+
+  if (totalUnvalidated > 0) {
+    if (!allowUnvalidated) {
+      console.error('Certaines lignes ne sont pas validees. Utilisez --allow-unvalidated pour forcer (interdit en production).');
+      return { code: 1 };
+    }
+    if (config.NODE_ENV === 'production') {
+      console.error('--allow-unvalidated est interdit en production.');
+      return { code: 1 };
+    }
+  }
+
+  const ecrits = await ecrire(plan);
+
+  console.log(`Regions : ${ecrits.regionsCreees} creee(s), ${ecrits.regionsExistantes} deja presente(s)`);
+  console.log(`Structures : ${ecrits.structsCreees} creee(s), ${ecrits.structsExistantes} deja presente(s)`);
+
+  return { code: 0 };
+}
+
+async function main() {
+  const args = process.argv.slice(2);
+  const apply = args.includes('--apply');
+  const allowUnvalidated = args.includes('--allow-unvalidated');
+
+  const data = lireCsv();
+  if (!data.success) {
+    await fermerBase();
+    process.exit(1);
+  }
+
+  const { nom } = await ouvrirBase();
+  console.log(`Base cible : ${nom}`);
+
+  const { code } = await executerInitStructures({ data, apply, allowUnvalidated });
+  await fermerBase();
+  process.exit(code);
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch(async (err) => {
+    console.error('Erreur:', err);
+    await fermerBase();
+    process.exit(1);
+  });
+}

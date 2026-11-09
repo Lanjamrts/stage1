@@ -24,18 +24,22 @@ function nomOracle(config) {
   return `Oracle (${service || '127.0.0.1:1521/XEPDB1'})`;
 }
 
-// Ouvre la base cible et retourne { store, nom } : `nom` est le libellé à
-// afficher (« Base cible : … »), jamais un identifiant.
+// Ouvre la base cible et retourne { store, nom, ouverteParNous } : `nom` est le
+// libellé à afficher (« Base cible : … »), jamais un identifiant ;
+// `ouverteParNous` dit si CET appel a ouvert la connexion — false en mode
+// Oracle (le pool s'ouvre à la demande) et false si l'appelant l'avait déjà
+// ouverte : dans ces deux cas le correspondant ne doit pas la refermer.
 export async function ouvrirBase() {
   const config = loadConfig();
   if (config.CORE_STORE === 'oracle') {
-    return { store: 'oracle', nom: nomOracle(config) };
+    return { store: 'oracle', nom: nomOracle(config), ouverteParNous: false };
   }
   if (mongoose.connection.readyState !== 1) {
     await mongoose.connect(config.MONGODB_URI);
     mongoOuverte = true;
+    return { store: 'mongo', nom: mongoose.connection.name, ouverteParNous: true };
   }
-  return { store: 'mongo', nom: mongoose.connection.name };
+  return { store: 'mongo', nom: mongoose.connection.name, ouverteParNous: false };
 }
 
 // Ferme ce qui a été ouvert : MongoDB si ouvrirBase l'a ouvert, puis le pool
