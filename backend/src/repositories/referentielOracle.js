@@ -22,6 +22,12 @@ function versOracle(valeur) {
   return valeur ? valeur : null;
 }
 
+function enDate(valeur) {
+  if (valeur == null) return null;
+  if (valeur instanceof Date) return valeur;
+  return new Date(valeur);
+}
+
 export async function lister(type) {
   const db = await getKnex();
   const resultat = await db.raw(
@@ -94,21 +100,33 @@ export async function assurerEpn({ value, ministere, regime, acronyme }) {
   });
 }
 
-export async function insererPlusieurs(elements) {
+// Étape 42 : avec { conserverDates: true } (migration uniquement),
+// CREATED_AT / UPDATED_AT de chaque élément sont écrits tels quels ; sans
+// l'option, comportement inchangé (dates par défaut SYSTIMESTAMP).
+export async function insererPlusieurs(elements, { conserverDates = false } = {}) {
   if (!elements || elements.length === 0) return;
   const db = await getKnex();
   await db.transaction(async (trx) => {
     for (const element of elements) {
-      await trx.raw(
-        'INSERT INTO REFERENTIEL (TYPE_REF, VALEUR, MINISTERE, REGIME, ACRONYME) VALUES (?, ?, ?, ?, ?)',
-        [
-          element.type,
-          element.value,
-          versOracle(element.ministere),
-          versOracle(element.regime),
-          versOracle(element.acronyme),
-        ]
-      );
+      const valeurs = [
+        element.type,
+        element.value,
+        versOracle(element.ministere),
+        versOracle(element.regime),
+        versOracle(element.acronyme),
+      ];
+      if (conserverDates) {
+        await trx.raw(
+          'INSERT INTO REFERENTIEL (TYPE_REF, VALEUR, MINISTERE, REGIME, ACRONYME, CREATED_AT, UPDATED_AT) ' +
+            'VALUES (?, ?, ?, ?, ?, ?, ?)',
+          [...valeurs, enDate(element.createdAt) || new Date(), enDate(element.updatedAt) || new Date()]
+        );
+      } else {
+        await trx.raw(
+          'INSERT INTO REFERENTIEL (TYPE_REF, VALEUR, MINISTERE, REGIME, ACRONYME) VALUES (?, ?, ?, ?, ?)',
+          valeurs
+        );
+      }
     }
   });
 }

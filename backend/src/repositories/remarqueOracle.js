@@ -66,14 +66,28 @@ async function avecAuteurs(docs) {
   }));
 }
 
-export async function creer({ authorId, context, text, state } = {}) {
+// Étape 42 : avec { conserverDates: true } (migration uniquement),
+// CREATED_AT / UPDATED_AT de la remarque sont écrits tels quels ; sans
+// l'option, comportement inchangé (dates par défaut SYSTIMESTAMP).
+export async function creer(
+  { authorId, context, text, state, createdAt, updatedAt } = {},
+  { conserverDates = false } = {}
+) {
   const db = await getKnex();
-  await db.raw('INSERT INTO REMARQUE (AUTEUR_ID, CONTEXTE, TEXTE, ETAT) VALUES (?, ?, ?, ?)', [
+  const base = [
     Number(authorId),
     context,
     text,
     state === undefined || state === null ? 'nouvelle' : state,
-  ]);
+  ];
+  if (conserverDates) {
+    await db.raw(
+      'INSERT INTO REMARQUE (AUTEUR_ID, CONTEXTE, TEXTE, ETAT, CREATED_AT, UPDATED_AT) VALUES (?, ?, ?, ?, ?, ?)',
+      [...base, enDate(createdAt) || new Date(), enDate(updatedAt) || new Date()]
+    );
+  } else {
+    await db.raw('INSERT INTO REMARQUE (AUTEUR_ID, CONTEXTE, TEXTE, ETAT) VALUES (?, ?, ?, ?)', base);
+  }
   // Pas de clé unique sur REMARQUE : relecture de la dernière ligne insérée
   // (monotone, l'identité est croissante).
   const lignes = await requeter(`SELECT ${COLONNES} FROM REMARQUE ORDER BY ID DESC FETCH FIRST 1 ROW ONLY`, []);

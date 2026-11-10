@@ -136,23 +136,35 @@ export async function creerSiAbsent(doc) {
   }
 }
 
-export async function insererPlusieurs(docs) {
+// Étape 42 : avec { conserverDates: true } (migration uniquement),
+// CREATED_AT / UPDATED_AT du document sont écrits tels quels ; sans l'option,
+// comportement inchangé (dates par défaut SYSTIMESTAMP).
+export async function insererPlusieurs(docs, { conserverDates = false } = {}) {
   if (!Array.isArray(docs) || docs.length === 0) return [];
   const db = await getKnex();
   try {
     return await db.transaction(async (trx) => {
       const creees = [];
       for (const doc of docs) {
-        await trx.raw(
-          'INSERT INTO STRUCTURE (CODE, LABEL, TYPE_STRUCTURE, REGION_ID, ACTIVE) VALUES (?, ?, ?, ?, ?)',
-          [
-            doc.code,
-            doc.label,
-            doc.type,
-            doc.regionId == null ? null : Number(doc.regionId),
-            doc.active === undefined || doc.active === null ? 1 : (doc.active ? 1 : 0),
-          ]
-        );
+        const base = [
+          doc.code,
+          doc.label,
+          doc.type,
+          doc.regionId == null ? null : Number(doc.regionId),
+          doc.active === undefined || doc.active === null ? 1 : (doc.active ? 1 : 0),
+        ];
+        if (conserverDates) {
+          await trx.raw(
+            'INSERT INTO STRUCTURE (CODE, LABEL, TYPE_STRUCTURE, REGION_ID, ACTIVE, CREATED_AT, UPDATED_AT) ' +
+              'VALUES (?, ?, ?, ?, ?, ?, ?)',
+            [...base, enDate(doc.createdAt) || new Date(), enDate(doc.updatedAt) || new Date()]
+          );
+        } else {
+          await trx.raw(
+            'INSERT INTO STRUCTURE (CODE, LABEL, TYPE_STRUCTURE, REGION_ID, ACTIVE) VALUES (?, ?, ?, ?, ?)',
+            base
+          );
+        }
         creees.push(await lireStructure(trx, doc.code));
       }
       return creees;

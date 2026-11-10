@@ -215,28 +215,41 @@ export async function trouverPremierParRole(role) {
   return lignes.length > 0 ? lignes[0] : null;
 }
 
-export async function creer(doc) {
+// Étape 42 : avec { conserverDates: true } (migration uniquement),
+// CREATED_AT / UPDATED_AT du document sont écrits tels quels ; sans l'option,
+// comportement inchangé (dates par défaut SYSTIMESTAMP).
+export async function creer(doc, { conserverDates = false } = {}) {
   const db = await getKnex();
+  const base = [
+    doc.im,
+    doc.nom,
+    doc.prenom,
+    doc.direction,
+    doc.service,
+    doc.passwordHash,
+    doc.role,
+    Number(doc.structureId),
+    doc.status === undefined || doc.status === null ? 'actif' : doc.status,
+    doc.mustChangePassword ? 1 : 0,
+    doc.failedAttempts === undefined || doc.failedAttempts === null ? 0 : Number(doc.failedAttempts),
+    doc.lockedUntil === undefined ? null : enDate(doc.lockedUntil),
+  ];
   try {
-    await db.raw(
-      'INSERT INTO UTILISATEUR (IM, NOM, PRENOM, DIRECTION, SERVICE, PASSWORD_HASH, ROLE_CODE, ' +
-        'STRUCTURE_ID, STATUT, MUST_CHANGE_PASSWORD, FAILED_ATTEMPTS, LOCKED_UNTIL) ' +
-        'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-      [
-        doc.im,
-        doc.nom,
-        doc.prenom,
-        doc.direction,
-        doc.service,
-        doc.passwordHash,
-        doc.role,
-        Number(doc.structureId),
-        doc.status === undefined || doc.status === null ? 'actif' : doc.status,
-        doc.mustChangePassword ? 1 : 0,
-        doc.failedAttempts === undefined || doc.failedAttempts === null ? 0 : Number(doc.failedAttempts),
-        doc.lockedUntil === undefined ? null : enDate(doc.lockedUntil),
-      ]
-    );
+    if (conserverDates) {
+      await db.raw(
+        'INSERT INTO UTILISATEUR (IM, NOM, PRENOM, DIRECTION, SERVICE, PASSWORD_HASH, ROLE_CODE, ' +
+          'STRUCTURE_ID, STATUT, MUST_CHANGE_PASSWORD, FAILED_ATTEMPTS, LOCKED_UNTIL, CREATED_AT, UPDATED_AT) ' +
+          'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [...base, enDate(doc.createdAt) || new Date(), enDate(doc.updatedAt) || new Date()]
+      );
+    } else {
+      await db.raw(
+        'INSERT INTO UTILISATEUR (IM, NOM, PRENOM, DIRECTION, SERVICE, PASSWORD_HASH, ROLE_CODE, ' +
+          'STRUCTURE_ID, STATUT, MUST_CHANGE_PASSWORD, FAILED_ATTEMPTS, LOCKED_UNTIL) ' +
+          'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        base
+      );
+    }
   } catch (err) {
     throw erreurDoublonSi(err) || err;
   }

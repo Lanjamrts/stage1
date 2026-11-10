@@ -278,26 +278,39 @@ async function reluParCle(trx, doc) {
   return convertir(lignes[0], validations.get(String(lignes[0].ID)));
 }
 
-async function insererDoc(trx, doc) {
+// Étape 42 : avec { conserverDates: true } (migration uniquement),
+// CREATED_AT / UPDATED_AT du document sont écrits tels quels ; sans l'option,
+// comportement inchangé (dates par défaut SYSTIMESTAMP).
+async function insererDoc(trx, doc, { conserverDates = false } = {}) {
   const dates = { created: new Date(), submitted: null, exported: null, ...(doc.dates || {}) };
-  await trx.raw(
-    'INSERT INTO SAISIE (STRUCTURE_ID, MODULE_ID, VERSION_MODULE, PERIODE_ID, DATE_EVENEMENT, ' +
-      'AUTEUR_ID, STATUT, VALEURS_JSON, DATE_CREATION, DATE_SOUMISSION, DATE_EXPORT) ' +
-      'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-    [
-      Number(doc.structureId),
-      Number(doc.moduleId),
-      Number(doc.moduleVersion),
-      doc.periodeId == null ? null : Number(doc.periodeId),
-      doc.eventDate == null ? null : enDate(doc.eventDate),
-      Number(doc.authorId),
-      doc.status === undefined || doc.status === null ? 'brouillon' : doc.status,
-      JSON.stringify(doc.values === undefined || doc.values === null ? {} : doc.values),
-      enDate(dates.created),
-      enDate(dates.submitted),
-      enDate(dates.exported),
-    ]
-  );
+  const base = [
+    Number(doc.structureId),
+    Number(doc.moduleId),
+    Number(doc.moduleVersion),
+    doc.periodeId == null ? null : Number(doc.periodeId),
+    doc.eventDate == null ? null : enDate(doc.eventDate),
+    Number(doc.authorId),
+    doc.status === undefined || doc.status === null ? 'brouillon' : doc.status,
+    JSON.stringify(doc.values === undefined || doc.values === null ? {} : doc.values),
+    enDate(dates.created),
+    enDate(dates.submitted),
+    enDate(dates.exported),
+  ];
+  if (conserverDates) {
+    await trx.raw(
+      'INSERT INTO SAISIE (STRUCTURE_ID, MODULE_ID, VERSION_MODULE, PERIODE_ID, DATE_EVENEMENT, ' +
+        'AUTEUR_ID, STATUT, VALEURS_JSON, DATE_CREATION, DATE_SOUMISSION, DATE_EXPORT, CREATED_AT, UPDATED_AT) ' +
+        'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [...base, enDate(doc.createdAt) || new Date(), enDate(doc.updatedAt) || new Date()]
+    );
+  } else {
+    await trx.raw(
+      'INSERT INTO SAISIE (STRUCTURE_ID, MODULE_ID, VERSION_MODULE, PERIODE_ID, DATE_EVENEMENT, ' +
+        'AUTEUR_ID, STATUT, VALEURS_JSON, DATE_CREATION, DATE_SOUMISSION, DATE_EXPORT) ' +
+        'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      base
+    );
+  }
 }
 
 export async function creer(doc) {
@@ -452,15 +465,40 @@ export async function archiverExportees(periodeIds) {
   });
 }
 
-export async function insererPlusieurs(docs) {
+// Étape 42 : le tableau `validations` du document est inséré avec la saisie
+// (parité avec insertMany de Mongo, aucun appelant existant n'en passait).
+// Avec { conserverDates: true } (migration uniquement) : dates d'horodatage
+// écrites telles quelles ET retour des lignes créées (les ids Oracle y sont) ;
+// sans l'option, retour inchangé (undefined).
+export async function insererPlusieurs(docs, { conserverDates = false } = {}) {
   if (!Array.isArray(docs) || docs.length === 0) return;
   const db = await getKnex();
   try {
+    const lignes = [];
     await db.transaction(async (trx) => {
       for (const doc of docs) {
-        await insererDoc(trx, doc);
+        await insererDoc(trx, doc, { conserverDates });
+        const validations = Array.isArray(doc.validations) ? doc.validations : [];
+        if (!conserverDates && validations.length === 0) continue;
+        const ligne = await reluParCle(trx, doc);
+        for (const validation of validations) {
+          await trx.raw(
+            'INSERT INTO SAISIE_VALIDATION (SAISIE_ID, DECISION, MOTIF, ACTEUR_ID, ACTEUR_LABEL, DATE_DECISION) ' +
+              'VALUES (?, ?, ?, ?, ?, ?)',
+            [
+              Number(ligne._id),
+              validation.decision,
+              validation.motif == null ? null : validation.motif,
+              validation.actorId == null ? null : Number(validation.actorId),
+              validation.actorLabel == null ? null : validation.actorLabel,
+              validation.date == null ? new Date() : enDate(validation.date),
+            ]
+          );
+        }
+        if (conserverDates) lignes.push(ligne);
       }
     });
+    if (conserverDates) return lignes;
   } catch (err) {
     throw erreurDoublonSi(err) || err;
   }

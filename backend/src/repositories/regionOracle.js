@@ -84,14 +84,27 @@ export async function assurer(nom) {
   }
 }
 
-export async function insererPlusieurs(noms) {
-  if (!Array.isArray(noms) || noms.length === 0) return [];
+// Étape 42 : avec { conserverDates: true } (migration uniquement), chaque
+// élément peut être { name, createdAt, updatedAt } et les deux dates sont
+// écrites telles quelles ; sans l'option, comportement inchangé (chaînes,
+// dates par défaut SYSTIMESTAMP).
+export async function insererPlusieurs(elements, { conserverDates = false } = {}) {
+  if (!Array.isArray(elements) || elements.length === 0) return [];
   const db = await getKnex();
   try {
     return await db.transaction(async (trx) => {
       const creees = [];
-      for (const nom of noms) {
-        await trx.raw('INSERT INTO REGION (NAME_REGION) VALUES (?)', [nom]);
+      for (const element of elements) {
+        const nom = typeof element === 'string' ? element : element.name;
+        if (conserverDates && element && typeof element === 'object') {
+          await trx.raw('INSERT INTO REGION (NAME_REGION, CREATED_AT, UPDATED_AT) VALUES (?, ?, ?)', [
+            nom,
+            enDate(element.createdAt) || new Date(),
+            enDate(element.updatedAt) || new Date(),
+          ]);
+        } else {
+          await trx.raw('INSERT INTO REGION (NAME_REGION) VALUES (?)', [nom]);
+        }
         const resultat = await trx.raw(`SELECT ${COLONNES} FROM REGION WHERE NAME_REGION = ?`, [nom]);
         const lignes = resultat.rows || resultat;
         creees.push(convertir(lignes[0]));
