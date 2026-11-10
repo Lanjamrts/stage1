@@ -2,33 +2,28 @@
 
 import './guard.js';
 
-import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
 import readline from 'node:readline/promises';
-import { loadConfig } from '../config.js';
+import { pathToFileURL } from 'node:url';
 
-import RegionModel from '../models/Region.js';
-import StructureModel from '../models/Structure.js';
-import UtilisateurModel from '../models/Utilisateur.js';
-import PeriodeModel from '../models/Periode.js';
-import ModuleModel from '../models/Module.js';
-import SaisieModel from '../models/Saisie.js';
-import RemarqueModel from '../models/Remarque.js';
+import { loadConfig } from '../config.js';
+import { ouvrirBase, fermerBase, nomOracle } from '../scripts/connexion.js';
+import { getRegionRepository } from '../repositories/regionRepository.js';
+import { getStructureRepository } from '../repositories/structureRepository.js';
+import { getUtilisateurRepository } from '../repositories/utilisateurRepository.js';
+import { getPeriodeRepository } from '../repositories/periodeRepository.js';
+import { getModuleRepository } from '../repositories/moduleRepository.js';
+import { getSaisieRepository } from '../repositories/saisieRepository.js';
+import { getRemarqueRepository } from '../repositories/remarqueRepository.js';
 import { getAuditRepository } from '../repositories/auditRepository.js';
 import { getProfilRepository } from '../repositories/profilRepository.js';
 import { getReferentielRepository } from '../repositories/referentielRepository.js';
-import { closeOracle } from '../db/oracle.js';
 import { MODULES } from './modules.js';
 import { buildSaisies } from './saisies.js';
 import { ensureProfils, ensureModules, ensureEpnReference } from './common.js';
 
 dotenv.config();
-const config = loadConfig();
-
-const args = process.argv.slice(2);
-const YES = args.includes('--yes');
-const PURGE_AUDIT = args.includes('--purge-audit');
 
 const REGIONS = [
   { name: 'Alaotra-Mangoro', code: 'ALA' },
@@ -67,45 +62,61 @@ const PERIODES = [
   { label: 'Octobre 2026', start: new Date('2026-10-01'), end: new Date('2026-10-31'), deadline: new Date('2026-11-05'), periodicity: 'monthly' },
 ];
 
-async function confirmOrExit() {
-  if (YES) return;
-  const dbName = new URL(config.MONGODB_URI).pathname.replace('/', '') || '(inconnue)';
+// Nom de la base affiché dans la demande de confirmation : calculé SANS aucune
+// connexion. En Mongo, le nom déjà déduit de MONGODB_URI ; en Oracle, le même
+// libellé que ouvrirBase() (service seul, jamais d'identifiant).
+function libelleBase() {
+  const config = loadConfig();
+  if (config.CORE_STORE === 'oracle') return nomOracle(config);
+  return new URL(config.MONGODB_URI).pathname.replace('/', '') || '(inconnue)';
+}
+
+// Demande de confirmation AVANT toute connexion et toute suppression.
+// Retourne le code de sortie (0 : continuer ou annulé sans écriture, 1 : refus)
+// au lieu d'appeler process.exit : l'appelant referme d'abord la base.
+async function confirmOrExit({ yes, purgeAudit }) {
+  if (yes) return { code: 0 };
+  const dbName = libelleBase();
   console.log(`ATTENTION : ce script SUPPRIME les donnees de la base "${dbName}" (regions, structures, utilisateurs, periodes, referentiels, modules, saisies, remarques) et recree des donnees de demonstration.`);
-  console.log(PURGE_AUDIT ? 'Le journal d\'audit sera AUSSI supprime (--purge-audit).' : 'Le journal d\'audit est conserve.');
+  console.log(purgeAudit ? 'Le journal d\'audit sera AUSSI supprime (--purge-audit).' : 'Le journal d\'audit est conserve.');
   if (!process.stdin.isTTY) {
     console.error('Terminal non interactif : relancez avec --yes pour confirmer.');
-    process.exit(1);
+    return { code: 1 };
   }
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
   const answer = await rl.question('Tapez OUI pour continuer : ');
   rl.close();
   if (answer.trim() !== 'OUI') {
     console.log('Annule. Aucune donnee modifiee.');
-    process.exit(0);
+    return { code: 0 };
   }
+  return { code: 0 };
 }
 
-async function seed() {
-  await confirmOrExit();
+// Seed de démonstration (SPEC §9) : toute la logique, sans process.exit.
+// La connexion est ouverte ici (puis refermée par l'appelant : seed() en ligne
+// de commande, le afterAll du test) — jamais deux fois de suite, jamais
+// refermée par un autre utilisateur de la base.
+export async function executerSeedDemo({ yes = false, purgeAudit = false } = {}) {
+  const confirmation = await confirmOrExit({ yes, purgeAudit });
+  if (confirmation.code !== 0) return { code: confirmation.code };
 
-  await mongoose.connect(config.MONGODB_URI);
-  console.log('Connecte a MongoDB');
+  const { store } = await ouvrirBase();
+  console.log(store === 'oracle' ? 'Connecte a Oracle' : 'Connecte a MongoDB');
 
-  // Nettoyage (seed idempotent)
-  await Promise.all([
-    RegionModel.deleteMany({}),
-    StructureModel.deleteMany({}),
-    getProfilRepository().supprimerTout(),
-    UtilisateurModel.deleteMany({}),
-    PeriodeModel.deleteMany({}),
-    getReferentielRepository().supprimerTout(),
-    ModuleModel.deleteMany({}),
-    SaisieModel.deleteMany({}),
-    RemarqueModel.deleteMany({}),
-  ]);
+  // Nettoyage (seed idempotent) : séquentiel, dans l'ordre des clés étrangères.
+  await getRemarqueRepository().supprimerTout();
+  await getSaisieRepository().supprimerTout();
+  await getUtilisateurRepository().supprimerTout();
+  await getModuleRepository().supprimerTout();
+  await getPeriodeRepository().supprimerTout();
+  await getStructureRepository().supprimerTout();
+  await getRegionRepository().supprimerTout();
+  await getProfilRepository().supprimerTout();
+  await getReferentielRepository().supprimerTout();
   console.log('Collections nettoyees');
 
-  if (PURGE_AUDIT) {
+  if (purgeAudit) {
     await getAuditRepository().supprimerTout();
     console.log('Journal d\'audit supprime (--purge-audit)');
   } else {
@@ -117,7 +128,7 @@ async function seed() {
   console.log(`${profils.created + profils.existing} profils prets`);
 
   // 2. Regions (12)
-  const regionDocs = await RegionModel.insertMany(REGIONS.map(r => ({ name: r.name })));
+  const regionDocs = await getRegionRepository().insererPlusieurs(REGIONS.map(r => r.name));
   const regionByName = {};
   regionDocs.forEach(r => { regionByName[r.name] = r._id; });
   const regionByCode = {};
@@ -141,7 +152,7 @@ async function seed() {
   structures.push({ code: 'SSEBF', label: 'SSEBF', type: 'SSEBF', active: true });
   structures.push({ code: 'DGBF', label: 'DGBF', type: 'DGBF', active: true });
   structures.push({ code: 'CELLULE_INFO', label: 'DGBF – Cellule Informatique', type: 'CELLULE_INFO', active: true });
-  const structureDocs = await StructureModel.insertMany(structures);
+  const structureDocs = await getStructureRepository().insererPlusieurs(structures);
   const structByCode = {};
   structureDocs.forEach(s => { structByCode[s.code] = s._id; });
   console.log(`${structureDocs.length} structures creees`);
@@ -151,7 +162,7 @@ async function seed() {
   const epnRef = await ensureEpnReference({ apply: true });
   if (!epnRef.success) {
     console.error('Echec du chargement des référentiels ministères/EPN.');
-    process.exit(1);
+    return { code: 1 };
   }
 
   const referentiels = [];
@@ -163,23 +174,24 @@ async function seed() {
   console.log(`${referentiels.length} referentiels crees`);
 
   // 5. Periodes (3)
-  const periodeDocs = await PeriodeModel.insertMany(PERIODES);
+  const periodeDocs = await getPeriodeRepository().insererPlusieurs(PERIODES);
   const periodeIdByLabel = {};
   periodeDocs.forEach(p => { periodeIdByLabel[p.label] = p._id; });
   console.log(`${PERIODES.length} periodes creees`);
 
   // 6. Modules (gabarits, fields structurés) - utiliser ensureModules pour reset et recreer
   await ensureModules();
-  const moduleDocs = await ModuleModel.find({ code: { $in: MODULES.map((m) => m.code) } });
+  const moduleDocs = await getModuleRepository().lister({ codes: MODULES.map((m) => m.code) });
   const moduleIdByCode = {};
   moduleDocs.forEach(m => { moduleIdByCode[m.code] = m._id; });
   console.log(`${MODULES.length} modules crees`);
 
   // 7. Utilisateurs (mot de passe depuis SEED_DEMO_PASSWORD, défaut seulement hors production)
+  const config = loadConfig();
   const demoPassword = process.env.SEED_DEMO_PASSWORD || (config.NODE_ENV === 'production' ? undefined : 'Test@2026');
   if (!demoPassword) {
     console.error('SEED_DEMO_PASSWORD est requis en production');
-    process.exit(1);
+    return { code: 1 };
   }
   const passwordHash = await bcrypt.hash(demoPassword, 10);
   const utilisateurs = [
@@ -194,9 +206,12 @@ async function seed() {
     { im: '125430', nom: 'Rakotonirina', prenom: 'Haja', direction: 'DRBF Analamanga', service: 'Service des rapports', role: 'client', structureId: structByCode['SRSP-ANL'], status: 'actif', mustChangePassword: true },
     { im: 'SYS-0000', nom: 'Systeme', prenom: 'SIGBD', direction: 'DGBF', service: 'Cellule Informatique', role: 'developpeur', structureId: structByCode['CELLULE_INFO'], status: 'actif', mustChangePassword: false },
   ];
-  const userDocs = await UtilisateurModel.insertMany(
-    utilisateurs.map(u => ({ ...u, passwordHash, failedAttempts: 0, lockedUntil: null }))
-  );
+  // Le dépôt Utilisateur n'a pas de insererPlusieurs : un creer par compte,
+  // l'ordre du tableau (et donc des _id) est conservé.
+  const userDocs = [];
+  for (const u of utilisateurs) {
+    userDocs.push(await getUtilisateurRepository().creer({ ...u, passwordHash, failedAttempts: 0, lockedUntil: null }));
+  }
   const userIdByIm = {};
   const actorLabelByIm = {};
   userDocs.forEach(u => {
@@ -213,19 +228,37 @@ async function seed() {
     periodeIdByLabel,
     actorLabelByIm,
   });
-  await SaisieModel.insertMany(saisies);
+  await getSaisieRepository().insererPlusieurs(saisies);
   console.log(`${saisies.length} saisies creees`);
 
-  await mongoose.disconnect();
-  // closeOracle est sans effet si Oracle n'a pas ete utilise : il ferme le
-  // pool ouvert par un depot (REFERENTIEL/PROFIL/AUDIT sur Oracle) pour que
-  // le processus se termine.
-  await closeOracle();
   console.log('Seed termine avec succes.');
+  return { code: 0 };
 }
 
-seed().catch(async (err) => {
-  console.error('Erreur de seed:', err);
-  await closeOracle().catch(() => {});
-  process.exit(1);
-});
+async function seed() {
+  const args = process.argv.slice(2);
+  let code = 1;
+  try {
+    const resultat = await executerSeedDemo({
+      yes: args.includes('--yes'),
+      purgeAudit: args.includes('--purge-audit'),
+    });
+    code = resultat.code;
+  } catch (err) {
+    console.error('Erreur de seed:', err);
+    code = 1;
+  }
+  // fermerBase() est sans effet si rien n'a été ouvert ; toute sortie du
+  // script passe par ici, succès comme échec, avant process.exit.
+  try {
+    await fermerBase();
+  } catch (err) {
+    console.error('Erreur de seed:', err);
+    code = 1;
+  }
+  process.exit(code);
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  seed();
+}

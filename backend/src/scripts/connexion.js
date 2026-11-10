@@ -15,8 +15,9 @@ import { closeOracle } from '../db/oracle.js';
 let mongoOuverte = false;
 
 // Libellé d'affichage de la base Oracle : service uniquement, jamais
-// l'utilisateur ni le mot de passe.
-function nomOracle(config) {
+// l'utilisateur ni le mot de passe. Exporté (41.4c) pour afficher le nom de
+// base AVANT toute connexion, au même format que ouvrirBase().
+export function nomOracle(config) {
   const service =
     config.NODE_ENV === 'test' && config.ORACLE_TEST_CONNECT_STRING
       ? config.ORACLE_TEST_CONNECT_STRING
