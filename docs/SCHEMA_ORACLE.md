@@ -254,6 +254,35 @@ Préparation seule : les routes, contrôleurs, services, scripts et seeds ne bas
 Le choix du dépôt est relu **à chaque appel** par `getXxxRepository()` (jamais d'implémentation cachée) ;
 l'écriture `SAISIE.VALEURS_JSON` et `MODULE_SIGBD.FIELDS_JSON` lie une chaîne `JSON.stringify(...)`.
 
+## Migration des données (étape 42)
+
+`npm run db:migrate:oracle` (racine) ou `npm run migrate:oracle --prefix backend` exécute
+`backend/src/scripts/migrer-mongo-oracle.js` : copie **MongoDB → Oracle** en lecture seule sur la
+source (`find().lean()`, aucune écriture ni suppression Mongo) via les dépôts `*Oracle.js`
+directement (`CORE_STORE` reste `mongo` pendant la migration).
+
+- **Dry-run par défaut** : plan, comptes et anomalies, aucune écriture. `--apply` écrit puis
+  vérifie **ligne à ligne** et sort en 1 au moindre écart.
+- **Refus (code 1, rien écrit)** : cible Oracle non vide (recréer avec
+  `npm run oracle:schema -- --reset` en développement ; en production, cible neuve), références
+  orphelines, doublons (codes, IM, labels, clés période/saisie, doublons internes des tableaux
+  `allowedPeriodicities` / `structureTypes`).
+- **Ordre d'écriture** (clés étrangères) : profils, régions, structures, périodes, modules,
+  référentiels, utilisateurs, saisies (+ validations), remarques, journal d'audit.
+- **Remappage** : ancien `_id` Mongo → nouvel `ID` Oracle pour `structure.regionId`,
+  `utilisateur.structureId`, `saisie.{structureId,moduleId,periodeId,authorId}`,
+  `saisie.validations[].actorId`, `remarque.authorId` ; journal d'audit : `userId` → `USER_REF`
+  remappé seulement s'il vaut un ancien `_id` connu (IM et `unknown` conservés), objet
+  `saisie:<id>` / `utilisateur:<id>` remappé seulement si l'id est connu.
+- **Aucun identifiant de connexion ni mot de passe** dans les journaux ni dans le rapport.
+
+### Conséquences après migration
+
+- Les identifiants passent d'ObjectId MongoDB (24 hex) à des `NUMBER` Oracle : **les sessions
+  JWT existantes deviennent invalides** (les utilisateurs se reconnectent).
+- Les liens, références et exports produits **avant** la migration pointent vers les anciens
+  identifiants Mongo et sont caducs ; seuls ceux créés après bascule sont valides.
+
 ## Inventaire
 
 - **13 tables**, **27 instructions** de création (13 `CREATE TABLE` + 14 `CREATE [UNIQUE] INDEX`), **13 `DROP TABLE`**.

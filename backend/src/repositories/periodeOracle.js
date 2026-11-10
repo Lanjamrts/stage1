@@ -112,14 +112,22 @@ export async function creerSiAbsent(doc) {
   }
 }
 
-export async function insererPlusieurs(docs) {
+// Étape 42 : avec { conserverDates: true } (migration uniquement),
+// CREATED_AT / UPDATED_AT du document sont écrits tels quels ; sans l'option,
+// comportement inchangé (dates par défaut SYSTIMESTAMP).
+export async function insererPlusieurs(docs, { conserverDates = false } = {}) {
   if (!Array.isArray(docs) || docs.length === 0) return [];
+  const colonnes = conserverDates ? `${COLONNES_INSERT}, CREATED_AT, UPDATED_AT` : COLONNES_INSERT;
+  const placeholders = conserverDates ? `${VALEURS_INSERT}, ?, ?` : VALEURS_INSERT;
   const db = await getKnex();
   try {
     return await db.transaction(async (trx) => {
       const creees = [];
       for (const doc of docs) {
-        await trx.raw(`INSERT INTO PERIODE (${COLONNES_INSERT}) VALUES (${VALEURS_INSERT})`, valeursInsert(doc));
+        const valeurs = conserverDates
+          ? [...valeursInsert(doc), enDate(doc.createdAt) || new Date(), enDate(doc.updatedAt) || new Date()]
+          : valeursInsert(doc);
+        await trx.raw(`INSERT INTO PERIODE (${colonnes}) VALUES (${placeholders})`, valeurs);
         creees.push(await lireCle(trx, doc.periodicity, doc.start));
       }
       return creees;

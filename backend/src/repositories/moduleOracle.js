@@ -220,20 +220,41 @@ export async function trouverParCode(code) {
   return lireParCode(db, code);
 }
 
-async function insererDoc(trx, doc) {
-  await trx.raw(
-    'INSERT INTO MODULE_SIGBD (CODE, LABEL, PERIODICITE, GENRE, VERSION_MODULE, ACTIVE, FIELDS_JSON) ' +
-      'VALUES (?, ?, ?, ?, ?, ?, ?)',
-    [
-      doc.code,
-      doc.label,
-      doc.periodicity,
-      doc.kind,
-      doc.version === undefined || doc.version === null ? 1 : Number(doc.version),
-      doc.active === undefined || doc.active === null ? 1 : doc.active ? 1 : 0,
-      JSON.stringify(doc.fields),
-    ]
-  );
+// Étape 42 : avec { conserverDates: true } (migration uniquement),
+// CREATED_AT / UPDATED_AT du document sont écrits tels quels ; sans l'option,
+// comportement inchangé (dates par défaut SYSTIMESTAMP).
+async function insererDoc(trx, doc, { conserverDates = false } = {}) {
+  if (conserverDates) {
+    await trx.raw(
+      'INSERT INTO MODULE_SIGBD (CODE, LABEL, PERIODICITE, GENRE, VERSION_MODULE, ACTIVE, FIELDS_JSON, CREATED_AT, UPDATED_AT) ' +
+        'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [
+        doc.code,
+        doc.label,
+        doc.periodicity,
+        doc.kind,
+        doc.version === undefined || doc.version === null ? 1 : Number(doc.version),
+        doc.active === undefined || doc.active === null ? 1 : doc.active ? 1 : 0,
+        JSON.stringify(doc.fields),
+        enDate(doc.createdAt) || new Date(),
+        enDate(doc.updatedAt) || new Date(),
+      ]
+    );
+  } else {
+    await trx.raw(
+      'INSERT INTO MODULE_SIGBD (CODE, LABEL, PERIODICITE, GENRE, VERSION_MODULE, ACTIVE, FIELDS_JSON) ' +
+        'VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [
+        doc.code,
+        doc.label,
+        doc.periodicity,
+        doc.kind,
+        doc.version === undefined || doc.version === null ? 1 : Number(doc.version),
+        doc.active === undefined || doc.active === null ? 1 : doc.active ? 1 : 0,
+        JSON.stringify(doc.fields),
+      ]
+    );
+  }
   const ligne = await trx.raw('SELECT ID FROM MODULE_SIGBD WHERE CODE = ?', [doc.code]);
   const lignes = ligne.rows || ligne;
   const moduleId = Number(lignes[0].ID);
@@ -252,11 +273,11 @@ async function insererDoc(trx, doc) {
   return moduleId;
 }
 
-export async function creer(doc) {
+export async function creer(doc, options = {}) {
   const db = await getKnex();
   try {
     return await db.transaction(async (trx) => {
-      await insererDoc(trx, doc);
+      await insererDoc(trx, doc, options);
       return lireParCode(trx, doc.code);
     });
   } catch (err) {
