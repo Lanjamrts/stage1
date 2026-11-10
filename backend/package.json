@@ -23,7 +23,8 @@
     "oracle:ping": "node src/scripts/oracle-ping.js",
     "oracle:schema": "node src/scripts/oracle-schema.js",
     "test": "npm run seed:test && vitest run",
-    "seed:test": "NODE_ENV=test MONGODB_URI=mongodb://127.0.0.1:27017/sigbd_test node src/seed/demo.js --yes --purge-audit"
+    "seed:test": "NODE_ENV=test MONGODB_URI=mongodb://127.0.0.1:27017/sigbd_test node src/seed/demo.js --yes --purge-audit",
+    "seed:test:oracle": "NODE_ENV=test CORE_STORE=oracle REFERENCE_STORE=oracle AUDIT_STORE=oracle node src/seed/demo.js --yes --purge-audit"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
