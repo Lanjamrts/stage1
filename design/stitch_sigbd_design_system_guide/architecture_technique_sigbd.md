@@ -38,7 +38,7 @@
                                  │  Driver / Connexion sécurisée
                                  ▼
   ┌─────────────────────────────────────────────────────────────┐
-  │     Base de Données ····················· MongoDB           │
+  │     Base de Données ·········· MongoDB ou Oracle (défaut)    │
   │     (Hébergée sur l'infrastructure sécurisée DGBF)          │
   └──────────────────────────────┬──────────────────────────────┘
                                  │
@@ -60,7 +60,8 @@
    * Serveur développé sous environnement **Node.js / Express**.
    * Exécution de l'ensemble de la logique métier, contrôle de validité des formulaires, gestion des workflows et ordonnancement des exports.
 3. **Couche Données (Persistance)** :
-   * Système de gestion de base de données **MongoDB** (modèle orienté documents pour s'adapter à la flexibilité des canevas).
+   * Système de gestion de base de données **MongoDB** (modèle orienté documents pour s'adapter à la flexibilité des canevas), **support par défaut**, ou **Oracle XE 21c** (tables relationnelles, support optionnel) : le cahier des charges §13 autorise « Oracle ou MongoDB ».
+   * Support choisi par composant avec `CORE_STORE` (noyau), `REFERENCE_STORE` (profils et référentiels) et `AUDIT_STORE` (journal), valeur `mongo` par défaut (`backend/src/config.js`). Lecture et écriture par la couche des dépôts (`backend/src/repositories/`) : une interface commune par entité et deux implémentations (`*Mongo.js` / `*Oracle.js`), choisies à chaque appel.
    * Hébergement exclusif au sein du centre de serveurs de la **DGBF** en environnement de production.
 4. **Couche Sécurité & Transverse** :
    * Chiffrement des flux de bout en bout (**HTTPS / TLS**).
@@ -68,7 +69,7 @@
 
 ---
 
-## 4. MODÉLISATION DES DONNÉES (9 Collections Principales)
+## 4. MODÉLISATION DES DONNÉES (MongoDB : 9 collections · Oracle : 13 tables)
 
 Le schéma s'articule autour de 9 collections fondamentales :
 1. `regions` : Liste officielle des régions administratives de rattachement.
@@ -80,6 +81,10 @@ Le schéma s'articule autour de 9 collections fondamentales :
 7. `saisies` : Enregistrements des données saisies, valeurs horodatées, historique du circuit de validation et **version exacte du canevas utilisée au moment de la soumission**.
 8. `remarques` : Remarques contextuelles et échanges techniques rattachés aux formulaires ou modules.
 9. `journal_audit` : Traçabilité immuable des accès et des actions sensibles du système.
+
+*Aux 9 collections ci-dessus s'ajoute la collection `referentiels` (directions, services, grades, EPN, STD, ministères), qui n'avait pas de place dans le comptage initial.*
+
+**Sous Oracle**, les mêmes entités sont des **tables** : 13 tables au total (`referentiels` → `REFERENTIEL`, le tableau `validations` de `saisies` → table `SAISIE_VALIDATION`, `fields` et `values` en colonnes de type `JSON` natif Oracle 21c). La correspondance complète collection → table, les colonnes et les contraintes sont dans `docs/SCHEMA_ORACLE.md`. Le vocabulaire reste ainsi : **collections** quand on parle de MongoDB, **tables** quand on parle d'Oracle ; la couche des dépôts (`backend/src/repositories/`, deux implémentations par entité) fait le lien sans modifier l'API ni les écrans.
 
 ---
 
@@ -127,13 +132,15 @@ Le schéma s'articule autour de 9 collections fondamentales :
 * **Fréquence** : Sauvegarde automatisée quotidienne de la base de données de production.
 * **Redondance** : Copie de sauvegarde déportée hors site pour pallier tout sinistre physique ou incident infrastructurel.
 * **Plan de Continuité** : Procédure de restauration testée et vérifiée chaque trimestre.
-* **Outillage technique** : Outils natifs standardisés d'extraction et de réinjection (`mongodump` et `mongorestore`).
+* **Outillage technique** :
+   * MongoDB : extraction et réinjection natives (`mongodump`, `mongorestore`) — commandes `npm run backup --prefix backend`, `npm run restore`, `npm run backup:verify`.
+   * Oracle : sauvegarde logique JSON des 13 tables avec somme de contrôle SHA-256 — `npm run db:backup:oracle`, `npm run restore:oracle`, et vérification du fichier `node backend/src/scripts/verify-backup-oracle.js` (aucune connexion requise). Les sauvegardes physiques Oracle (Data Pump / RMAN) relèvent de l'informatique du ministère : voir `docs/DEPLOIEMENT.md`.
 
 ---
 
 ## 9. POINTS TECHNIQUES À VALIDER
 
-1. **Validation du SGBD cible** : Arbitrage définitif entre **MongoDB** (flexibilité des schémas de canevas) et **Oracle Database** (conformité avec le SI existant) par le *Comité technique*.
+1. **Support de la base de données** : les deux supports du cahier des charges §13 sont implémentés (**MongoDB** par défaut, **Oracle Database** en support optionnel) et se choisissent avec `CORE_STORE` / `REFERENCE_STORE` / `AUDIT_STORE`. Reste à confirmer avec l'informatique du ministère : système d'exploitation, version exacte d'Oracle, politique de sauvegardes et terminaison HTTPS — recensés dans `docs/DEPLOIEMENT.md`.
 2. **Compétences et transfert** : Évaluation de la montée en compétences et de l'autonomie de la *Cellule Informatique* sur les technologies proposées (**React** et **Node.js**).
 3. **Dimensionnement infrastructure** : Spécification des prérequis d'hébergement, CPU, mémoire vive et stockage pour le serveur d'application à la DGBF.
 4. **Paramètres de sécurité** : Définition formelle par l'administration du délai de timeout d'inactivité (ex. 15 ou 30 min) et de la politique de complexité des mots de passe.

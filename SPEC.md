@@ -6,7 +6,7 @@ Application web du Ministère de l'Économie et des Finances ( DGBF / SSEBF ). T
 
 - Frontend: React (WEB, avec Vite) + React Router + Tailwind CSS. ( PAS React Native, PAS Next.js.)
 - Backend: Node.js + Express ( REST API, JSON ).
-- Base de données: MongoDB locale à mongodb://127.0.0.1:27017/sigbd, accédée avec Mongoose.
+- Base de données: MongoDB locale à mongodb://127.0.0.1:27017/sigbd, accédée avec Mongoose, OU Oracle XE 21c (oracledb en mode thin + knex) — le cahier des charges §13 autorise « Oracle ou MongoDB ». MongoDB est le support par défaut; le support actif se choisit par les variables CORE_STORE, REFERENCE_STORE et AUDIT_STORE (backend/src/config.js, valeur « mongo » par défaut, « oracle » optionnel) et les lectures/écritures passent par la couche des dépôts (backend/src/repositories/ : une interface commune par entité et deux implémentations, *Mongo.js et *Oracle.js, le choix étant relu à chaque appel).
 - Bibliothèques: bcrypt, jsonwebtoken, cookie-parser, helmet, express-rate-limit, express-mongo-sanitize, zod, exceljs, pdfkit, supertest + vitest ou jest.
 - Monorepo: /backend et /frontend. Git dès le premier commit. Un README avec les instructions d'exécution.
 
@@ -116,7 +116,11 @@ Gardes de route: un utilisateur authentifié ouvrant une route d'un autre rôle 
 - Les utilisateurs sont désactivés, jamais supprimés( statut « actif » / « desactive »)。
 - Sécurité: helmet, limitation de débit sur la connexion, express-mongo-sanitize, validation zod sur chaque body, échapper les textes affichés, pas de stack traces au client
  
-##  ́6. BASE DE DONNÉES( MongoDB, 9 collections )
+##  ́6. BASE DE DONNÉES( MongoDB: 9 collections · Oracle: 13 tables )
+Vocabulaire de stockage (le cahier des charges §13 autorise « Oracle ou MongoDB », les deux supports sont code) :
+- MongoDB ( support par défaut ) : COLLECTIONS — les 9 collections listées ci-dessous, plus la collection `referentiels` qui porte les listes de référence (choix consigné en DECISIONS.md [P1] ).
+- Oracle XE 21c ( support optionnel ) : TABLES — 13 tables issues des 10 modèles Mongoose ( `modules` → `MODULE_SIGBD` + `MODULE_PERIODICITE` + `MODULE_TYPE_STRUCTURE`, `saisies` → `SAISIE` + `SAISIE_VALIDATION` ) ; correspondance complète et DDL : docs/SCHEMA_ORACLE.md.
+- Lecture et écriture : couche des dépôts `backend/src/repositories/` — une interface commune par entité, deux implémentations `*Mongo.js` / `*Oracle.js`, choisies à chaque appel par `getXxxRepository()` d'après `CORE_STORE` (noyau), `REFERENCE_STORE` (profils et référentiels) et `AUDIT_STORE` (journal), valeur `mongo` par défaut (backend/src/config.js).
 - regions {name} 
 - structures {code, label, type: SRB|SRSP|SRPE|CIRBF|DRBF|SSEBF|DGBF|CELLULE_INFO, regionId?, active} 
 - profils {code, label}( les 5 rôles )
