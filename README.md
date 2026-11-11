@@ -10,7 +10,8 @@ et leur consultation en lecture seule.
 ## Prérequis
 
 - Node.js ≥ 18
-- MongoDB local (`mongodb://127.0.0.1:27017`) ou Docker (optionnel, voir `npm run db:up`)
+- MongoDB local (`mongodb://127.0.0.1:27017`) ou Docker (optionnel, voir `npm run db:up`) — support par défaut
+- Oracle XE 21c (support optionnel, voir « Choix de la base de données » et `docs/DEPLOIEMENT.md`)
 
 ## Démarrage rapide
 
@@ -25,6 +26,10 @@ npm run dev                        # lance l'API (port 4000) et le frontend (por
 Puis ouvrir <http://localhost:5173> et se connecter avec `104562` / `Test@2026`.
 
 > **Note** : si un MongoDB local tourne déjà sur le port 27017, ne lancez pas `npm run db:up` (conflit de port).
+>
+> Ce déroulé rapide part sur MongoDB (support par défaut). Pour travailler sur Oracle, positionnez
+> `CORE_STORE` / `REFERENCE_STORE` / `AUDIT_STORE` et les variables `ORACLE_*`, posez le schéma
+> puis lancez le seed : voir « Choix de la base de données ».
 
 ## Installation
 
@@ -67,6 +72,9 @@ Variables backend (`.env`) :
 - `LOGIN_RATE_LIMIT_MAX` : Nombre max de tentatives de login par IP par fenêtre (défaut: `60`)
 - `SEED_DEMO_PASSWORD` : Mot de passe pour les comptes de démo (défaut: `Test@2026` hors production)
 - `SEED_ALLOW_PRODUCTION` : Autoriser le seed de **démonstration** en production (défaut: `false`, **dangereux**)
+- `CORE_STORE`, `REFERENCE_STORE`, `AUDIT_STORE` : support de stockage par composant (`mongo` par défaut, `oracle` optionnel) — voir « Choix de la base de données »
+- `ORACLE_USER`, `ORACLE_PASSWORD`, `ORACLE_CONNECT_STRING`, `ORACLE_POOL_MIN`, `ORACLE_POOL_MAX` : connexion Oracle XE 21c (optionnelle) — voir « Choix de la base de données »
+- `ORACLE_TEST_USER`, `ORACLE_TEST_PASSWORD`, `ORACLE_TEST_CONNECT_STRING` : identifiants de test Oracle, lus uniquement si `NODE_ENV=test`
 
 Variables frontend (`.env`) :
 - `VITE_API_URL` : URL de l'API backend (défaut: `http://localhost:4000`)
@@ -77,6 +85,65 @@ Variables frontend (`.env`) :
 - Les comptes de démo (IM `104562`, `112470`, `115908`, `108231`, `120344`, `121775`, `123009`, `125430`, `098716`) **ne doivent jamais exister en production**
 - Utilisez `npm run create-admin` pour créer le premier admin1 avec un mot de passe provisoire généré aléatoirement
 - Le seed de **démonstration** est refusé en production sauf si `SEED_ALLOW_PRODUCTION=true` (à éviter)
+
+## Choix de la base de données
+
+SIGBD fonctionne sur **MongoDB** (support par défaut) ou sur **Oracle XE 21c** (support
+optionnel) ; le cahier des charges §13 autorise « Oracle ou MongoDB ». Les deux supports sont
+code : la lecture et l'écriture passent par la couche des dépôts
+(`backend/src/repositories/`) où chaque entité a une implémentation MongoDB (`*Mongo.js`) et
+une implémentation Oracle (`*Oracle.js`). Le choix est relu **à chaque appel** par
+`getXxxRepository()` d'après trois interrupteurs (`backend/src/config.js`).
+
+### Variables de stockage et variables Oracle
+
+| Variable | Défaut | Rôle |
+| --- | --- | --- |
+| `CORE_STORE` | `mongo` | Noyau : régions, structures, périodes, utilisateurs, modules, saisies, remarques (`mongo` ou `oracle`) |
+| `REFERENCE_STORE` | `mongo` | Profils et listes de référence (directions, services, grades, EPN, STD, ministères) |
+| `AUDIT_STORE` | `mongo` | Journal d'audit (append-only) |
+| `ORACLE_USER` | (vide) | Utilisateur Oracle applicatif ; **requis en production** dès qu'une variable Oracle est définie ou qu'un interrupteur vaut `oracle` (`backend/src/config.js`) |
+| `ORACLE_PASSWORD` | (vide) | Mot de passe Oracle (jamais journalisé ni renvoyé au client) ; la valeur d'exemple est refusée en production |
+| `ORACLE_CONNECT_STRING` | `127.0.0.1:1521/XEPDB1` | `hôte:port/service` de la base Oracle |
+| `ORACLE_POOL_MIN` | `1` | Taille minimale du pool de connexions (`backend/src/db/oracle.js`) |
+| `ORACLE_POOL_MAX` | `10` | Taille maximale du pool |
+| `ORACLE_TEST_USER` | (vide) | Identifiants de test, lus **uniquement** quand `NODE_ENV=test` (effacés sinon) |
+| `ORACLE_TEST_PASSWORD` | (vide) | idem |
+| `ORACLE_TEST_CONNECT_STRING` | (vide) | idem |
+| `MONGODB_URI` | `mongodb://127.0.0.1:27017/sigbd` | URI MongoDB ; **reste obligatoire** : le serveur s'y connecte au démarrage (`backend/src/server.js`), quel que soit le choix des interrupteurs |
+
+Sans `ORACLE_*` et avec les trois interrupteurs à `mongo` (valeurs par défaut), l'application
+tourne entièrement sur MongoDB, comme au départ.
+
+### Commandes Oracle
+
+Commandes depuis la racine du dépôt (les options se passent avec `--prefix backend`, voir
+les exemples ci-dessous ; un argument de fichier passé tel quel est bien transmis) :
+
+| Commande (racine) | Script `backend/package.json` | Rôle |
+| --- | --- | --- |
+| `npm run db:oracle:up` / `npm run db:oracle:down` | — | Démarre / arrête le conteneur Oracle de développement (`docker-compose.yml`) |
+| `npm run db:oracle:ping` | `oracle:ping` | Teste la connexion : `Oracle OK — version … — service …` (code 1 en cas d'échec) |
+| `npm run db:oracle:schema` | `oracle:schema` | Crée les 13 tables (`backend/db/oracle/001_schema.sql`) ; options `--drop` / `--reset` refusées en production |
+| `npm run db:migrate:oracle` | `migrate:oracle` | Copie MongoDB → Oracle (`backend/src/scripts/migrer-mongo-oracle.js`) ; dry-run par défaut, `--apply` écrit |
+| `npm run db:backup:oracle` | `backup:oracle` | Sauvegarde logique JSON des 13 tables dans `backups/` (fichier mode 0600) |
+| `npm run db:restore:oracle` | `restore:oracle` | Restaure un fichier ; dry-run par défaut, `--apply` écrit (base cible vide obligatoire) |
+| — | `node src/scripts/verify-backup-oracle.js [fichier]` | Vérifie un fichier de sauvegarde (somme SHA-256 et comptes), sans connexion à la base |
+| — | `seed:test:oracle` | Seed de démonstration sur Oracle (nécessite `ORACLE_TEST_*`), utilisé par la recette en mode Oracle |
+
+Exemples avec options (depuis la racine, les options passent par `--prefix backend`) :
+
+```bash
+npm run oracle:schema --prefix backend -- --reset          # développement uniquement
+npm run migrate:oracle --prefix backend -- --apply         # écrit puis vérifie ligne à ligne
+npm run restore:oracle --prefix backend -- ../backups/<fichier> --apply
+node backend/src/scripts/verify-backup-oracle.js backups/<fichier>
+```
+
+Les commandes npm tournent dans `backend/` : un chemin relatif y est résolu depuis `backend/`
+(écrit donc `../backups/<fichier>` pour le dossier `backups/` de la racine, ou un chemin absolu).
+Le lancement direct `node backend/src/scripts/…` depuis la racine résout lui les chemins depuis
+la racine.
 
 ## Base de données (seed)
 
@@ -98,19 +165,25 @@ Crée le premier administrateur (production).
 
 Après un seed:demo il faut se reconnecter.
 
-## Base Oracle (migration en cours)
+## Base Oracle (XE 21c)
 
-La base de données active reste **MongoDB** jusqu'à la fin de la migration. Le socle Oracle XE 21c est posé à part (dépendances `oracledb` + `knex`, module `backend/src/db/oracle.js`, service Docker) et n'est utilisé que si les variables `ORACLE_*` sont définies.
+Le socle Oracle XE 21c (dépendances `oracledb` + `knex`, module `backend/src/db/oracle.js`,
+service Docker) est actif **uniquement** quand les variables `ORACLE_*` sont définies et qu'un
+interrupteur `CORE_STORE` / `REFERENCE_STORE` / `AUDIT_STORE` vaut `oracle` ; avec les valeurs
+par défaut, l'application tourne sur MongoDB. Voir « Choix de la base de données » ci-dessus,
+le schéma dans [docs/SCHEMA_ORACLE.md](docs/SCHEMA_ORACLE.md) et la mise en production dans
+[docs/DEPLOIEMENT.md](docs/DEPLOIEMENT.md).
 
 ### Prérequis
 
-- Oracle XE 21c accessible sur `127.0.0.1:1521/XEPDB1` (service `XEPDB1`, utilisateur applicatif `sigbd`).
+- Oracle XE 21c accessible sur `127.0.0.1:1521/XEPDB1` (service `XEPDB1`, utilisateur applicatif `sigbd`), ou le service fourni par l'informatique du ministère.
 - `oracledb` en **mode léger (thin)** : aucun Instant Client Oracle n'est nécessaire côté Node.
 - Variables optionnelles (sans elles, l'application tourne sur MongoDB) :
   - `ORACLE_USER` : utilisateur applicatif
   - `ORACLE_PASSWORD` : mot de passe (jamais journalisé ni renvoyé au client)
   - `ORACLE_CONNECT_STRING` (défaut `127.0.0.1:1521/XEPDB1`)
   - `ORACLE_POOL_MIN` (défaut `1`), `ORACLE_POOL_MAX` (défaut `10`)
+- `MONGODB_URI` reste obligatoire même en mode Oracle (connexion établie au démarrage du serveur).
 
 ### Démarrer Oracle (Docker, développement uniquement)
 
@@ -138,10 +211,19 @@ Aucun mot de passe réel n'est stocké dans le dépôt. `backend/.env.example` c
 
 ### Mise en service (production)
 
+Ordre valable quel que soit le support choisi (MongoDB par défaut, Oracle si `CORE_STORE` /
+`REFERENCE_STORE` / `AUDIT_STORE` valent `oracle`) ; le guide détaillé, avec les variables de
+production et les points à confirmer avec le ministère, est
+[docs/DEPLOIEMENT.md](docs/DEPLOIEMENT.md).
+
 1. `npm run seed:ref` — crée les profils, les 13 gabarits de modules, les 32 ministères et les 223 EPN (données de référence, idempotent, ne supprime rien).
 2. `npm run init:structures` — importe les régions et les structures (depuis `data/init/regions.csv` et `data/init/structures.csv`).
 3. `npm run init:periodes` — génère les périodes de collecte.
 4. `npm run create-admin` — crée le premier administrateur (production).
+
+En Oracle, le schéma est posé avant (`npm run db:oracle:schema`) et une éventuelle migration
+depuis MongoDB se fait juste après, sur une cible vide (`npm run db:migrate:oracle`), avant
+toute écriture de seed.
 
 Les référentiels de référence (ministères et EPN) sont chargés par `seed:ref` ; il n'est plus nécessaire de lancer `init:epn` manuellement.
 
@@ -170,6 +252,10 @@ Pour initialiser une base de production (ou de préproduction) avec les structur
 7. Connectez-vous en tant qu'Admin 1 et créez les vrais utilisateurs dans l'écran « Utilisateurs ».
 
 Les listes CSV proviennent de sources web non officielles et doivent être confirmées par le SSEBF. Les 3 structures centrales (SSEBF, DGBF, CELLULE_INFO) sont créées par le script. Les périodes sont générées par `init:periodes` (voir « Générer les périodes »). Les utilisateurs ne sont **pas** importés (ils sont saisis dans l'interface).
+
+En mode Oracle, ces mêmes commandes s'appliquent : les scripts écrivent dans le support désigné
+par `CORE_STORE` / `REFERENCE_STORE` / `AUDIT_STORE`. `MONGODB_URI` reste toutefois obligatoire
+dans la configuration (le serveur s'y connecte au démarrage) mais n'est plus la cible d'écriture.
 
 ## Générer les périodes
 
@@ -217,6 +303,7 @@ npm run test
 
 Le script sème d'abord la base dédiée `sigbd_test`, puis exécute la suite Vitest
 (119 tests : RBAC, machine à états, audit append-only, `mustChangePassword`, périodicité, seed, setup, config, exports Excel/PDF, sauvegarde ; 6 tests de sauvegarde ignorés si `mongodump` est absent).
+Les blocs de tests Oracle ne s'exécutent que si `ORACLE_TEST_USER` et `ORACLE_TEST_PASSWORD` sont définis (sinon ils sont ignorés sans erreur) ; le seed de test Oracle se lance avec `npm run seed:test:oracle --prefix backend` (voir « Recette en mode Oracle » dans [docs/RECETTE.md](docs/RECETTE.md)).
 Les exports Excel et PDF suivent une mise en page commune (feuille de synthèse, une feuille par module, tableaux à lignes groupées, en-tête et pied de page PDF).
 Le build de production du client : `cd frontend && npm run build` ou `npm run build` depuis la racine.
 
@@ -231,6 +318,25 @@ npm run backup --prefix backend           # crée backups/sigbd-<base>-<AAAAMMJJ
 npm run restore --prefix backend -- <fichier>  # restaure ; ajoutez --yes pour confirmer sans saisie
 npm run backup:verify --prefix backend [-- <fichier>]  # vérifie la dernière ou un fichier donné
 ```
+
+En mode Oracle (interrupteurs à `oracle`), les commandes équivalentes produisent un fichier
+JSON des 13 tables (`backups/sigbd-oracle-<service>-<horodatage>Z.json`, même dossier, même
+mode 0600, somme de contrôle SHA-256) :
+
+```bash
+npm run db:backup:oracle                                              # crée la sauvegarde
+npm run restore:oracle --prefix backend -- <fichier>                  # dry-run (plan, aucune écriture)
+npm run restore:oracle --prefix backend -- <fichier> --apply          # écrit (base cible vide obligatoire)
+node backend/src/scripts/verify-backup-oracle.js [<fichier>]          # vérifie sans connexion à la base
+```
+
+Le script de vérification Oracle n'a pas de raccourci npm : il s'exécute avec `node`
+(depuis la racine ou depuis `backend/` avec `node src/scripts/verify-backup-oracle.js`).
+
+Chemins de fichiers : les commandes `npm run … --prefix backend` s'exécutent dans `backend/`,
+un chemin relatif y est donc résolu depuis `backend/` (écrivez `../backups/<fichier>` pour le
+dossier `backups/` de la racine, ou un chemin absolu). `node backend/src/scripts/…` lancé
+depuis la racine résout lui les chemins depuis la racine.
 
 Exemple de ligne cron quotidienne (DOCUMENTATION SEULEMENT, rien n'est installé automatiquement) :
 
@@ -300,18 +406,25 @@ Cycle de vie d'une saisie : `brouillon → soumise → validee|rejetee → expor
 ## Structure du dépôt
 
 ```
-backend/    API Express + Mongoose (src/server.js), seed, tests Vitest
+backend/    API Express + Mongoose (src/server.js), dépôts MongoDB/Oracle (src/repositories), seeds, scripts, tests Vitest
+backend/db/oracle/  schéma DDL Oracle (001_schema.sql, 000_drop.sql)
 frontend/   React + Vite + Tailwind (src/pages, src/components)
 shared/     rules.mjs — règles de formulaire partagées navigateur/serveur
 design/     planches de design de référence (lecture seule)
 SPEC.md     spécification fonctionnelle (faisant foi)
 DECISIONS.md journal des choix d'implémentation phase par phase
-docs/RECETTE.md  dossier de recette (livrable L5)
-docs/DEMO.md     script de démonstration (10 min)
+docs/RECETTE.md      dossier de recette (livrable L5)
+docs/DEMO.md         script de démonstration (10 min)
+docs/SCHEMA_ORACLE.md schéma Oracle (13 tables, correspondance Mongo → Oracle)
+docs/DEPLOIEMENT.md  guide de déploiement pour l'équipe informatique du ministère
 ```
 
 ## Déploiement
 
-- `backend` : `npm start` (variable `PORT`, `MONGODB_URI`, `JWT_SECRET` via `.env`).
+- `backend` : `npm start` (variable `PORT`, `MONGODB_URI`, `JWT_SECRET` via `.env` ; variables `CORE_STORE`, `REFERENCE_STORE`, `AUDIT_STORE`, `ORACLE_*` pour basculer sur Oracle).
 - `frontend` : `npm run build` puis servir `frontend/dist` derrière le même domaine que
   l'API (les appels sont préfixés `/api`, cookies de session `httpOnly`).
+- Guide complet (prérequis, schéma Oracle, variables de production, ordre de mise en service,
+  sauvegarde, vérifications, reprise après incident) : [docs/DEPLOIEMENT.md](docs/DEPLOIEMENT.md).
+- HTTPS, reverse proxy et points à confirmer avec l'informatique du ministère : voir les
+  sections correspondantes de `docs/DEPLOIEMENT.md`.

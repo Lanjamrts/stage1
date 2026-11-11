@@ -348,3 +348,63 @@ Aucun test automatique.
 | T-10 |      |         |                      |                   |              |
 | T-11 |      |         |                      |                   |              |
 | T-12 |      |         |                      |                   |              |
+
+## 5. Recette en mode Oracle
+
+Cette section rejoue les mêmes 12 scénarios sur le support **Oracle** (cahier des charges §13 autorise les deux supports : Oracle ou MongoDB) au lieu de MongoDB. Elle n'ajoute, ne supprime et ne modifie rien des sections 1 à 4, qui restent valables telles quelles en mode MongoDB (support par défaut).
+
+### 5.1 Variables à positionner
+
+- `ORACLE_TEST_USER`, `ORACLE_TEST_PASSWORD` : identifiants de test, lus **uniquement** quand `NODE_ENV=test` (`backend/src/config.js`) ; `ORACLE_TEST_CONNECT_STRING` complète le service (`ORACLE_CONNECT_STRING` sinon, défaut `127.0.0.1:1521/XEPDB1`). Sans `ORACLE_TEST_USER` et `ORACLE_TEST_PASSWORD`, les blocs de tests Oracle sont ignorés sans erreur (`describe.skipIf`) et le seed Oracle échoue sur les identifiants puis sort en code 1.
+- `CORE_STORE=oracle`, `REFERENCE_STORE=oracle`, `AUDIT_STORE=oracle` : les trois interrupteurs sur Oracle (imposés par le script `seed:test:oracle`, voir `backend/package.json`).
+- Les variables `ORACLE_USER` / `ORACLE_PASSWORD` / `ORACLE_CONNECT_STRING` servent au serveur lancé hors tests.
+
+### 5.2 Commandes
+
+```bash
+# depuis la racine du projet
+export ORACLE_TEST_USER=<utilisateur-de-test>
+export ORACLE_TEST_PASSWORD=<mot-de-passe-de-test>
+export ORACLE_TEST_CONNECT_STRING=127.0.0.1:1521/XEPDB1
+
+npm run db:oracle:ping                        # attendu : Oracle OK — version … — service …
+npm run db:oracle:schema                      # crée les 13 tables ; échoue si elles existent déjà (seul --drop ignore la table absente)
+npm run seed:test:oracle --prefix backend     # seed de démonstration sur Oracle (sans confirmation, --yes inclus)
+npm test                                      # suite Vitest : blocs Oracle exécutés, blocs Mongo aussi
+```
+
+Pour les procédures manuelles (T-01, T-02, T-05 à T-12), lancez le serveur et le client avec les mêmes variables :
+
+```bash
+# terminal 1 (API) — depuis la racine
+CORE_STORE=oracle REFERENCE_STORE=oracle AUDIT_STORE=oracle \
+ORACLE_USER=<utilisateur> ORACLE_PASSWORD=<mot-de-passe> ORACLE_CONNECT_STRING=127.0.0.1:1521/XEPDB1 \
+npm run dev --prefix backend
+
+# terminal 2 (client)
+npm run dev --prefix frontend
+```
+
+`MONGODB_URI` reste présent dans `backend/.env` : le serveur s'y connecte au démarrage (`backend/src/server.js`), quel que soit le support choisi.
+
+### 5.3 Scénarios rejoués
+
+- **T-01** — identique : mêmes comptes, mêmes redirections par rôle ; la lecture des comptes passe par le dépôt Oracle (`backend/src/repositories/utilisateurOracle.js`).
+- **T-02** — identique : création, recherche, désactivation d'un utilisateur ; les lignes d'audit vont dans la table `JOURNAL_AUDIT` (`AUDIT_STORE=oracle`) et restent visibles dans Journal d'audit.
+- **T-03** — identique : brouillon enregistré, modifié, rouvert ; les saisies sont écrites dans `SAISIE`.
+- **T-04** — identique : refus des champs obligatoires et des formats, messages inchangés (règles communes navigateur/serveur, `shared/rules.mjs`).
+- **T-05** — identique : soumission, validation, export par admin2 ; les transitions d'état sont les mêmes (`STATUT` dans `SAISIE`, historique dans `SAISIE_VALIDATION`).
+- **T-06** — identique : rejet avec motif, correction et nouvelle soumission.
+- **T-07** — identique : téléchargements Excel et PDF ; le contenu vient du support actif, la mise en page ne change pas.
+- **T-08** — identique : envoi et traitement d'une remarque (table `REMARQUE`).
+- **T-09** — identique : matrice des permissions appliquée par le serveur, indépendante du support.
+- **T-10** — **procédure Oracle différente** : `npm run db:backup:oracle` (fichier JSON des 13 tables, mode 0600), puis `npm run restore:oracle --prefix backend -- ../backups/<fichier>` (dry-run, plan seul) et `npm run restore:oracle --prefix backend -- ../backups/<fichier> --apply` sur une base vidée, et vérification du fichier sans connexion avec `node backend/src/scripts/verify-backup-oracle.js backups/<fichier>`. Tests automatisés associés : `backend/tests/backup-oracle.test.js` (exécutés seulement si `ORACLE_TEST_*` sont définis, aucun `mongodump` nécessaire).
+- **T-11** — identique : test de charge identique, l'API écrit sur le support actif.
+- **T-12** — identique : compatibilité navigateurs indépendante du support.
+
+### 5.4 Points d'attention
+
+- La recette Oracle suppose un schéma Oracle vide ou déjà conforme ([SCHEMA_ORACLE.md](SCHEMA_ORACLE.md)) et un seed exécuté avant les scénarios manuels.
+- Chemins des sauvegardes : les commandes `npm run … --prefix backend` s'exécutent dans `backend/`, un chemin relatif y est donc résolu depuis `backend/` (écrivez `../backups/<fichier>` pour le dossier `backups/` de la racine) ; `node backend/src/scripts/…` lancé depuis la racine résout lui les chemins depuis la racine.
+- Les tests Mongo de T-10 restent ignorés si `mongodump` est absent (voir section 3, T-10) ; cela ne change pas le résultat des blocs Oracle.
+- La migration éventuelle des données MongoDB vers Oracle (`npm run db:migrate:oracle`) est un cas d'installation, pas un scénario de recette : elle refuse une cible non vide.
