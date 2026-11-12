@@ -385,7 +385,7 @@ npm run dev --prefix backend
 npm run dev --prefix frontend
 ```
 
-`MONGODB_URI` reste présent dans `backend/.env` : le serveur s'y connecte au démarrage (`backend/src/server.js`), quel que soit le support choisi.
+Les trois stocks étant sur Oracle, le serveur ne connecte MongoDB que si un stockage en a besoin (`backend/src/server.js`) : `MONGODB_URI` peut rester présent dans `backend/.env` sans être utilisé, ou être retiré — la sortie ne contient alors que `✅ Oracle connecté` et le message de démarrage, jamais `MongoDB`.
 
 ### 5.3 Scénarios rejoués
 

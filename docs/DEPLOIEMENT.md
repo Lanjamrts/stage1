@@ -24,7 +24,7 @@ Règles suivies dans ce document :
 | Prérequis | Détail | Référence |
 | --- | --- | --- |
 | Node.js ≥ 18 et npm | installation des dépendances | [README](../README.md), section Prérequis ; `npm run install:all` (racine) |
-| MongoDB joignable | `MONGODB_URI`, défaut `mongodb://127.0.0.1:27017/sigbd` ; **obligatoire même en mode Oracle** (voir section 9) | `backend/.env.example`, `backend/src/config.js` |
+| MongoDB joignable | `MONGODB_URI`, défaut `mongodb://127.0.0.1:27017/sigbd` ; **requis dès qu'au moins un des trois stocks vaut `mongo`**, sans objet quand les trois valent `oracle` (voir section 9) | `backend/.env.example`, `backend/src/config.js` |
 | Oracle XE 21c | ou version fournie par le ministère **[À CONFIRMER]** ; en développement, conteneur `gvenzl/oracle-xe:21-slim` | `docker-compose.yml` |
 | Client Oracle Node | `oracledb` en mode léger (thin) : aucun Instant Client à installer | `backend/src/db/oracle.js` |
 | HTTPS | obligatoire en production (cookie de session `secure` dès `NODE_ENV=production`) | `backend/src/services/auth.js` |
@@ -136,7 +136,7 @@ génère aussi un `JWT_SECRET` aléatoire de 96 caractères — `scripts/setup.m
 
 | Variable | Défaut | Rôle |
 | --- | --- | --- |
-| `MONGODB_URI` | aucun (obligatoire) | URI MongoDB ; exigée par `config.js` et utilisée au démarrage du serveur (`backend/src/server.js`) |
+| `MONGODB_URI` | aucun (requis) | URI MongoDB ; exigée par `config.js` **si l'un des trois stocks vaut `mongo`** et utilisée au démarrage du serveur (`backend/src/server.js`) seulement dans ce cas ; facultative quand `CORE_STORE`, `REFERENCE_STORE` et `AUDIT_STORE` valent tous `oracle` (si fournie, elle doit rester une URL valide) |
 | `CORE_STORE` | `mongo` | Support du noyau : régions, structures, périodes, utilisateurs, modules, saisies, remarques |
 | `REFERENCE_STORE` | `mongo` | Support des profils et des listes de référence |
 | `AUDIT_STORE` | `mongo` | Support du journal d'audit |
@@ -156,6 +156,9 @@ Le serveur refuse de démarrer si :
 
 - `JWT_SECRET` fait moins de 32 caractères, vaut `change-me-in-production-sigbd-2026` ou vaut
   la valeur d'exemple `votre-secret-jwt-d-au-moins-32-caracteres-ici` ;
+- `MONGODB_URI` est absente (ou n'est pas une URL valide) alors qu'au moins un des trois
+  stocks vaut `mongo` — message `MONGODB_URI est requis : …` (refus valable dans tous les
+  environnements) ;
 - une variable `ORACLE_*` est définie ou qu'un des trois interrupteurs vaut `oracle`, sans
   `ORACLE_USER` ou sans `ORACLE_PASSWORD` ;
 - `ORACLE_PASSWORD` vaut la valeur d'exemple `votre-mot-de-passe-oracle-ici`.
@@ -189,8 +192,9 @@ npm run install:all        # racine, backend, frontend (package.json)
 npm run setup              # backend/.env + frontend/.env si absents, JWT_SECRET aléatoire
 ```
 
-Puis éditez `backend/.env` : `NODE_ENV=production`, `JWT_SECRET` sur mesure, `MONGODB_URI`,
-`TRUST_PROXY=true`, et les variables de la section 3.3.
+Puis éditez `backend/.env` : `NODE_ENV=production`, `JWT_SECRET` sur mesure, `TRUST_PROXY=true`,
+et les variables de la section 3.3 (`MONGODB_URI` compris, sauf si les trois stocks sont sur
+Oracle).
 
 ### 4.2 Schéma Oracle (mode Oracle)
 
@@ -397,7 +401,7 @@ voir README, section « Sauvegarde et restauration ». Ces commandes exigent `mo
 | 1 | Connexion Oracle | `npm run db:oracle:ping` | `Oracle OK — version … — service …`, code 0 |
 | 2 | Schéma présent | `npm run db:oracle:schema` sur un schéma vierge | `Schéma Oracle créé : 27 objets` (sur un schéma déjà posé, ce contrôle n'est pas réexécutable) |
 | 3 | Idempotence des données de référence | `npm run seed:ref --prefix backend` (second exécution) | 0 création, tout en déjà présent |
-| 4 | Démarrage de l'API | `npm start --prefix backend` | connexion MongoDB établie puis message de démarrage sur `PORT` (`backend/src/server.js`) |
+| 4 | Démarrage de l'API | `npm start --prefix backend` | `✅ MongoDB connecté` si un stockage est sur MongoDB (rien sinon), `✅ Oracle connecté` si un stockage est sur Oracle (rien sinon), puis message de démarrage sur `PORT` (`backend/src/server.js`) |
 | 5 | Sauvegarde | `npm run db:backup:oracle` puis `node backend/src/scripts/verify-backup-oracle.js` | fichier créé, comptes > 0, somme de contrôle vérifiée |
 | 6 | Recette fonctionnelle | [RECETTE.md](RECETTE.md), scénarios T-01 à T-12 (mode Oracle : section 5 du même document) | critères d'acceptation de chaque scénario |
 | 7 | Contrôle des droits | RECETTE T-09 : un rôle hors périmètre reçoit 403 ou 404 | aucune action interdite ne renvoie 200 |
@@ -462,7 +466,7 @@ et doivent toutes être écartées avant la mise en service.
 | Comptes de démonstration | IM `104562`, `108231`, `120344`, `123009`, `121775`, … + mot de passe de démonstration | Le seed de démonstration est refusé en production sans `SEED_ALLOW_PRODUCTION=true` (à ne pas définir) | `backend/src/seed/guard.js`, README |
 | Mot de passe provisoire du premier admin | format `Xxx-Xxx-Xxx`, affiché une fois | Changement forcé à la première connexion (`mustChangePassword`) ; le confier hors échange numérique si possible | `backend/src/scripts/create-admin.js`, `backend/src/services/auth.js` |
 | Variables du conteneur Oracle de développement | `ORACLE_PASSWORD`, `APP_USER`, `APP_USER_PASSWORD` : obligatoires mais **jamais** écrits dans le fichier | Développement uniquement, à ne pas réutiliser en production | `docker-compose.yml` |
-| Identifiants MongoDB | aucune valeur d'exemple de mot de passe dans le dépôt (URI sans authentification) | Authentification de l'instance de production à préciser : **[À CONFIRMER]** (point 1 de la section 1.2) | `backend/.env.example` |
+| Identifiants MongoDB | aucune valeur d'exemple de mot de passe dans le dépôt (URI sans authentification) | Sans objet si les trois stocks sont sur Oracle (aucune instance MongoDB à prévoir) ; sinon, authentification de l'instance de production à préciser : **[À CONFIRMER]** (point 1 de la section 1.2) | `backend/.env.example` |
 
 Après la mise en service : créer les comptes réels par l'Admin 1 (mots de passe provisoires
 générés par le serveur), puis désactiver tout compte de test resté en place.
@@ -471,11 +475,13 @@ générés par le serveur), puis désactiver tout compte de test resté en place
 
 ## 9. Limites connues
 
-1. **MongoDB reste indispensable au démarrage.** Le serveur établit toujours une connexion
-   MongoDB (`backend/src/server.js`) et sort en erreur s'il échoue ; `seed:ref` fait de même
-   (`backend/src/seed/reference.js`). En conséquence, `MONGODB_URI` est **obligatoire** dans la
-   configuration même si `CORE_STORE`, `REFERENCE_STORE` et `AUDIT_STORE` valent tous `oracle`
-   (`backend/src/config.js`). Une instance MongoDB joignable doit donc rester disponible.
+1. **MongoDB n'est indispensable au démarrage que si un stockage l'utilise.** Le serveur ne
+   connecte MongoDB que si l'un des trois stocks vaut `mongo` (`backend/src/server.js` via
+   `mongoRequis`, `backend/src/config.js`) ; avec `CORE_STORE`, `REFERENCE_STORE` et
+   `AUDIT_STORE` tous à `oracle`, il démarre **sans `MONGODB_URI`** et n'ouvre qu'Oracle (testé
+   par `backend/tests/demarrage.test.js`). En revanche `seed:ref` ouvre toujours une connexion
+   MongoDB avant d'écrire (`backend/src/seed/reference.js`) : ce script reste à lancer avec une
+   `MONGODB_URI` joignable (section 4.4), y compris en mode Oracle.
 2. **Les scripts ne servent pas le client.** Aucun `express.static` dans `backend/src` : le
    reverse proxy doit distribuer `frontend/dist` et router `/api` (section 1.3).
 3. **Aucune planification intégrée.** Sauvegardes, archivage et vérifications sont des

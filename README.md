@@ -59,7 +59,7 @@ Puis adaptez les valeurs, notamment `JWT_SECRET` en production.
 
 Variables backend (`.env`) :
 - `NODE_ENV` : `development` | `production` | `test` (défaut: `development`)
-- `MONGODB_URI` : URI de connexion MongoDB (défaut: `mongodb://127.0.0.1:27017/sigbd`)
+- `MONGODB_URI` : URI de connexion MongoDB (défaut: `mongodb://127.0.0.1:27017/sigbd`) — obligatoire sauf si `CORE_STORE`, `REFERENCE_STORE` et `AUDIT_STORE` valent tous `oracle`
 - `PORT` : Port du serveur API (défaut: `4000`)
 - `JWT_SECRET` : **Secret JWT (minimum 32 caractères, OBLIGATOIRE en production, ne jamais utiliser la valeur par défaut)**
 - `SESSION_TIMEOUT_MINUTES` : Délai d'inactivité glissant en minutes (défaut: `30`)
@@ -110,7 +110,7 @@ une implémentation Oracle (`*Oracle.js`). Le choix est relu **à chaque appel**
 | `ORACLE_TEST_USER` | (vide) | Identifiants de test, lus **uniquement** quand `NODE_ENV=test` (effacés sinon) |
 | `ORACLE_TEST_PASSWORD` | (vide) | idem |
 | `ORACLE_TEST_CONNECT_STRING` | (vide) | idem |
-| `MONGODB_URI` | `mongodb://127.0.0.1:27017/sigbd` | URI MongoDB ; **reste obligatoire** : le serveur s'y connecte au démarrage (`backend/src/server.js`), quel que soit le choix des interrupteurs |
+| `MONGODB_URI` | `mongodb://127.0.0.1:27017/sigbd` | URI MongoDB ; **exigée tant qu'au moins un des trois stocks vaut `mongo`** : le serveur ne connecte MongoDB que si un stockage en a besoin (`backend/src/server.js`). Avec les trois stocks à `oracle`, la variable est facultative (si elle est fournie, elle doit rester une URL valide, mais rien ne s'y connecte) |
 
 Sans `ORACLE_*` et avec les trois interrupteurs à `mongo` (valeurs par défaut), l'application
 tourne entièrement sur MongoDB, comme au départ.
@@ -183,7 +183,7 @@ le schéma dans [docs/SCHEMA_ORACLE.md](docs/SCHEMA_ORACLE.md) et la mise en pro
   - `ORACLE_PASSWORD` : mot de passe (jamais journalisé ni renvoyé au client)
   - `ORACLE_CONNECT_STRING` (défaut `127.0.0.1:1521/XEPDB1`)
   - `ORACLE_POOL_MIN` (défaut `1`), `ORACLE_POOL_MAX` (défaut `10`)
-- `MONGODB_URI` reste obligatoire même en mode Oracle (connexion établie au démarrage du serveur).
+- `MONGODB_URI` n'est exigée que si l'un des trois stocks reste sur MongoDB : avec les trois stocks sur Oracle, le serveur démarre sans MongoDB et n'ouvre qu'Oracle (`backend/src/server.js`).
 
 ### Démarrer Oracle (Docker, développement uniquement)
 
@@ -254,8 +254,9 @@ Pour initialiser une base de production (ou de préproduction) avec les structur
 Les listes CSV proviennent de sources web non officielles et doivent être confirmées par le SSEBF. Les 3 structures centrales (SSEBF, DGBF, CELLULE_INFO) sont créées par le script. Les périodes sont générées par `init:periodes` (voir « Générer les périodes »). Les utilisateurs ne sont **pas** importés (ils sont saisis dans l'interface).
 
 En mode Oracle, ces mêmes commandes s'appliquent : les scripts écrivent dans le support désigné
-par `CORE_STORE` / `REFERENCE_STORE` / `AUDIT_STORE`. `MONGODB_URI` reste toutefois obligatoire
-dans la configuration (le serveur s'y connecte au démarrage) mais n'est plus la cible d'écriture.
+par `CORE_STORE` / `REFERENCE_STORE` / `AUDIT_STORE`. `MONGODB_URI` n'est exigée dans la
+configuration que si l'un des trois stocks reste sur MongoDB (le serveur ne s'y connecte alors
+qu'en cas de besoin) ; avec les trois stocks sur Oracle, elle peut être absente.
 
 ## Générer les périodes
 

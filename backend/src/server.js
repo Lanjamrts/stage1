@@ -4,7 +4,8 @@ import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser';
 import mongoSanitize from 'express-mongo-sanitize';
 import mongoose from 'mongoose';
-import { loadConfig } from './config.js';
+import { loadConfig, mongoRequis, oracleRequis } from './config.js';
+import { pingOracle, closeOracle, messageErreurOracle } from './db/oracle.js';
 
 import authRoutes from './routes/auth.js';
 import moduleRoutes from './routes/modules.js';
@@ -94,19 +95,89 @@ app.use((err, req, res, next) => {
 });
 
 // Démarrer le serveur (sauté en environnement de test : supertest importe
-// l'app et Mongo est connecté par le setup des tests)
-async function startServer() {
-  try {
-    await mongoose.connect(config.MONGODB_URI);
-    console.log('✅ MongoDB connecté');
+// l'app et Mongo est connecté par le setup des tests).
+// Étape 44 : chaque base n'est ouverte que si un stockage en a besoin, et
+// toujours AVANT l'écoute, pour échouer vite avec un message clair (jamais
+// d'identifiant). Les journaux « ✅ MongoDB connecté » / « ✅ Oracle connecté »
+// n'apparaissent que si la connexion correspondante a réellement été établie.
+let serveurHttp = null;
+let arretementEnCours = false;
+const DELAI_ARRET_MS = 10000;
 
-    app.listen(PORT, () => {
-      console.log(`🚀 Serveur démarré sur le port ${PORT}`);
-    });
-  } catch (error) {
-    console.error('❌ Erreur de connexion à MongoDB:', error);
-    process.exit(1);
+export async function startServer() {
+  if (mongoRequis(config)) {
+    try {
+      await mongoose.connect(config.MONGODB_URI);
+      console.log('✅ MongoDB connecté');
+    } catch (error) {
+      console.error('❌ Erreur de connexion à MongoDB:', error);
+      process.exit(1);
+    }
   }
+
+  if (oracleRequis(config)) {
+    try {
+      const ping = await pingOracle();
+      if (!ping || ping.test !== 'OK') {
+        throw new Error('Requête de test Oracle sans réponse attendue.');
+      }
+      console.log('✅ Oracle connecté');
+    } catch (error) {
+      console.error('❌ Erreur de connexion à Oracle:', messageErreurOracle(error));
+      process.exit(1);
+    }
+  }
+
+  installerArretPropre();
+  serveurHttp = app.listen(PORT, () => {
+    console.log(`🚀 Serveur démarré sur le port ${PORT}`);
+  });
+}
+
+// Ferme le serveur HTTP : on libère d'abord les connexions inactives (keep-alive)
+// pour que close() ne se bloque pas sur un client qui garde son socket ouvert.
+async function fermerServeurHttp() {
+  if (!serveurHttp) return;
+  if (typeof serveurHttp.closeIdleConnections === 'function') {
+    serveurHttp.closeIdleConnections();
+  }
+  await new Promise((resolve) => serveurHttp.close(() => resolve()));
+  serveurHttp = null;
+}
+
+// Arrêt propre (étape 44) : serveur HTTP, puis MongoDB s'il est connecté et
+// pool Oracle s'il est ouvert ; code de sortie 0. Un second signal ne fait
+// rien (pas de blocage) ; au-delà de 10 s, sortie forcée avec le code 1.
+export function arreterProprement() {
+  if (arretementEnCours) return;
+  arretementEnCours = true;
+
+  const sortieForcee = setTimeout(() => {
+    console.error(`⏱ Arrêt forcé après ${DELAI_ARRET_MS / 1000} s.`);
+    process.exit(1);
+  }, DELAI_ARRET_MS);
+
+  (async () => {
+    try {
+      await fermerServeurHttp();
+      if (mongoose.connection.readyState === 1) {
+        await mongoose.disconnect();
+      }
+      await closeOracle();
+    } catch (error) {
+      console.error("Erreur pendant l'arrêt:", error?.message || error);
+    } finally {
+      clearTimeout(sortieForcee);
+      process.exit(0);
+    }
+  })();
+}
+
+// Posé au démarrage réel du serveur seulement : importer l'app en test ne
+// doit pas installer de gestionnaire de signaux dans le processus de test.
+export function installerArretPropre() {
+  process.on('SIGTERM', arreterProprement);
+  process.on('SIGINT', arreterProprement);
 }
 
 if (config.NODE_ENV !== 'test') {
