@@ -7,7 +7,9 @@ dotenv.config();
 
 const configSchema = z.object({
   JWT_SECRET: z.string().min(32, 'JWT_SECRET doit contenir au moins 32 caractères'),
-  MONGODB_URI: z.string().url('MONGODB_URI doit être une URL valide'),
+  // Optionnel : exigé plus bas (parseEnv) seulement si au moins un stockage
+  // reste sur MongoDB (étape 44). Si fourni, il doit rester une URL valide.
+  MONGODB_URI: z.string().url('MONGODB_URI doit être une URL valide').optional(),
   PORT: z.coerce.number().int().positive().default(4000),
   SESSION_TIMEOUT_MINUTES: z.coerce.number().int().positive().default(30),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
@@ -39,6 +41,22 @@ const configSchema = z.object({
 const DEFAULT_TEST_JWT_SECRET = 'test-secret-key-for-testing-only-do-not-use-in-production-32chars';
 const ORACLE_PASSWORD_EXAMPLE = 'votre-mot-de-passe-oracle-ici';
 
+// Message affiché quand au moins un stockage est sur MongoDB sans MONGODB_URI.
+const MESSAGE_MONGODB_URI_ABSENTE =
+  "MONGODB_URI est requis : au moins un stockage (CORE_STORE, REFERENCE_STORE, AUDIT_STORE) utilise MongoDB. " +
+  "Définissez MONGODB_URI ou passez les trois stocks à 'oracle'.";
+
+// Oracle est nécessaire dès qu'un des trois stocks vaut 'oracle'.
+export function oracleRequis(config) {
+  return [config.AUDIT_STORE, config.REFERENCE_STORE, config.CORE_STORE].includes('oracle');
+}
+
+// Mongo est nécessaire dès qu'un des trois stocks n'est pas 'oracle'
+// (défaut 'mongo' : une valeur absente compte comme MongoDB).
+export function mongoRequis(config) {
+  return [config.AUDIT_STORE, config.REFERENCE_STORE, config.CORE_STORE].some((store) => store !== 'oracle');
+}
+
 let config;
 
 export function parseEnv(env) {
@@ -48,6 +66,12 @@ export function parseEnv(env) {
     throw new Error(`Configuration invalide: ${errors}`);
   }
   const data = parsed.data;
+
+  // MongoDB n'est exigé que si au moins un stockage y est rattaché : les trois
+  // stocks sur Oracle autorisent un démarrage sans MONGODB_URI (étape 44).
+  if (mongoRequis(data) && !data.MONGODB_URI) {
+    throw new Error(MESSAGE_MONGODB_URI_ABSENTE);
+  }
 
   if (data.NODE_ENV === 'production') {
     if (data.JWT_SECRET === 'votre-secret-jwt-d-au-moins-32-caracteres-ici') {
